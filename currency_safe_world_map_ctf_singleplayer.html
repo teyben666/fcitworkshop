@@ -1,0 +1,4182 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1280" />
+    <title>Currency Safe · 金库行动</title>
+    <!-- ===== 字体 ===== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,700;14..32,900&display=swap" rel="stylesheet" />
+    <style>
+        /* ============================================================
+           CSS — 2D Live Cyber Threat Map
+           ============================================================ */
+        :root {
+            --bg: #020805;
+            --bg2: #04130d;
+            --panel: rgba(7, 24, 15, 0.82);
+            --panel2: rgba(7, 18, 14, 0.92);
+            --line: rgba(77, 255, 166, 0.18);
+            --line-2: rgba(77, 255, 166, 0.09);
+            --text: #ecfff5;
+            --muted: #96cdb3;
+            --green: #5aff9a;
+            --green-2: #27db74;
+            --cyan: #71ffe8;
+            --amber: #ffd65a;
+            --red: #ff6e79;
+            --glow: 0 0 0 1px rgba(90, 255, 154, 0.08), 0 0 24px rgba(77, 255, 166, 0.12), inset 0 0 30px rgba(77, 255, 166, 0.05);
+            --shadow: 0 24px 80px rgba(0, 0, 0, 0.58);
+            --radius: 22px;
+            --game-gap: 16px;
+            --content-w: min(1560px, 97vw);
+            --content-pad: 12px;
+            --content-inset: calc((100vw - var(--content-w)) / 2 + var(--content-pad));
+        }
+        * {
+            box-sizing: border-box;
+        }
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+        body {
+            margin: 0;
+            min-width: 1100px;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 50% 0%, rgba(90, 255, 154, 0.12), transparent 28%),
+                radial-gradient(circle at 100% 10%, rgba(113, 255, 232, 0.08), transparent 22%),
+                radial-gradient(circle at 0% 100%, rgba(90, 255, 154, 0.08), transparent 20%),
+                linear-gradient(155deg, #010503 0%, #03100b 52%, #010503 100%);
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background-image:
+                linear-gradient(var(--line-2) 1px, transparent 1px),
+                linear-gradient(90deg, var(--line-2) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: .8;
+            mask-image: linear-gradient(to bottom, #000, transparent 96%);
+        }
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background: linear-gradient(to bottom, transparent 0 48%, rgba(90, 255, 154, 0.035) 50%, transparent 52%);
+            background-size: 100% 5px;
+            opacity: .55;
+            mix-blend-mode: screen;
+        }
+        .mouse-glow {
+            position: fixed;
+            z-index: 1;
+            pointer-events: none;
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(90, 255, 154, 0.16), transparent 68%);
+            filter: blur(14px);
+            transform: translate(-50%, -50%);
+        }
+        .app {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            align-items: flex-start;
+            flex-shrink: 0;
+            width: 100%;
+            margin-bottom: 12px;
+            z-index: 50;
+            padding: 14px var(--content-inset) 12px;
+            background: linear-gradient(180deg, rgba(2, 8, 5, 0.96) 72%, rgba(2, 8, 5, 0.88) 100%);
+            backdrop-filter: blur(16px) saturate(1.15);
+            -webkit-backdrop-filter: blur(16px) saturate(1.15);
+            border-bottom: 1px solid rgba(77, 255, 166, 0.14);
+            box-shadow: 0 10px 36px rgba(0, 0, 0, 0.38);
+        }
+        .brand {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+        .logo.logo-img {
+            font-size: 0;
+            background: rgba(5, 16, 12, 0.92);
+        }
+        .logo.logo-img::after {
+            display: none;
+        }
+        .logo.logo-img img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            position: relative;
+            z-index: 1;
+        }
+        .logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
+            display: grid;
+            place-items: center;
+            font-size: 30px;
+            background: linear-gradient(145deg, rgba(90, 255, 154, 0.16), rgba(113, 255, 232, 0.08));
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow), inset 0 0 30px rgba(90, 255, 154, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .logo::after {
+            content: "";
+            position: absolute;
+            inset: -120%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+            animation: shine 5s infinite;
+        }
+        @keyframes shine {
+            0%,
+            45% {
+                transform: translateX(-120%) rotate(18deg);
+            }
+            100% {
+                transform: translateX(120%) rotate(18deg);
+            }
+        }
+        h1 {
+            margin: 0;
+            font-size: 2.35rem;
+            line-height: .95;
+            letter-spacing: -.06em;
+        }
+        .subtitle {
+            margin-top: 8px;
+            color: var(--muted);
+            max-width: 820px;
+            line-height: 1.55;
+        }
+        .hud {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .pill {
+            min-width: 134px;
+            padding: 10px 12px;
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            background: linear-gradient(180deg, rgba(5, 20, 13, 0.9), rgba(5, 16, 12, 0.76));
+            box-shadow: var(--glow), 0 14px 34px rgba(0, 0, 0, 0.26);
+        }
+        .pill small {
+            display: block;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            font-size: .66rem;
+            margin-bottom: 4px;
+        }
+        .pill span {
+            font-weight: 900;
+            color: var(--text);
+        }
+        .pill.pill-match {
+            min-width: 118px;
+            border-color: rgba(113, 255, 232, 0.35);
+            background: linear-gradient(180deg, rgba(8, 28, 22, 0.95), rgba(5, 18, 14, 0.82));
+            box-shadow: var(--glow), 0 0 20px rgba(113, 255, 232, 0.08);
+        }
+        .pill.pill-match span {
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.06em;
+            color: var(--cyan);
+        }
+        .layout {
+            flex: 1;
+            min-height: 0;
+            width: var(--content-w);
+            margin: 0 auto;
+            padding: 0 var(--content-pad) var(--content-pad);
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: var(--game-gap);
+            align-items: stretch;
+        }
+        .card {
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: linear-gradient(180deg, rgba(7, 20, 15, 0.9), rgba(4, 14, 10, 0.82));
+            box-shadow: var(--shadow), inset 0 0 35px rgba(90, 255, 154, 0.03);
+            backdrop-filter: blur(14px);
+        }
+        .map-card {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            height: 100%;
+        }
+        .map-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(4, 16, 11, 0.78);
+        }
+        .map-top h2,
+        .panel-title h2 {
+            margin: 0;
+            font-size: 1.05rem;
+            letter-spacing: -.03em;
+        }
+        .legend {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            color: var(--muted);
+            font-size: .82rem;
+        }
+        .map-wrap.attacks-hidden .threat-scanline {
+            display: none;
+        }
+        .map-wrap.attacks-hidden .scan-labels .bl {
+            display: none;
+        }
+        /* ---------- 2D 威胁地图 ---------- */
+        .map-wrap {
+            position: relative;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+            background: #030810;
+            cursor: grab;
+        }
+        #threat-map {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+        #threatMapCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .threat-map-markers {
+            position: absolute;
+            inset: 0;
+            z-index: 6;
+            pointer-events: none;
+        }
+        .threat-marker {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            pointer-events: auto;
+            cursor: pointer;
+            text-align: center;
+        }
+        .threat-marker-dot {
+            display: block;
+            width: 12px;
+            height: 12px;
+            margin: 0 auto;
+            border-radius: 50%;
+            background: #44ddff;
+            box-shadow: 0 0 12px rgba(68, 221, 255, 0.8);
+        }
+        .threat-marker.target .threat-marker-dot {
+            width: 16px;
+            height: 16px;
+            transform: rotate(45deg);
+        }
+        .threat-marker.player .threat-marker-dot {
+            width: 14px;
+            height: 14px;
+        }
+        .threat-marker-pulse {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 28px;
+            height: 28px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 1px solid rgba(255, 68, 85, 0.5);
+            animation: threat-pulse 2s ease-out infinite;
+            pointer-events: none;
+        }
+        .threat-marker.player .threat-marker-pulse,
+        .threat-marker.ai .threat-marker-pulse { display: none; }
+        @keyframes threat-pulse {
+            0% { transform: translate(-50%, -50%) scale(0.6); opacity: 0.9; }
+            100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
+        }
+        .threat-marker-label {
+            display: block;
+            margin-top: 4px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+            background: rgba(0, 0, 0, 0.55);
+            border: 1px solid rgba(144, 255, 196, 0.2);
+            color: #96cdb3;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+        }
+        .threat-marker.target .threat-marker-label {
+            color: #ff8a93;
+            border-color: rgba(255, 110, 121, 0.5);
+            background: rgba(40, 10, 14, 0.7);
+        }
+        .threat-marker.player .threat-marker-label {
+            color: #ffd65a;
+            border-color: rgba(255, 214, 90, 0.4);
+        }
+        .city-flash-marker {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: rgba(255, 214, 90, 0.9);
+            box-shadow: 0 0 24px rgba(255, 214, 90, 0.95);
+            z-index: 7;
+            pointer-events: none;
+            animation: city-flash 1.2s ease-in-out infinite;
+            display: none;
+        }
+        @keyframes city-flash {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.5; }
+        }
+        .threat-scanline {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(0, 200, 255, 0.35), transparent);
+            box-shadow: 0 0 12px rgba(0, 200, 255, 0.4);
+            z-index: 3;
+            pointer-events: none;
+            animation: threat-scan 4s linear infinite;
+        }
+        @keyframes threat-scan {
+            0% { top: 0; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        /* 覆盖层 — 浮在威胁地图之上 */
+        .nuclear-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 3;
+            background:
+                radial-gradient(circle at 50% 50%, rgba(0, 140, 255, 0.06), transparent 45%),
+                radial-gradient(circle at 20% 80%, rgba(255, 60, 80, 0.04), transparent 35%);
+        }
+        .sweep-ring {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 62%;
+            aspect-ratio: 1;
+            transform: translate(-50%, -50%);
+            border: 1px solid rgba(90, 255, 154, 0.12);
+            border-radius: 50%;
+            box-shadow: 0 0 0 70px rgba(90, 255, 154, 0.03), 0 0 0 140px rgba(90, 255, 154, 0.02);
+            pointer-events: none;
+            z-index: 3;
+        }
+        .sweep-ring::before,
+        .sweep-ring::after {
+            content: "";
+            position: absolute;
+            inset: 18%;
+            border-radius: 50%;
+            border: 1px solid rgba(90, 255, 154, 0.11);
+        }
+        .sweep-ring::after {
+            inset: 36%;
+        }
+        .scan-labels {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 4;
+            color: rgba(144, 255, 196, 0.5);
+            font-size: .72rem;
+            font-weight: 800;
+            letter-spacing: .1em;
+        }
+        .scan-labels span {
+            position: absolute;
+        }
+        .scan-labels .tl {
+            left: 14px;
+            top: 10px;
+        }
+        .scan-labels .tr {
+            right: 14px;
+            top: 10px;
+        }
+        .scan-labels .bl {
+            left: 14px;
+            bottom: 10px;
+        }
+        .scan-labels .br {
+            right: 14px;
+            bottom: 10px;
+        }
+        /* 路线层 (2D SVG) */
+        .route-layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+        /* 地图顶部 — 排名前三 + 我的排名 */
+        .map-rank-bar {
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            top: 12px;
+            z-index: 10;
+            display: grid;
+            gap: 10px;
+            grid-template-columns: repeat(3, 1fr) minmax(148px, 1.12fr);
+            pointer-events: none;
+        }
+        .map-rank-card.is-me {
+            border-color: rgba(255, 214, 90, 0.45);
+            background: rgba(28, 22, 8, 0.88);
+        }
+        .map-rank-card.is-me b { color: var(--amber); }
+        .map-rank-placeholder b { color: var(--muted); }
+        /* 地图底部 — 战场统计 */
+        .map-stats-bar {
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            bottom: 16px;
+            z-index: 10;
+            display: grid;
+            gap: 10px;
+            grid-template-columns: repeat(4, 1fr);
+            pointer-events: none;
+        }
+        .map-zoom-hint {
+            position: absolute;
+            right: 14px;
+            bottom: 88px;
+            z-index: 11;
+            padding: 6px 10px;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: rgba(4, 16, 11, 0.82);
+            color: var(--muted);
+            font-size: 0.72rem;
+            pointer-events: none;
+        }
+        .stat-mini {
+            padding: 12px;
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            background: rgba(4, 16, 11, 0.84);
+            box-shadow: var(--glow);
+            pointer-events: auto;
+        }
+        .stat-mini b {
+            display: block;
+            font-size: 1.05rem;
+            color: var(--green);
+        }
+        .stat-mini span {
+            color: var(--muted);
+            font-size: .82rem;
+        }
+
+        /* ---------- 侧边栏 ---------- */
+        .side {
+            min-height: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .mission-panel {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .mission-scroll {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            scrollbar-gutter: stable;
+        }
+        .tabs {
+            flex-shrink: 0;
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(4, 16, 11, 0.72);
+            overflow: auto;
+        }
+        .tab {
+            white-space: nowrap;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--muted);
+            padding: 10px 12px;
+            border-radius: 14px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: .18s;
+        }
+        .tab.active {
+            background: var(--green-2);
+            color: #021008;
+            border-color: transparent;
+            box-shadow: 0 12px 26px rgba(39, 219, 116, 0.16);
+        }
+        .section {
+            display: none;
+            padding: 18px;
+        }
+        .section.active {
+            display: block;
+            animation: fade .22s ease both;
+        }
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .panel-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .tag {
+            padding: 6px 9px;
+            border-radius: 999px;
+            background: rgba(90, 255, 154, 0.14);
+            color: var(--green);
+            font-size: .76rem;
+            font-weight: 950;
+            border: 1px solid rgba(90, 255, 154, 0.18);
+        }
+        .muted {
+            color: var(--muted);
+            line-height: 1.58;
+        }
+        .notice {
+            padding: 12px 13px;
+            border-radius: 16px;
+            border: 1px solid rgba(90, 255, 154, 0.18);
+            background: rgba(90, 255, 154, 0.06);
+            color: #ddffe9;
+            line-height: 1.55;
+            font-size: .92rem;
+        }
+        .warning {
+            border-color: rgba(255, 110, 121, 0.26);
+            background: rgba(255, 110, 121, 0.07);
+            color: #ffe5e8;
+        }
+        .success {
+            border-color: rgba(90, 255, 154, 0.24);
+            background: rgba(90, 255, 154, 0.09);
+            color: #e4fff0;
+        }
+        label {
+            display: block;
+            margin: 12px 0 6px;
+            color: var(--muted);
+            font-size: .84rem;
+            font-weight: 900;
+            letter-spacing: .02em;
+        }
+        input,
+        select,
+        textarea {
+            width: 100%;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            padding: 12px 13px;
+            font: inherit;
+            outline: none;
+        }
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 4px rgba(113, 255, 232, 0.08);
+        }
+        select option {
+            background: #04120d;
+            color: #fff;
+        }
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        button {
+            border: 0;
+            padding: 12px 14px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 950;
+            color: #03110a;
+            background: var(--amber);
+            transition: .18s ease;
+            box-shadow: 0 10px 24px rgba(255, 214, 90, 0.16);
+            font-family: inherit;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+        button:disabled {
+            cursor: not-allowed;
+            opacity: .46;
+            transform: none;
+            filter: grayscale(.4);
+        }
+        button.secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            border: 1px solid var(--line);
+            box-shadow: none;
+        }
+        button.green {
+            background: var(--green-2);
+            color: #021008;
+        }
+        button.red {
+            background: rgba(255, 110, 121, 0.16);
+            color: #fff;
+            border: 1px solid rgba(255, 110, 121, 0.3);
+            box-shadow: none;
+        }
+        button.cyan {
+            background: var(--cyan);
+            color: #022017;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid var(--line);
+            margin: 16px 0;
+        }
+        .safe-note {
+            font-size: .82rem;
+            color: var(--muted);
+            line-height: 1.5;
+            margin-top: 10px;
+        }
+        .puzzle-grid {
+            display: grid;
+            gap: 10px;
+        }
+        .puzzle-card {
+            padding: 14px;
+            border-radius: 18px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .puzzle-card h3 {
+            margin: 0 0 8px;
+            font-size: 1rem;
+        }
+        .cipher {
+            padding: 11px;
+            border-radius: 12px;
+            background: #010705;
+            border: 1px solid rgba(90, 255, 154, 0.15);
+            font-family: SFMono-Regular, Consolas, monospace;
+            color: #e5fff0;
+            margin: 8px 0;
+            word-break: break-word;
+        }
+        .question-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 6px 0 8px;
+        }
+        .mini-badge {
+            padding: 5px 8px;
+            border-radius: 999px;
+            font-size: .72rem;
+            font-weight: 950;
+            border: 1px solid var(--line);
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .reveal {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px dashed rgba(255, 214, 90, 0.35);
+            background: rgba(255, 214, 90, 0.06);
+            color: #fff6d0;
+            font-weight: 900;
+        }
+        .password-board {
+            display: grid;
+            gap: 10px;
+        }
+        .frag-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .frag-box {
+            padding: 12px;
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.03);
+            text-align: center;
+        }
+        .frag-box b {
+            display: block;
+            font-size: 1.15rem;
+            color: var(--amber);
+            min-height: 28px;
+            letter-spacing: .12em;
+        }
+        .frag-box span {
+            color: var(--muted);
+            font-size: .8rem;
+        }
+        .scoreboard {
+            display: grid;
+            gap: 8px;
+            max-height: 390px;
+            overflow: auto;
+            padding-right: 2px;
+        }
+        .score-row {
+            display: grid;
+            grid-template-columns: 40px 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .rank {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: rgba(90, 255, 154, 0.08);
+            color: var(--green);
+            font-weight: 950;
+        }
+        .score-row b {
+            display: block;
+        }
+        .score-row span {
+            color: var(--muted);
+            font-size: .82rem;
+        }
+        .money {
+            color: var(--green);
+            font-weight: 950;
+        }
+        .transactions {
+            display: grid;
+            gap: 8px;
+            max-height: 280px;
+            overflow: auto;
+        }
+        .tx {
+            padding: 10px 12px;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--muted);
+            line-height: 1.45;
+            font-size: .9rem;
+        }
+        .tx strong {
+            color: var(--text);
+        }
+        .checklist {
+            padding: 0;
+            list-style: none;
+            display: grid;
+            gap: 8px;
+            margin: 12px 0 0;
+        }
+        .checklist li {
+            padding: 10px 12px;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--muted);
+            line-height: 1.45;
+        }
+        .checklist strong {
+            color: var(--text);
+        }
+        /* ---------- 特工小游戏 (8-15) ---------- */
+        .mission-steps {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .mission-step {
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            font-size: .72rem;
+            font-weight: 900;
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .mission-step.done {
+            color: #021008;
+            background: var(--green-2);
+            border-color: transparent;
+        }
+        .mission-step.active {
+            color: var(--cyan);
+            border-color: rgba(113, 255, 232, 0.35);
+            box-shadow: 0 0 16px rgba(113, 255, 232, 0.12);
+        }
+        .mini-game-card {
+            padding: 14px;
+            border-radius: 18px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.03);
+            margin-bottom: 12px;
+        }
+        .mini-game-card.locked {
+            opacity: .45;
+            pointer-events: none;
+        }
+        .mini-game-card.solved {
+            border-color: rgba(90, 255, 154, 0.35);
+            background: rgba(90, 255, 154, 0.05);
+        }
+        .mini-game-card h3 {
+            margin: 0 0 8px;
+            font-size: 1rem;
+        }
+        .typing-stage {
+            text-align: center;
+            padding: 8px 0;
+        }
+        .typing-giant-char {
+            font-size: clamp(3.5rem, 12vw, 5.5rem);
+            font-weight: 900;
+            color: var(--amber);
+            line-height: 1;
+            animation: char-bounce 0.9s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(255, 214, 90, 0.45);
+        }
+        @keyframes char-bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-8px) scale(1.06); }
+        }
+        .typing-progress {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 10px 0;
+            font-family: SFMono-Regular, Consolas, monospace;
+            letter-spacing: .14em;
+        }
+        .typing-progress span {
+            width: 1.1rem;
+            text-align: center;
+            color: var(--muted);
+        }
+        .typing-progress span.done { color: var(--green); }
+        .typing-progress span.cur { color: var(--amber); font-weight: 900; }
+        .arc-bar-wrap {
+            height: 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--line);
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .arc-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--red), var(--amber));
+            transition: width .12s linear;
+        }
+        .arc-bar-fill.safe {
+            background: linear-gradient(90deg, var(--green-2), var(--cyan));
+        }
+        .signal-warn {
+            animation: signal-flash .45s ease 2;
+        }
+        @keyframes signal-flash {
+            0%, 100% { box-shadow: none; }
+            50% { box-shadow: 0 0 0 3px rgba(255, 214, 90, 0.55); }
+        }
+        .coin-burst {
+            position: fixed;
+            z-index: 55;
+            pointer-events: none;
+            font-weight: 900;
+            color: var(--amber);
+            font-size: 1.1rem;
+            animation: coin-fly .8s ease-out forwards;
+        }
+        @keyframes coin-fly {
+            to { transform: translateY(-70px); opacity: 0; }
+        }
+        .dial-row {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 16px 0;
+            padding: 14px 10px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 214, 90, 0.14);
+            background: linear-gradient(180deg, rgba(8, 22, 16, 0.92), rgba(4, 12, 9, 0.88));
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.35);
+        }
+        .slot-reel {
+            width: 68px;
+            user-select: none;
+            touch-action: none;
+        }
+        .slot-reel.interactive {
+            cursor: grab;
+        }
+        .slot-reel.interactive.slot-dragging {
+            cursor: grabbing;
+        }
+        .slot-reel-window {
+            height: 144px;
+            overflow: hidden;
+            border-radius: 16px;
+            border: 2px solid rgba(255, 214, 90, 0.32);
+            background: linear-gradient(180deg, #0c1a14 0%, #050f0b 42%, #050f0b 58%, #0c1a14 100%);
+            box-shadow: inset 0 10px 18px rgba(0, 0, 0, 0.55), inset 0 -10px 18px rgba(0, 0, 0, 0.55), 0 0 22px rgba(90, 255, 154, 0.06);
+            position: relative;
+        }
+        .slot-reel-window::before,
+        .slot-reel-window::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 46px;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .slot-reel-window::before {
+            top: 0;
+            background: linear-gradient(180deg, rgba(5, 14, 10, 0.96), transparent);
+        }
+        .slot-reel-window::after {
+            bottom: 0;
+            background: linear-gradient(0deg, rgba(5, 14, 10, 0.96), transparent);
+        }
+        .slot-reel-highlight {
+            position: absolute;
+            left: 5px;
+            right: 5px;
+            top: 50%;
+            height: 48px;
+            transform: translateY(-50%);
+            border: 1px solid rgba(255, 214, 90, 0.45);
+            border-radius: 11px;
+            box-shadow: 0 0 18px rgba(255, 214, 90, 0.12), inset 0 0 12px rgba(255, 214, 90, 0.06);
+            pointer-events: none;
+            z-index: 1;
+        }
+        .slot-reel-strip {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            will-change: transform;
+            transition: transform 0.2s cubic-bezier(0.22, 0.85, 0.28, 1);
+        }
+        .slot-reel-strip.no-transition {
+            transition: none;
+        }
+        .slot-cell {
+            height: 48px;
+            display: grid;
+            place-items: center;
+            font-size: 1.55rem;
+            font-weight: 900;
+            color: rgba(150, 205, 179, 0.45);
+            letter-spacing: 0.04em;
+        }
+        .slot-reel.match .slot-reel-window {
+            border-color: rgba(90, 255, 154, 0.55);
+            box-shadow: inset 0 0 20px rgba(90, 255, 154, 0.08), 0 0 20px rgba(90, 255, 154, 0.12);
+        }
+        .slot-reel.match .slot-reel-highlight {
+            border-color: rgba(90, 255, 154, 0.55);
+            box-shadow: 0 0 20px rgba(90, 255, 154, 0.2);
+        }
+        .slot-reel.fixed .slot-reel-window {
+            border-color: rgba(113, 255, 232, 0.38);
+        }
+        .slot-reel.fixed .slot-cell {
+            color: var(--cyan);
+        }
+        .transfer-reward-display {
+            font-size: 1.35rem;
+            font-weight: 900;
+            color: var(--amber);
+            padding: 8px 0 4px;
+        }
+        .transfer-perf-hint {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin: 0 0 10px;
+        }
+        .slot-reel.solved .slot-cell {
+            color: var(--green);
+        }
+        .slot-hint {
+            margin-top: 7px;
+            font-size: 0.68rem;
+            color: var(--muted);
+            text-align: center;
+            letter-spacing: 0.04em;
+        }
+        .slot-machine-label {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--amber);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            opacity: 0.85;
+        }
+        .dial-actions {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        .dial-reset-btn {
+            padding: 8px 18px;
+            font-size: 0.82rem;
+        }
+        .vault-grid-wrap {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            max-width: 280px;
+            margin: 12px auto;
+        }
+        .vault-cell {
+            aspect-ratio: 1;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.04);
+            display: grid;
+            place-items: center;
+            font-size: .85rem;
+            cursor: pointer;
+            user-select: none;
+            transition: .15s;
+        }
+        .vault-cell.laser {
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(255, 110, 121, 0.28),
+                rgba(255, 110, 121, 0.28) 4px,
+                rgba(255, 60, 80, 0.15) 4px,
+                rgba(255, 60, 80, 0.15) 8px
+            );
+            border-color: rgba(255, 110, 121, 0.55);
+            cursor: not-allowed;
+            font-size: 1rem;
+        }
+        .vault-cell.laser.scan-laser-flash {
+            animation: scan-laser-pulse 0.55s ease-in-out infinite;
+            box-shadow: 0 0 14px rgba(255, 110, 121, 0.55);
+        }
+        @keyframes scan-laser-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.72; }
+        }
+        .vault-cell.laser-warn {
+            background: rgba(255, 214, 90, 0.2);
+            border-color: rgba(255, 214, 90, 0.5);
+        }
+        .vault-cell.path {
+            background: rgba(90, 255, 154, 0.18);
+            border-color: rgba(90, 255, 154, 0.4);
+            position: relative;
+        }
+        .vault-cell.path::after {
+            content: "✓";
+            position: absolute;
+            bottom: 2px;
+            right: 4px;
+            font-size: .6rem;
+            color: var(--green);
+        }
+        .vault-cell.start { color: var(--cyan); font-weight: 900; }
+        .vault-cell.safe {
+            background: rgba(90, 255, 154, 0.22);
+            border-color: rgba(90, 255, 154, 0.45);
+        }
+        .vault-cell.goal { color: var(--amber); font-weight: 900; }
+        .vault-cell.goal-pulse {
+            animation: goal-pulse 0.9s ease-in-out infinite;
+            box-shadow: 0 0 16px rgba(255, 214, 90, 0.45);
+        }
+        @keyframes goal-pulse {
+            0%, 100% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.06); filter: brightness(1.25); }
+        }
+        .vault-cell.vault-fog {
+            display: grid !important;
+            place-items: center;
+            background: repeating-linear-gradient(
+                -45deg,
+                #041510,
+                #041510 3px,
+                #071a14 3px,
+                #071a14 6px
+            );
+            border-color: rgba(77, 255, 166, 0.12);
+            color: rgba(144, 255, 196, 0.25);
+        }
+        .vault-cell.revealed-safe {
+            background: rgba(90, 255, 154, 0.14);
+            border-color: rgba(90, 255, 154, 0.35);
+        }
+        .vault-hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            background: rgba(4, 16, 11, 0.75);
+        }
+        .vault-shields { font-size: 1.15rem; letter-spacing: .12em; }
+        .vault-scout-banner {
+            flex: 1;
+            text-align: center;
+            font-size: .86rem;
+            color: var(--cyan);
+            font-weight: 700;
+        }
+        .vault-grid-wrap.signal-warn {
+            animation: signal-flash .45s ease 2;
+        }
+        .vault-scan-btn {
+            background: rgba(255, 110, 121, 0.2) !important;
+            color: #ffe5e8 !important;
+            border: 1px solid rgba(255, 110, 121, 0.45) !important;
+            box-shadow: none !important;
+            width: 100%;
+            margin-top: 8px;
+        }
+        .vault-scan-btn:disabled { opacity: .4; }
+        .vault-start-btn {
+            background: linear-gradient(135deg, rgba(77, 255, 166, 0.35), rgba(45, 200, 120, 0.25)) !important;
+            color: #e8fff3 !important;
+            border: 1px solid rgba(77, 255, 166, 0.55) !important;
+            box-shadow: 0 0 18px rgba(77, 255, 166, 0.2) !important;
+            width: 100%;
+            margin-top: 10px;
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: .08em;
+        }
+        .vault-start-wrap {
+            margin-top: 10px;
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px dashed rgba(77, 255, 166, 0.35);
+            background: rgba(4, 20, 14, 0.6);
+            text-align: center;
+        }
+        .vault-start-wrap p {
+            margin: 0 0 12px;
+            font-size: .86rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+        .vault-cell.current-path {
+            box-shadow: 0 0 0 2px var(--green);
+        }
+        .footprint-code {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px dashed rgba(113, 255, 232, 0.35);
+            background: rgba(113, 255, 232, 0.06);
+            font-family: SFMono-Regular, Consolas, monospace;
+            font-size: 1.2rem;
+            letter-spacing: .25em;
+            text-align: center;
+            color: var(--cyan);
+        }
+        .intercept-arc {
+            display: none !important;
+        }
+        .intercept-packet {
+            filter: drop-shadow(0 0 8px rgba(255, 214, 90, 0.9));
+        }
+        .intercept-energy-wrap { margin: 8px 0; }
+        .intercept-energy-wrap small { color: var(--muted); font-size: .75rem; }
+        .intercept-energy-bar {
+            height: 8px; border-radius: 999px;
+            background: rgba(255,255,255,.06); border: 1px solid var(--line); overflow: hidden;
+        }
+        .intercept-energy-fill {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, var(--cyan), var(--green-2));
+            transition: width .2s ease;
+        }
+        .cipher-strip {
+            display: flex; gap: 6px; justify-content: center; margin: 10px 0;
+            font-family: SFMono-Regular, Consolas, monospace; font-weight: 900;
+        }
+        .cipher-strip span {
+            padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line);
+            background: rgba(0,0,0,.35); animation: strip-pulse 1.2s ease infinite;
+        }
+        .cipher-strip span:nth-child(2) { animation-delay: .15s; }
+        .cipher-strip span:nth-child(3) { animation-delay: .3s; }
+        @keyframes strip-pulse {
+            0%, 100% { opacity: .7; transform: translateY(0); }
+            50% { opacity: 1; transform: translateY(-3px); }
+        }
+        .agent-note {
+            margin-top: 10px; padding: 10px 12px; border-radius: 12px;
+            border: 1px solid rgba(113, 255, 232, 0.25);
+            background: rgba(113, 255, 232, 0.06); color: #c8fff5;
+            font-size: .86rem; line-height: 1.5;
+        }
+        .mission-step.clickable { cursor: pointer; }
+        .mission-step.clickable:hover { filter: brightness(1.15); }
+        .mission-step.locked-step { opacity: .5; cursor: not-allowed; }
+        .arc-route-label {
+            position: absolute; left: 16px; top: 52px; z-index: 7;
+            padding: 6px 10px; border-radius: 10px;
+            background: rgba(4,16,11,.88); border: 1px solid var(--line);
+            font-size: .78rem; color: var(--muted); pointer-events: none; max-width: 90%;
+        }
+        .overlay-modal {
+            position: fixed; inset: 0; z-index: 70; display: none;
+            place-items: center; background: rgba(0,0,0,.82); padding: 20px;
+        }
+        .overlay-modal.show { display: grid; }
+        .overlay-box {
+            text-align: center; padding: 28px; border-radius: 24px;
+            border: 1px solid var(--line);
+            background: linear-gradient(180deg, #071710, #04110c);
+            max-width: 420px; animation: fade .3s ease;
+        }
+        .overlay-box h2 { margin: 0 0 8px; font-size: 1.5rem; }
+        .overlay-box p { color: var(--muted); line-height: 1.55; }
+        .vault-door-icon {
+            font-size: 4rem; margin: 12px 0; animation: char-bounce 1s ease infinite;
+        }
+        .toast {
+            position: fixed;
+            z-index: 30;
+            left: 50%;
+            bottom: 24px;
+            transform: translateX(-50%) translateY(80px);
+            opacity: 0;
+            pointer-events: none;
+            transition: .25s ease;
+            background: var(--green-2);
+            color: #021008;
+            padding: 14px 18px;
+            border-radius: 999px;
+            font-weight: 950;
+            box-shadow: var(--shadow);
+            max-width: min(92vw, 760px);
+            text-align: center;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 40;
+            display: none;
+            place-items: center;
+            background: rgba(0, 0, 0, 0.74);
+            padding: 20px;
+        }
+        .modal.show {
+            display: grid;
+        }
+        .modal-box {
+            width: min(760px, 100%);
+            padding: 24px;
+            border-radius: 28px;
+            border: 1px solid var(--line);
+            background: linear-gradient(180deg, #071710, #04110c);
+            box-shadow: var(--shadow);
+        }
+        .modal-box h2 {
+            margin: 0 0 10px;
+        }
+        .modal-box p,
+        .modal-box li {
+            color: var(--muted);
+            line-height: 1.65;
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 16px;
+            pointer-events: none;
+            z-index: 60;
+            animation: fall .9s ease-out forwards;
+            border-radius: 3px;
+        }
+        @keyframes fall {
+            to {
+                transform: translate(var(--x), var(--y)) rotate(650deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 鼠标光晕 ===== -->
+    <div class="mouse-glow" id="mouseGlow"></div>
+
+    <!-- ===== 应用主体 ===== -->
+    <main class="app">
+        <!-- 头部 -->
+        <header>
+            <div class="brand">
+                <div class="logo logo-img"><img src="logo-dark.png" alt="Currency Safe" /></div>
+                <div>
+                    <h1>Currency Safe: 金库行动</h1>
+                </div>
+            </div>
+            <div class="hud">
+                <div class="pill pill-match"><small>比赛时间</small><span id="hudMatchTime">--:--</span></div>
+                <div class="pill"><small>Player Team</small><span id="hudTeam">None</span></div>
+                <div class="pill"><small>Balance</small>RM <span id="hudBalance">0</span></div>
+                <div class="pill"><small>Your Password Timer</small><span id="hudTimer">05:00</span></div>
+                <div class="pill"><small>Computer Teams</small><span id="hudTeams">0</span></div>
+            </div>
+        </header>
+
+        <!-- 主布局 -->
+        <div class="layout">
+            <!-- 地图卡片 -->
+            <section class="card map-card">
+                <div class="map-top">
+                    <h2>Malaysia Cyber Threat Map</h2>
+                    <div class="legend"><span>🟡 You</span><span>🔴 Selected Target</span><span>🟢 Computer Team</span><span>⚠️ Rotation Expired</span></div>
+                </div>
+                <div class="map-wrap" id="mapWrap">
+                    <div id="threat-map">
+                        <canvas id="threatMapCanvas"></canvas>
+                        <div class="threat-map-markers" id="threatMapMarkers"></div>
+                        <div class="city-flash-marker" id="cityFlashMarker"></div>
+                    </div>
+                    <div class="threat-scanline"></div>
+
+                    <!-- 覆盖层：角落标签 -->
+                    <div class="scan-labels">
+                        <span class="tl">MALAYSIA THREAT MAP</span>
+                        <span class="tr">LIVE SIMULATION · RM</span>
+                        <span class="bl">ATTACK TRAFFIC · ACTIVE</span>
+                        <span class="br">CLASSROOM SAFE MODE</span>
+                    </div>
+                    <!-- 拦截转账弧线 -->
+                    <div class="intercept-arc" id="interceptArc" style="display:none">
+                        <div class="arc-route-label" id="arcRouteLabel"></div>
+                        <svg viewBox="0 0 643 316" preserveAspectRatio="xMidYMid meet">
+                            <path id="interceptPath" fill="none" stroke="rgba(255,214,90,.7)" stroke-width="3" stroke-dasharray="8 8"/>
+                            <circle id="interceptDot" class="intercept-packet" r="10" fill="#ffd65a"/>
+                        </svg>
+                    </div>
+                    <!-- 路线层 (2D SVG) -->
+                    <svg class="route-layer" id="routeLayer" viewBox="0 0 643 316" preserveAspectRatio="xMidYMid meet"></svg>
+                    <!-- 底部统计 -->
+                    <div class="map-rank-bar" id="mapLeaderboard"></div>
+                    <div class="map-zoom-hint">滚轮缩放 · 左键拖拽平移</div>
+                    <div class="map-stats-bar">
+                        <div class="stat-mini"><b id="totalMoney">RM 0</b><span>地图总资金</span></div>
+                        <div class="stat-mini"><b id="totalTransfers">0</b><span>成功转账</span></div>
+                        <div class="stat-mini"><b id="currentTarget">—</b><span>当前目标</span></div>
+                        <div class="stat-mini"><b id="missionReward">—</b><span>本次夺取</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 侧边栏 -->
+            <aside class="side">
+                <section class="card mission-panel">
+                    <div class="tabs">
+                        <button class="tab active" data-tab="register">特工入职</button>
+                        <button class="tab" data-tab="attack">截获任务</button>
+                        <button class="tab" data-tab="score">战绩榜</button>
+                    </div>
+
+                    <div class="mission-scroll">
+                    <!-- Register -->
+                    <div class="section active" id="register">
+                        <div class="panel-title"><h2>特工入职登记</h2><span class="tag">单人任务</span></div>
+                        <p class="muted">领取你的特工代号与金库密码，并选择金库所在的州属。5 支敌方电脑金库将分布在马来西亚各州。攻破后敌方会自动换密码。</p>
+                        <label>特工代号</label>
+                        <input id="teamName" maxlength="24" placeholder="例如：暗影金库小队" />
+                        <label>金库密码 <span class="muted">(6–9 位大写字母或数字，课堂模拟用)</span></label>
+                        <input id="teamPassword" maxlength="9" placeholder="例如：SAFE2024" />
+                        <label>特工等级</label>
+                        <select id="agentRank">
+                            <option value="trainee" selected>见习特工（推荐 · 慢弧线 · 2 次容错 · 固定激光）</option>
+                            <option value="elite">精英特工（更快 · 更少容错 · 无提示）</option>
+                        </select>
+                        <label>金库所在州属</label>
+                        <select id="playerState"></select>
+                        <div class="buttons">
+                            <button class="green" id="registerBtn">开始马来西亚行动</button>
+                            <button class="secondary" id="howBtn">任务简报</button>
+                        </div>
+                        <div class="safe-note">请勿使用真实银行密码。这是课堂安全模拟。</div>
+                    </div>
+
+                    <!-- Attack -->
+                    <div class="section" id="attack">
+                        <div class="panel-title"><h2>马来西亚截获控制台</h2><span class="tag">三关闯关 → 解锁金库</span></div>
+                        <div id="attackNotice" class="notice">先完成特工入职，然后点击威胁地图上的敌方金库选择目标。</div>
+                        <div class="row">
+                            <div>
+                                <label>你的特工队</label>
+                                <input id="playerDisplay" disabled value="Not registered" />
+                            </div>
+                            <div>
+                                <label>目标敌方金库</label>
+                                <select id="targetTeamSelect"></select>
+                            </div>
+                        </div>
+                        <div class="buttons">
+                            <button class="cyan" id="selectTargetBtn">重新部署任务</button>
+                            <button class="secondary" id="refreshIntelBtn">刷新情报</button>
+                        </div>
+                        <hr />
+                        <div class="mission-steps" id="missionSteps">
+                            <span class="mission-step" data-step="0">① 拦截转账码</span>
+                            <span class="mission-step" data-step="1">② 破译坐标</span>
+                            <span class="mission-step" data-step="2">③ 潜入网格</span>
+                        </div>
+                        <div class="password-board">
+                            <div class="frag-row">
+                                <div class="frag-box"><b id="frag1">???</b><span>密钥片段 1</span></div>
+                                <div class="frag-box"><b id="frag2">???</b><span>密钥片段 2</span></div>
+                                <div class="frag-box"><b id="frag3">???</b><span>密钥片段 3</span></div>
+                            </div>
+                            <div class="notice">完成三个特工小游戏，每关揭示一段金库密钥。组合后即可解锁转账。</div>
+                        </div>
+                        <div class="puzzle-grid" id="puzzleGrid"></div>
+                        <label>组合后的金库密钥</label>
+                        <input id="passwordGuess" maxlength="9" placeholder="三段片段组合" />
+                        <div class="buttons">
+                            <button class="green" id="autofillBtn">自动填入片段</button>
+                            <button class="green" id="breachBtn">破解金库门锁</button>
+                        </div>
+                        <div id="transferPanel" class="notice success" style="display:none; margin-top:12px">
+                            <strong>金库已破解！模拟转账已授权。</strong><br/>
+                            将敌方金库的模拟资金转入你的特工账户。
+                            <div class="row">
+                                <div>
+                                    <label>Transfer To</label>
+                                    <input id="transferTo" disabled />
+                                </div>
+                                <div>
+                                    <label>夺取金额</label>
+                                    <div class="transfer-reward-display" id="transferRewardDisplay">RM —</div>
+                                    <p class="transfer-perf-hint" id="transferPerfHint">完成三关后按表现结算夺取金额</p>
+                                </div>
+                            </div>
+                            <button class="green" id="transferBtn">确认转账</button>
+                        </div>
+                    </div>
+
+                    <!-- Scoreboard -->
+                    <div class="section" id="score">
+                        <div class="panel-title"><h2>Scoreboard</h2><span class="tag">Ranking</span></div>
+                        <div class="scoreboard" id="scoreboard"></div>
+                        <hr />
+                        <div class="panel-title"><h2>Transaction Log</h2><span class="tag">Audit Trail</span></div>
+                        <div class="transactions" id="transactions"></div>
+                        <div class="buttons">
+                            <button class="secondary" id="exportBtn">Export Report</button>
+                            <button class="red" id="resetBtn">Reset Simulation</button>
+                        </div>
+                    </div>
+                    </div>
+                </section>
+            </aside>
+        </div>
+    </main>
+
+    <!-- ===== Toast / Modal ===== -->
+    <div class="toast" id="toast"></div>
+    <div class="modal" id="howModal">
+        <div class="modal-box">
+            <h2>特工任务简报</h2>
+            <p><strong>安全提醒：</strong>这是课堂模拟。请勿使用真实银行密码或攻击真实网站。</p>
+            <ol>
+                <li>登记特工代号与金库密码（6–9 位大写字母/数字）。</li>
+                <li>5 支敌方金库出现在威胁地图上，点击标记选择目标。</li>
+                <li><strong>游戏1 拦截转账码：</strong>在密钥飘到终点前，按屏幕提示逐字敲出转账密钥。允许错 2 次。</li>
+                <li><strong>游戏2 破译坐标：</strong>拖动老虎机转轮或滚轮破解密电，找出能量核心所在城市。</li>
+                <li><strong>游戏3 潜入网格：</strong>先「开牌」记住 5×5 安全走廊（5–8 秒），再从左上角摸黑走到右下角宝石。3 次护盾容错；热感扫描亮灯 2 秒，只显示换位后的激光。</li>
+                <li>三段密钥组合后破解金库，把模拟资金转入你的账户。</li>
+                <li>见习特工敌方密码 <strong>12 分钟</strong>轮换；闯关进行中会自动暂停轮换。</li>
+                <li>刷新页面会<strong>保留</strong>当前三关进度（已自动存档）。</li>
+            </ol>
+            <div class="notice warning">重新部署任务会重置当前目标的三关。敌方轮换时已完成关卡的情报会保留。</div>
+            <div class="buttons"><button id="closeHowBtn">出发！</button></div>
+        </div>
+    </div>
+
+    <div class="overlay-modal" id="alertUpgradeModal">
+        <div class="overlay-box">
+            <h2>🚨 警报升级！</h2>
+            <p>敌方启动了<strong>动态红外线</strong>！激光会缓慢移动，注意黄灯预警。</p>
+            <div class="buttons" style="justify-content:center;margin-top:16px">
+                <button id="closeAlertUpgrade">继续潜入</button>
+            </div>
+        </div>
+    </div>
+    <div class="overlay-modal" id="vaultDoorModal">
+        <div class="overlay-box">
+            <div class="vault-door-icon">🏦🔓</div>
+            <h2>三段密钥已集齐！</h2>
+            <p>金库大门已解开。组合密钥后点击「破解金库门锁」。</p>
+            <div class="buttons" style="justify-content:center;margin-top:16px">
+                <button class="green" id="closeVaultDoor">破解门锁</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    JavaScript — 2D Live Cyber Threat Map
+    ============================================================ -->
+    <script src="js/malaysia-states.js"></script>
+    <script src="js/map-attack-lines.js"></script>
+    <script>
+        // ==========================================================
+        // Currency Safe V3 — 配置集中 / 课堂优化
+        // 排期见文件末尾 ROADMAP 注释块
+        // ==========================================================
+        const storageKey = "currencySafeSinglePlayerMalaysiaV5";
+        const MAP_CONFIG = {
+            w: 643,
+            h: 316,
+            image: "malaysia.png",
+            showCalibrationGrid: false,
+            showAttacks: true,
+            bounds: { latMin: 0.85, latMax: 7.5, lonMin: 99.0, lonMax: 119.5 }
+        };
+        window.__mapLayout = { wrapW: 0, wrapH: 0, offsetX: 0, offsetY: 0, drawW: 0, drawH: 0, scale: 1 };
+        const GAME_CONFIG = {
+            typingKeywordLen: 6,
+            arcRetreatPerChar: 0.055,
+            arcFailBackoffChars: 2,
+            arcGraceMs: 3000,
+            saveDebounceMs: 2000
+        };
+        const MALAYSIA_STATES = window.MALAYSIA_STATES;
+        const MALAYSIA_CITIES = [
+            { name: "KUALA_LUMPUR", label: "吉隆坡", mapX: 18.9, mapY: 67, lat: 3.139, lon: 101.686 },
+            { name: "GEORGETOWN", label: "槟城", mapX: 8.4, mapY: 29.4, lat: 5.414, lon: 100.329 },
+            { name: "JOHOR_BAHRU", label: "新山", mapX: 35.4, mapY: 87.8, lat: 1.493, lon: 103.741 },
+            { name: "IPOH", label: "怡保", mapX: 13.1, mapY: 40.1, lat: 4.597, lon: 101.090 },
+            { name: "KUCHING", label: "古晋", mapX: 66.6, mapY: 61.3, lat: 1.553, lon: 110.359 },
+            { name: "KOTA_KINABALU", label: "亚庇", mapX: 84.4, mapY: 29.4, lat: 5.980, lon: 116.073 },
+            { name: "MELAKA", label: "马六甲", mapX: 24.3, mapY: 82.9, lat: 2.194, lon: 102.250 },
+            { name: "KUANTAN", label: "关丹", mapX: 27.1, mapY: 58.7, lat: 3.807, lon: 103.326 },
+            { name: "KOTA_BHARU", label: "哥打峇鲁", mapX: 21.9, mapY: 29.9, lat: 6.125, lon: 102.238 },
+            { name: "MIRI", label: "美里", mapX: 64, mapY: 52, lat: 4.399, lon: 113.991 }
+        ];
+
+        let mapZoom = 1;
+        let mapPanX = 0;
+        let mapPanY = 0;
+        const MAP_ZOOM_MIN = 0.85;
+        const MAP_ZOOM_MAX = 2.8;
+
+        function computeMapLayout(wrapW, wrapH) {
+            const baseScale = Math.min(wrapW / MAP_CONFIG.w, wrapH / MAP_CONFIG.h);
+            const scale = baseScale * mapZoom;
+            const drawW = MAP_CONFIG.w * scale;
+            const drawH = MAP_CONFIG.h * scale;
+            return {
+                wrapW, wrapH,
+                offsetX: (wrapW - drawW) / 2 + mapPanX,
+                offsetY: (wrapH - drawH) / 2 + mapPanY,
+                drawW, drawH, scale, baseScale, zoom: mapZoom
+            };
+        }
+
+        function zoomMapAt(wrap, clientX, clientY, deltaY) {
+            if (!wrap) return;
+            const rect = wrap.getBoundingClientRect();
+            const mx = clientX - rect.left;
+            const my = clientY - rect.top;
+            const w = wrap.clientWidth;
+            const h = wrap.clientHeight;
+            const layout = computeMapLayout(w, h);
+            const factor = deltaY < 0 ? 1.12 : 1 / 1.12;
+            const newZoom = Math.max(MAP_ZOOM_MIN, Math.min(MAP_ZOOM_MAX, mapZoom * factor));
+            if (Math.abs(newZoom - mapZoom) < 0.001) return;
+            const mapX = (mx - layout.offsetX) / layout.scale;
+            const mapY = (my - layout.offsetY) / layout.scale;
+            mapZoom = newZoom;
+            if (mapZoom <= 1.001) {
+                mapZoom = 1;
+                mapPanX = 0;
+                mapPanY = 0;
+            } else {
+                const baseScale = Math.min(w / MAP_CONFIG.w, h / MAP_CONFIG.h);
+                const newScale = baseScale * mapZoom;
+                mapPanX = mx - mapX * newScale - (w - MAP_CONFIG.w * newScale) / 2;
+                mapPanY = my - mapY * newScale - (h - MAP_CONFIG.h * newScale) / 2;
+            }
+            if (mapZoom > 1.001) {
+                const arc = $("interceptArc");
+                if (arc) arc.style.display = "none";
+                const rl = $("routeLayer");
+                if (rl) rl.innerHTML = "";
+            }
+            clampMapPan(w, h);
+            if (window.__globeResize) window.__globeResize();
+            if (window.updateTeamMarkers3D) window.updateTeamMarkers3D();
+        }
+
+        function clampMapPan(wrapW, wrapH) {
+            if (mapZoom <= 1.001) {
+                mapPanX = 0;
+                mapPanY = 0;
+                return;
+            }
+            const baseScale = Math.min(wrapW / MAP_CONFIG.w, wrapH / MAP_CONFIG.h);
+            const scale = baseScale * mapZoom;
+            const drawW = MAP_CONFIG.w * scale;
+            const drawH = MAP_CONFIG.h * scale;
+            const maxPanX = Math.max(0, (drawW - wrapW) / 2);
+            const maxPanY = Math.max(0, (drawH - wrapH) / 2);
+            mapPanX = Math.max(-maxPanX, Math.min(maxPanX, mapPanX));
+            mapPanY = Math.max(-maxPanY, Math.min(maxPanY, mapPanY));
+        }
+
+        function setupMapPanning(wrap) {
+            if (!wrap) return;
+            let panning = false;
+            let panMoved = false;
+            let startX = 0;
+            let startY = 0;
+            let startPanX = 0;
+            let startPanY = 0;
+
+            wrap.addEventListener("mousedown", (e) => {
+                if (e.button !== 0) return;
+                if (e.target.closest(".threat-marker")) return;
+                panning = true;
+                panMoved = false;
+                startX = e.clientX;
+                startY = e.clientY;
+                startPanX = mapPanX;
+                startPanY = mapPanY;
+                wrap.classList.add("is-panning");
+            });
+
+            window.addEventListener("mousemove", (e) => {
+                if (!panning) return;
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                if (Math.abs(dx) > 3 || Math.abs(dy) > 3) panMoved = true;
+                mapPanX = startPanX + dx;
+                mapPanY = startPanY + dy;
+                clampMapPan(wrap.clientWidth, wrap.clientHeight);
+                if (window.__globeResize) window.__globeResize();
+                if (window.updateTeamMarkers3D) window.updateTeamMarkers3D();
+            });
+
+            const endPan = () => {
+                if (!panning) return;
+                panning = false;
+                wrap.classList.remove("is-panning");
+                if (panMoved) wrap.dataset.suppressClick = "1";
+            };
+            window.addEventListener("mouseup", endPan);
+            wrap.addEventListener("click", (e) => {
+                if (wrap.dataset.suppressClick === "1") {
+                    wrap.dataset.suppressClick = "";
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
+            }, true);
+        }
+
+        function malaysiaLatLonToXY(lat, lon) {
+            const b = MAP_CONFIG.bounds;
+            return {
+                x: ((lon - b.lonMin) / (b.lonMax - b.lonMin)) * MAP_CONFIG.w,
+                y: ((b.latMax - lat) / (b.latMax - b.latMin)) * MAP_CONFIG.h
+            };
+        }
+
+        function malaysiaImagePercentToWrapPercent(mapX, mapY) {
+            const px = (mapX / 100) * MAP_CONFIG.w;
+            const py = (mapY / 100) * MAP_CONFIG.h;
+            const layout = window.__mapLayout;
+            if (!layout?.wrapW) {
+                return {
+                    x: Math.max(1, Math.min(99, mapX)),
+                    y: Math.max(1, Math.min(99, mapY))
+                };
+            }
+            const x = layout.offsetX + (px / MAP_CONFIG.w) * layout.drawW;
+            const y = layout.offsetY + (py / MAP_CONFIG.h) * layout.drawH;
+            return {
+                x: Math.max(1, Math.min(99, (x / layout.wrapW) * 100)),
+                y: Math.max(1, Math.min(99, (y / layout.wrapH) * 100))
+            };
+        }
+
+        function coordsToMapPercent(obj) {
+            if (obj?.mapX != null && obj?.mapY != null) {
+                return malaysiaImagePercentToWrapPercent(obj.mapX, obj.mapY);
+            }
+            if (obj?.lat != null && obj?.lon != null) {
+                return malaysiaLatLonToPercent(obj.lat, obj.lon);
+            }
+            return { x: obj?.x ?? 50, y: obj?.y ?? 50 };
+        }
+
+        function malaysiaLatLonToPercent(lat, lon) {
+            const p = malaysiaLatLonToXY(lat, lon);
+            const layout = window.__mapLayout;
+            if (!layout?.wrapW) {
+                return {
+                    x: Math.max(1, Math.min(99, (p.x / MAP_CONFIG.w) * 100)),
+                    y: Math.max(1, Math.min(99, (p.y / MAP_CONFIG.h) * 100))
+                };
+            }
+            const x = layout.offsetX + (p.x / MAP_CONFIG.w) * layout.drawW;
+            const y = layout.offsetY + (p.y / MAP_CONFIG.h) * layout.drawH;
+            return {
+                x: Math.max(1, Math.min(99, (x / layout.wrapW) * 100)),
+                y: Math.max(1, Math.min(99, (y / layout.wrapH) * 100))
+            };
+        }
+
+        function getTeamMapPercent(team) {
+            if (!team) return { x: 50, y: 50 };
+            if (team.mapX != null && team.mapY != null) {
+                return malaysiaImagePercentToWrapPercent(team.mapX, team.mapY);
+            }
+            if (team.stateId) {
+                const st = getMalaysiaState(team.stateId);
+                if (st?.mapX != null) return malaysiaImagePercentToWrapPercent(st.mapX, st.mapY);
+            }
+            if (team.lat != null && team.lon != null) return malaysiaLatLonToPercent(team.lat, team.lon);
+            return { x: team.x ?? 50, y: team.y ?? 50 };
+        }
+
+        function getMalaysiaState(id) {
+            return window.getMalaysiaStateById(id);
+        }
+
+        function teamCoordsFromState(state, tight = false) {
+            const spread = tight ? 1.2 : 2.2;
+            const mapX = Math.max(2, Math.min(98, state.mapX + (Math.random() - 0.5) * spread));
+            const mapY = Math.max(2, Math.min(98, state.mapY + (Math.random() - 0.5) * spread));
+            const pct = malaysiaImagePercentToWrapPercent(mapX, mapY);
+            return {
+                ...pct,
+                mapX, mapY,
+                lat: state.lat,
+                lon: state.lon,
+                state: state.label,
+                stateId: state.id,
+                city: state.label
+            };
+        }
+
+        function teamCoordsFromCity(city) {
+            const mapX = Math.max(2, Math.min(98, city.mapX + (Math.random() - 0.5) * 2));
+            const mapY = Math.max(2, Math.min(98, city.mapY + (Math.random() - 0.5) * 2));
+            const pct = malaysiaImagePercentToWrapPercent(mapX, mapY);
+            return { ...pct, mapX, mapY, lat: city.lat, lon: city.lon, city: city.label };
+        }
+
+        function initStateSelect() {
+            const sel = $("playerState");
+            if (!sel) return;
+            sel.innerHTML = MALAYSIA_STATES.map(s =>
+                `<option value="${s.id}">${s.label}</option>`
+            ).join("");
+            sel.value = "selangor";
+        }
+        const aiNames = ["Crimson Vault", "Neon Ledger", "Cipher Harbor", "Omega Mint", "Atlas Credit", "Shadow Bank",
+            "Quantum Safe", "Solar Ledger", "Titan Purse", "Ghost Coin"
+        ];
+        const pinIcons = ["💻", "🔐", "💾", "🛰️", "💰", "🏦", "⚙️", "📡"];
+        const kidPasswordRegex = /^[A-Z0-9]{6,9}$/;
+        const passwordSymbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+        const AGENT_NOTES = {
+            typing: "特工笔记：转账验证码有效期很短，所以要快准狠——就像真正的 2FA 拦截。",
+            dial: "特工笔记：凯撒密码把字母整体移位。坐标城市只是掩护，真正的情报是密电片段。",
+            grid: "特工笔记：先记住安全走廊，再摸黑潜入——就像真实特工的「开牌记忆」训练。",
+        };
+
+        const cityPool = MALAYSIA_CITIES;
+
+        const TRAINEE_CFG = {
+            arcDurationMs: 22000, mistakes: 2, dialHint: "lesson",
+            laserMoveMs: 0, roundMs: 12 * 60 * 1000, showWholeWord: false
+        };
+        const ELITE_CFG = {
+            arcDurationMs: 14000, mistakes: 0, dialHint: false,
+            laserMoveMs: 2500, roundMs: 5 * 60 * 1000, showWholeWord: true
+        };
+
+        const $ = (id) => document.getElementById(id);
+        const toast = $("toast");
+        const mapWrap = $("mapWrap");
+        const routeLayer = $("routeLayer");
+        let routeTimer = null;
+        let typingArcTimer = null;
+        let typingArcStart = 0;
+        let gridScoutTimer = null;
+        let gridMeltdownTimer = null;
+        let gridScanTimeout = null;
+        let audioCtx = null;
+        let saveDebounceTimer = null;
+        let missionStartedAt = null;
+        let activeMissionStep = 0;
+
+        let state = loadState();
+        let currentIntel = state.currentIntel || null;
+        let breachUnlocked = !!state.breachUnlocked;
+
+        function getAgentCfg() {
+            const rank = state.player?.agentRank || $("agentRank")?.value || "trainee";
+            return rank === "elite" ? ELITE_CFG : TRAINEE_CFG;
+        }
+
+        function getRoundMs() { return getAgentCfg().roundMs; }
+
+        function enableAudio() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === "suspended") audioCtx.resume();
+            } catch (_) { /* ignore */ }
+        }
+
+        function playTone(freq, dur = 0.07, type = "square", vol = 0.08) {
+            try {
+                enableAudio();
+                if (!audioCtx) return;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.value = freq;
+                gain.gain.value = vol;
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+                osc.stop(audioCtx.currentTime + dur + 0.01);
+            } catch (_) { /* ignore */ }
+        }
+
+        function playClickSound() { playTone(180 + Math.random() * 40, 0.06); }
+        function playSuccessSound() { playTone(520, 0.12, "sine", 0.1); playTone(780, 0.15, "sine", 0.07); }
+        function playCoinSound() { playTone(880, 0.08, "triangle", 0.09); }
+        function playAlarmSound() { playTone(120, 0.2, "sawtooth", 0.06); }
+
+        function defaultMissionStats() {
+            return { typingFails: 0, dialSpins: 0, gridFails: 0, levelsDone: 0, missionsStarted: 0 };
+        }
+
+        function loadState() {
+            try {
+                const s = JSON.parse(localStorage.getItem(storageKey)) || {};
+                const intel = s.currentIntel || null;
+                if (intel && s.targetId && intel.targetId !== s.targetId) {
+                    // 目标已变，丢弃不匹配的情报
+                }
+                return {
+                    player: s.player || null,
+                    aiTeams: s.aiTeams || [],
+                    targetId: s.targetId || null,
+                    transactions: s.transactions || [],
+                    gridAdvancedUnlocked: !!s.gridAdvancedUnlocked,
+                    dialLessonSeen: !!s.dialLessonSeen,
+                    currentIntel: intel && intel.targetId === s.targetId ? intel : null,
+                    breachUnlocked: !!s.breachUnlocked,
+                    missionStats: s.missionStats || defaultMissionStats(),
+                    matchStartedAt: s.matchStartedAt || null
+                };
+            } catch {
+                return {
+                    player: null, aiTeams: [], targetId: null, transactions: [],
+                    gridAdvancedUnlocked: false, dialLessonSeen: false,
+                    currentIntel: null, breachUnlocked: false, missionStats: defaultMissionStats(),
+                    matchStartedAt: null
+                };
+            }
+        }
+
+        if (state.player && !state.matchStartedAt) {
+            state.matchStartedAt = state.player.passwordUpdatedAt || Date.now();
+        }
+
+        function saveStateImmediate() {
+            state.currentIntel = currentIntel;
+            state.breachUnlocked = breachUnlocked;
+            localStorage.setItem(storageKey, JSON.stringify(state));
+        }
+
+        function saveState() {
+            clearTimeout(saveDebounceTimer);
+            saveDebounceTimer = setTimeout(saveStateImmediate, GAME_CONFIG.saveDebounceMs);
+        }
+
+        function saveStateNow() { clearTimeout(saveDebounceTimer); saveStateImmediate(); }
+
+        function uid() { return "ID" + Math.random().toString(36).slice(2, 8).toUpperCase(); }
+
+        function money(n) { return Number(n || 0).toLocaleString("en-MY"); }
+
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add("show");
+            clearTimeout(showToast.t);
+            showToast.t = setTimeout(() => toast.classList.remove("show"), 2500);
+        }
+
+        function escapeHtml(text) { const div = document.createElement("div");
+            div.textContent = text; return div.innerHTML; }
+
+        function confetti() {
+            for (let i = 0; i < 28; i++) {
+                const c = document.createElement("div");
+                c.className = "confetti";
+                c.style.left = (50 + Math.random() * 10 - 5) + "vw";
+                c.style.top = "40vh";
+                c.style.background = ["#5aff9a", "#71ffe8", "#ffd65a", "#ff6e79"][i % 4];
+                c.style.setProperty("--x", (Math.random() * 520 - 260) + "px");
+                c.style.setProperty("--y", (Math.random() * 340 + 110) + "px");
+                document.body.appendChild(c);
+                setTimeout(() => c.remove(), 900);
+            }
+        }
+
+        function shake(el) { if (!el) return;
+            el.animate([{ transform: "translateX(0)" }, { transform: "translateX(-8px)" }, { transform: "translateX(8px)" },
+                { transform: "translateX(0)" }
+            ], { duration: 260 }); }
+
+        function normalizeAnswer(text) { return (text || "").trim().toUpperCase().replace(/[^A-Z0-9 ]/g, "").replace(/\s+/g,
+            " "); }
+
+        function cleanPassword(value) { return (value || "").trim(); }
+
+        function splitPassword(pass) {
+            const chars = [...pass];
+            const a = Math.ceil(chars.length / 3);
+            const b = Math.ceil((chars.length - a) / 2);
+            return [chars.slice(0, a).join(""), chars.slice(a, a + b).join(""), chars.slice(a + b).join("")].filter(Boolean);
+        }
+
+        function caesar(text, shift) {
+            return [...text].map(ch => {
+                const code = ch.charCodeAt(0);
+                if (code >= 65 && code <= 90) return String.fromCharCode(((code - 65 + shift + 26) % 26) + 65);
+                return ch;
+            }).join("");
+        }
+
+        function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+        function randomPick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+        function randomPassword(len = 8) {
+            let out = "";
+            for (let i = 0; i < len; i++) out += passwordSymbols[Math.floor(Math.random() * passwordSymbols.length)];
+            return out;
+        }
+
+        function getAllTeams() { return state.player ? [state.player, ...state.aiTeams] : [...state.aiTeams]; }
+
+        function getPlayer() { return state.player; }
+
+        function getAI(id) { return state.aiTeams.find(t => t.id === id); }
+
+        function formatRemaining(ms) {
+            const s = Math.max(0, Math.floor(ms / 1000));
+            return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+        }
+
+        function formatElapsed(ms) {
+            const s = Math.max(0, Math.floor(ms / 1000));
+            return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+        }
+
+        function isExpired(team) { return Date.now() - team.passwordUpdatedAt >= getRoundMs(); }
+
+        function autoRotateIfExpired(team) {
+            if (!team || !isExpired(team)) return false;
+            team.password = randomPassword(randomInt(6, 8));
+            team.passwordUpdatedAt = Date.now();
+            return true;
+        }
+
+        function ensurePlayerVaultFresh() {
+            const player = getPlayer();
+            if (!autoRotateIfExpired(player)) return false;
+            saveState();
+            return true;
+        }
+
+        function computeMissionTransferAmount(intel, target) {
+            if (!intel || !target) return { amount: 0, score: 0 };
+            const cfg = getAgentCfg();
+            const games = intel.games || [];
+            if (!games.every(g => g.solved)) return { amount: 0, score: 0 };
+
+            let score = 100;
+            const typing = games.find(g => g.kind === "typing");
+            if (typing) {
+                const used = Math.max(0, cfg.mistakes - (typing.mistakesLeft ?? 0));
+                score -= used * 15;
+            }
+            const dial = games.find(g => g.kind === "dial");
+            if (dial) {
+                const wheels = dial.wheels?.filter(isDialWheelRotatable).length || 1;
+                const extra = Math.max(0, (dial.spinCount || 0) - wheels * 4);
+                score -= Math.min(20, Math.round(extra * 1.5));
+            }
+            const grid = games.find(g => g.kind === "grid");
+            if (grid) {
+                score -= Math.max(0, 3 - (grid.shields ?? 0)) * 12;
+                score -= Math.max(0, 2 - (grid.scansLeft ?? 0)) * 6;
+            }
+            score = Math.max(40, Math.min(100, Math.round(score)));
+            const maxLoot = Math.min(target.balance, 600);
+            let amt = Math.round(maxLoot * score / 100 / 10) * 10;
+            amt = Math.max(50, Math.min(target.balance, amt));
+            return { amount: amt, score };
+        }
+
+        function getMissionTransferPreview() {
+            const target = getAI(state.targetId);
+            if (!target || !currentIntel) return null;
+            const allSolved = currentIntel.games?.every(g => g.solved);
+            if (!allSolved && !breachUnlocked) return null;
+            return computeMissionTransferAmount(currentIntel, target);
+        }
+
+        function updateTransferRewardUI() {
+            const preview = getMissionTransferPreview();
+            const rewardEl = $("transferRewardDisplay");
+            const hintEl = $("transferPerfHint");
+            const mapEl = $("missionReward");
+            if (rewardEl) rewardEl.textContent = preview ? `RM ${money(preview.amount)}` : "RM —";
+            if (hintEl) {
+                hintEl.textContent = preview
+                    ? `表现评分 ${preview.score}%`
+                    : "完成三关后按表现结算夺取金额";
+            }
+            if (mapEl) mapEl.textContent = preview ? `RM ${money(preview.amount)}` : "—";
+        }
+
+        function isMissionActive() {
+            if (!currentIntel || breachUnlocked) return false;
+            return !currentIntel.games.every(g => g.solved);
+        }
+
+        function teamToSvg(team) {
+            if (!team) return { x: MAP_CONFIG.w * 0.5, y: MAP_CONFIG.h * 0.5 };
+            if (team.mapX != null && team.mapY != null) {
+                return { x: (team.mapX / 100) * MAP_CONFIG.w, y: (team.mapY / 100) * MAP_CONFIG.h };
+            }
+            if (team.lat != null && team.lon != null) return malaysiaLatLonToXY(team.lat, team.lon);
+            return { x: (team.x / 100) * MAP_CONFIG.w, y: (team.y / 100) * MAP_CONFIG.h };
+        }
+
+        function getTypingKeyword(password) {
+            const clean = (password || "VAULT9").toUpperCase().replace(/[^A-Z0-9]/g, "");
+            const len = Math.min(GAME_CONFIG.typingKeywordLen, Math.max(5, clean.length));
+            return clean.slice(0, len) || "VAULT9";
+        }
+
+        function onLevelComplete(idx) {
+            state.missionStats.levelsDone = (state.missionStats.levelsDone || 0) + 1;
+            if (idx === 0 && window.flashMapCityPercent) {
+                const target = getAI(state.targetId);
+                if (target) {
+                    const pos = getTeamMapPercent(target);
+                    window.flashMapCityPercent(pos.y, pos.x, target.state || "截获站");
+                }
+            }
+            if (currentIntel?.fragments?.every(Boolean)) {
+                playSuccessSound();
+                $("vaultDoorModal")?.classList.add("show");
+            }
+            saveStateNow();
+        }
+
+        function scrollToMission(step = 0) {
+            activeMissionStep = step;
+            const el = document.getElementById("miniGame" + step) || $("puzzleGrid");
+            el?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        function createAITeams() {
+            const names = [...aiNames].sort(() => Math.random() - 0.5).slice(0, 5);
+            const states = [...MALAYSIA_STATES].sort(() => Math.random() - 0.5).slice(0, 5);
+            return names.map((name, idx) => {
+                const coords = teamCoordsFromState(states[idx % states.length]);
+                return {
+                    id: uid(),
+                    name,
+                    password: randomPassword(8),
+                    balance: randomPick([900, 1000, 1100, 1200, 1300]),
+                    x: coords.x,
+                    y: coords.y,
+                    lat: coords.lat,
+                    lon: coords.lon,
+                    state: coords.state,
+                    stateId: coords.stateId,
+                    city: coords.state,
+                    icon: pinIcons[idx % pinIcons.length],
+                    passwordUpdatedAt: Date.now(),
+                    wins: 0,
+                    losses: 0,
+                    isAI: true
+                };
+            });
+        }
+
+        function registerPlayer() {
+            const name = $("teamName").value.trim().slice(0, 24);
+            const password = cleanPassword($("teamPassword").value).toUpperCase();
+            const agentRank = $("agentRank").value || "trainee";
+            if (!name) { showToast("输入你的特工代号。"); return; }
+            if (!kidPasswordRegex.test(password)) {
+                showToast("密码需 6–9 位大写字母或数字。");
+                shake($("teamPassword"));
+                return;
+            }
+            stopTypingArc();
+            stopGridPhaseTimers();
+            enableAudio();
+            const homeState = getMalaysiaState($("playerState")?.value || "selangor");
+            const playerCoords = teamCoordsFromState(homeState, true);
+            state.player = {
+                id: uid(),
+                name,
+                password,
+                balance: 1000,
+                x: playerCoords.x,
+                y: playerCoords.y,
+                lat: playerCoords.lat,
+                lon: playerCoords.lon,
+                state: playerCoords.state,
+                stateId: playerCoords.stateId,
+                city: playerCoords.state,
+                icon: "🧑",
+                passwordUpdatedAt: Date.now(),
+                wins: 0,
+                losses: 0,
+                isAI: false,
+                agentRank
+            };
+            state.aiTeams = createAITeams();
+            state.targetId = state.aiTeams[0]?.id || null;
+            currentIntel = null;
+            breachUnlocked = false;
+            state.transactions = [];
+            state.missionStats = defaultMissionStats();
+            state.matchStartedAt = Date.now();
+            missionStartedAt = Date.now();
+            saveStateNow();
+            render();
+            showTab("attack");
+            showToast(`马来西亚行动已启动！你的金库在${homeState.label}。点击地图上的敌方金库选择目标。`);
+        }
+
+        // --- 三关特工小游戏情报 ---
+        function shiftLetter(ch, delta) {
+            const code = ch.charCodeAt(0);
+            if (code >= 65 && code <= 90) return String.fromCharCode(((code - 65 + delta + 2600) % 26) + 65);
+            return ch;
+        }
+
+        function shiftDigit(ch, delta) {
+            const code = ch.charCodeAt(0);
+            if (code >= 48 && code <= 57) return String((code - 48 + delta + 100) % 10);
+            return ch;
+        }
+
+        function dialWheelKind(w) {
+            if (w.kind) return w.kind;
+            const t = w.target || w.current;
+            if (t >= "A" && t <= "Z") return "letter";
+            if (t >= "0" && t <= "9") return "digit";
+            return "static";
+        }
+
+        function isDialWheelRotatable(w) {
+            const k = dialWheelKind(w);
+            return k === "letter" || k === "digit";
+        }
+
+        function caesarLettersOnly(text, shift) {
+            return [...text].map(ch => {
+                const code = ch.charCodeAt(0);
+                if (code >= 65 && code <= 90) return String.fromCharCode(((code - 65 + shift + 26) % 26) + 65);
+                return ch;
+            }).join("");
+        }
+
+        function generateTypingGame(fragment, fullPassword, originLabel, targetTeam, playerTeam) {
+            const keyword = getTypingKeyword(fullPassword);
+            const cfg = getAgentCfg();
+            return {
+                kind: "typing",
+                title: "游戏1 · 拦截转账验证码",
+                solved: false,
+                keyword,
+                typedIndex: 0,
+                mistakesLeft: cfg.mistakes,
+                arcProgress: 0,
+                arcGraceUntil: null,
+                interceptEnergy: 0,
+                originLabel: originLabel || "瑞士银行",
+                targetTeam,
+                playerTeam,
+                reveal: fragment,
+                agentNote: AGENT_NOTES.typing
+            };
+        }
+
+        function generateDialGame(fragment) {
+            const cfg = getAgentCfg();
+            const city = randomPick(cityPool);
+            const shift = randomInt(1, 5);
+            const wheels = [...(fragment || "KEY")].map(ch => {
+                const c = ch.toUpperCase();
+                const isLetter = c >= "A" && c <= "Z";
+                const isDigit = c >= "0" && c <= "9";
+                let kind = "static";
+                let current = c;
+                let reelOffset = 0;
+                if (isLetter) {
+                    kind = "letter";
+                    current = shiftLetter(c, shift);
+                    reelOffset = 52 + (current.charCodeAt(0) - 65);
+                } else if (isDigit) {
+                    kind = "digit";
+                    current = shiftDigit(c, shift);
+                    reelOffset = 20 + parseInt(current, 10);
+                }
+                return { kind, isLetter, current, target: c, reelOffset };
+            });
+            const cipherDisplay = wheels.map(w => w.current).join("");
+            let hintMode = false;
+            if (cfg.dialHint === "lesson" && !state.dialLessonSeen) hintMode = "lesson";
+            else if (cfg.dialHint === "lesson" || cfg.dialHint === true) hintMode = "shift";
+            return {
+                kind: "dial",
+                title: "游戏2 · 破译特工坐标密语",
+                solved: false,
+                shift,
+                wheels,
+                cipherDisplay,
+                initialCipher: cipherDisplay,
+                initialWheels: wheels.map(w => ({
+                    current: w.current,
+                    reelOffset: w.reelOffset ?? 0,
+                    isLetter: w.isLetter,
+                    kind: w.kind,
+                    target: w.target
+                })),
+                city,
+                reveal: fragment,
+                hintMode,
+                spinCount: 0,
+                agentNote: AGENT_NOTES.dial
+            };
+        }
+
+        function bfsPath(grid, start, end, size) {
+            const key = (r, c) => `${r},${c}`;
+            const q = [{ r: start.r, c: start.c, path: [{ r: start.r, c: start.c }] }];
+            const seen = new Set([key(start.r, start.c)]);
+            const dirs = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+            while (q.length) {
+                const cur = q.shift();
+                if (cur.r === end.r && cur.c === end.c) return cur.path;
+                for (const [dr, dc] of dirs) {
+                    const nr = cur.r + dr, nc = cur.c + dc;
+                    if (nr < 0 || nc < 0 || nr >= size || nc >= size) continue;
+                    if (grid[nr][nc] === "laser") continue;
+                    const k = key(nr, nc);
+                    if (seen.has(k)) continue;
+                    seen.add(k);
+                    q.push({ r: nr, c: nc, path: [...cur.path, { r: nr, c: nc }] });
+                }
+            }
+            return null;
+        }
+
+        function buildVaultGridLayout(size, start, end, laserCount, pathFrom = start) {
+            for (let attempt = 0; attempt < 80; attempt++) {
+                const grid = Array.from({ length: size }, () => Array(size).fill("safe"));
+                grid[start.r][start.c] = "start";
+                grid[end.r][end.c] = "goal";
+                let placed = 0;
+                while (placed < laserCount) {
+                    const r = randomInt(0, size - 1);
+                    const c = randomInt(0, size - 1);
+                    if ((r === start.r && c === start.c) || (r === end.r && c === end.c)) continue;
+                    if (pathFrom && r === pathFrom.r && c === pathFrom.c) continue;
+                    if (grid[r][c] === "laser") continue;
+                    grid[r][c] = "laser";
+                    placed++;
+                }
+                if (bfsPath(grid, pathFrom || start, end, size)) return grid;
+            }
+            const grid = Array.from({ length: size }, () => Array(size).fill("safe"));
+            grid[start.r][start.c] = "start";
+            grid[end.r][end.c] = "goal";
+            return grid;
+        }
+
+        function generateVaultGrid(fragment) {
+            const size = 5;
+            const start = { r: 0, c: 0 };
+            const end = { r: 4, c: 4 };
+            const grid = buildVaultGridLayout(size, start, end, randomInt(6, 9));
+            return {
+                kind: "grid",
+                title: "游戏3 · 潜入核金库安保网格",
+                solved: false,
+                phase: "ready",
+                scoutCountdown: randomInt(5, 8),
+                size,
+                grid,
+                start,
+                end,
+                playerPos: { r: start.r, c: start.c },
+                playerPath: [{ r: start.r, c: start.c }],
+                revealed: {},
+                shields: 3,
+                scansLeft: 2,
+                meltdownSec: 0,
+                footprint: "",
+                reveal: fragment,
+                agentNote: AGENT_NOTES.grid
+            };
+        }
+
+        function migrateGridGame(game) {
+            repairGridGame(game);
+        }
+
+        function repairGridGame(game) {
+            if (!game || game.kind !== "grid") return;
+            const size = 5;
+            const start = { r: 0, c: 0 };
+            const end = { r: 4, c: 4 };
+            game.size = size;
+            if (!game.start || (game.end?.r === 2 && game.end?.c === 2)) {
+                game.start = start;
+                game.end = end;
+            }
+            const validPhases = ["ready", "scout", "hidden", "scan_flash", "meltdown"];
+            if (!validPhases.includes(game.phase)) game.phase = "ready";
+            if (!game.playerPos) game.playerPos = { r: game.start.r, c: game.start.c };
+            if (!Array.isArray(game.playerPath) || !game.playerPath.length) {
+                game.playerPath = [{ r: game.playerPos.r, c: game.playerPos.c }];
+            }
+            if (!game.revealed || typeof game.revealed !== "object") game.revealed = {};
+            if (typeof game.shields !== "number") game.shields = 3;
+            if (typeof game.scansLeft !== "number") game.scansLeft = 2;
+            if (typeof game.scoutCountdown !== "number") game.scoutCountdown = randomInt(5, 8);
+
+            const gridOk = game.grid && Array.isArray(game.grid) && game.grid.length === size
+                && game.grid.every(row => Array.isArray(row) && row.length === size)
+                && game.grid[game.end.r]?.[game.end.c] === "goal"
+                && game.grid[game.start.r]?.[game.start.c] === "start"
+                && bfsPath(game.grid, game.playerPos, game.end, size);
+
+            if (!gridOk) {
+                game.grid = buildVaultGridLayout(size, game.start, game.end, randomInt(6, 9));
+                if (!game.solved) {
+                    game.playerPos = { r: game.start.r, c: game.start.c };
+                    game.playerPath = [{ r: game.start.r, c: game.start.c }];
+                    game.revealed = {};
+                    if (game.phase !== "scout" && game.phase !== "meltdown" && game.phase !== "scan_flash") {
+                        game.phase = "ready";
+                    }
+                }
+            }
+        }
+
+        if (currentIntel?.games?.[2]) migrateGridGame(currentIntel.games[2]);
+
+        function buildIntelForTarget(team) {
+            if (!team) return null;
+            const frags = splitPassword(team.password);
+            const city = randomPick(cityPool);
+            const origin = `${city.label}（${team.name}）`;
+            const player = getPlayer();
+            state.missionStats.missionsStarted = (state.missionStats.missionsStarted || 0) + 1;
+            missionStartedAt = Date.now();
+            return {
+                targetId: team.id,
+                startedAt: Date.now(),
+                fragments: [null, null, null],
+                games: [
+                    generateTypingGame(frags[0] || "", team.password, origin, team, player),
+                    generateDialGame(frags[1] || ""),
+                    generateVaultGrid(frags[2] || "")
+                ]
+            };
+        }
+
+        function deployTargetIntel(resetAll = true) {
+            const target = getAI($("targetTeamSelect").value || state.targetId);
+            if (!state.player) { showToast("请先完成特工入职。"); return false; }
+            if (!target) { showToast("请选择目标金库。"); return false; }
+            ensurePlayerVaultFresh();
+            stopTypingArc();
+            stopGridPhaseTimers();
+            state.targetId = target.id;
+            if (resetAll || !currentIntel || currentIntel.targetId !== target.id) {
+                currentIntel = buildIntelForTarget(target);
+                breachUnlocked = false;
+                $("passwordGuess").value = "";
+            }
+            saveStateNow();
+            render();
+            typingArcStart = Date.now();
+            if (currentIntel?.games?.[0]) {
+                currentIntel.games[0].arcProgress = 0;
+                currentIntel.games[0].arcGraceUntil = null;
+            }
+            startTypingArcIfNeeded();
+            startGridScoutIfNeeded();
+            showTab("attack");
+            scrollToMission(0);
+            showToast(resetAll ? `任务已部署：${target.name}` : `继续任务：${target.name}`);
+            return true;
+        }
+
+        function loadTargetIntel() { deployTargetIntel(true); }
+
+        // --- 渲染地图：2D 威胁地图标记由 updateTeamMarkers3D 负责 ---
+        function renderMap() {}
+
+        // --- 渲染 HUD ---
+        function renderHud() {
+            const player = getPlayer();
+            const matchEl = $("hudMatchTime");
+            if (matchEl) {
+                matchEl.textContent = state.matchStartedAt
+                    ? formatElapsed(Date.now() - state.matchStartedAt)
+                    : "--:--";
+            }
+            $("hudTeam").textContent = player ? player.name : "None";
+            $("hudBalance").textContent = player ? money(player.balance) : "0";
+            $("hudTeams").textContent = state.aiTeams.length;
+            const remaining = player ? (getRoundMs() - (Date.now() - player.passwordUpdatedAt)) : getRoundMs();
+            $("hudTimer").textContent = formatRemaining(remaining);
+        }
+
+        function renderMapLeaderboard() {
+            const box = $("mapLeaderboard");
+            if (!box) return;
+            const medals = ["🥇", "🥈", "🥉"];
+            const allTeams = getAllTeams().sort((a, b) => b.balance - a.balance);
+            const top3 = allTeams.slice(0, 3);
+            const player = getPlayer();
+            const myRank = player ? allTeams.findIndex(t => t.id === player.id) + 1 : 0;
+            let html = "";
+            for (let i = 0; i < 3; i++) {
+                const team = top3[i];
+                if (team) {
+                    const nameColor = teamStateColor(team);
+                    html += `<div class="stat-mini map-rank-card">` +
+                        `<b>${medals[i]} RM ${money(team.balance)}</b>` +
+                        `<span style="color:${nameColor}">${escapeHtml(team.name)}</span></div>`;
+                } else {
+                    html += `<div class="stat-mini map-rank-card map-rank-placeholder">` +
+                        `<b>${medals[i]} —</b><span>—</span></div>`;
+                }
+            }
+            if (player && myRank > 0) {
+                const nameColor = teamStateColor(player);
+                html += `<div class="stat-mini map-rank-card is-me">` +
+                    `<b>#${myRank} · RM ${money(player.balance)}</b>` +
+                    `<span style="color:${nameColor}">${escapeHtml(player.name)}</span></div>`;
+            } else {
+                html += `<div class="stat-mini map-rank-card is-me map-rank-placeholder">` +
+                    `<b>—</b><span>尚未入职</span></div>`;
+            }
+            box.innerHTML = html;
+        }
+
+        function renderMapStats() {
+            const player = getPlayer();
+            const teams = getAllTeams();
+            if ($("totalMoney")) $("totalMoney").textContent = "RM " + money(teams.reduce((sum, t) => sum + t.balance, 0));
+            if ($("totalTransfers")) $("totalTransfers").textContent = String(state.transactions.length);
+            const target = getAI(state.targetId);
+            if ($("currentTarget")) $("currentTarget").textContent = target ? target.name : "无";
+            updateTransferRewardUI();
+        }
+
+        // --- 渲染表单 ---
+        function renderForms() {
+            const player = getPlayer();
+            $("playerDisplay").value = player ? player.name : "Not registered";
+            $("transferTo").value = player ? player.name : "Not registered";
+
+            $("targetTeamSelect").innerHTML = state.aiTeams.length ? "" :
+            `<option value="">No computer teams yet</option>`;
+            state.aiTeams.forEach(team => {
+                const opt = document.createElement("option");
+                opt.value = team.id;
+                const stateTag = team.state ? ` · ${team.state}` : "";
+                opt.textContent =
+                    `${team.name}${stateTag} · RM ${money(team.balance)} · 轮换 ${formatRemaining(getRoundMs() - (Date.now() - team.passwordUpdatedAt))}`;
+                $("targetTeamSelect").appendChild(opt);
+            });
+            if (state.targetId && state.aiTeams.some(t => t.id === state.targetId)) $("targetTeamSelect").value = state
+                .targetId;
+            else if (state.aiTeams[0]) $("targetTeamSelect").value = state.aiTeams[0].id;
+        }
+
+        // --- 渲染攻击面板 ---
+        function renderAttack() {
+            ensurePlayerVaultFresh();
+            const player = getPlayer();
+            const target = getAI(state.targetId);
+            const notice = $("attackNotice");
+            if (!player) {
+                notice.className = "notice warning";
+                notice.textContent = "请先注册你的队伍。";
+            } else if (!target) {
+                notice.className = "notice";
+                notice.textContent = "请点击地图上的敌方金库标记选择目标。";
+            } else {
+                notice.className = "notice";
+                notice.innerHTML =
+                    `特工 <strong>${escapeHtml(player.name)}</strong> · 目标 <strong>${escapeHtml(target.name)}</strong> · 完成三关小游戏夺取金库密钥。`;
+            }
+
+            if (!currentIntel && target) currentIntel = buildIntelForTarget(target);
+            renderFragments();
+            renderMissionSteps();
+            renderMiniGames();
+            $("breachBtn").disabled = !player || !target;
+            $("transferPanel").style.display = breachUnlocked ? "block" : "none";
+            updateTransferRewardUI();
+        }
+
+        function renderFragments() {
+            const fragEls = [$("frag1"), $("frag2"), $("frag3")];
+            fragEls.forEach((el, i) => {
+                const value = currentIntel?.fragments?.[i];
+                el.textContent = value || "???";
+            });
+        }
+
+        function renderMissionSteps() {
+            const steps = document.querySelectorAll("#missionSteps .mission-step");
+            if (!currentIntel) return;
+            steps.forEach((el, i) => {
+                const solved = currentIntel.games[i]?.solved;
+                const unlocked = isGameUnlocked(i);
+                el.classList.toggle("done", solved);
+                el.classList.toggle("active", !solved && unlocked);
+                el.classList.toggle("clickable", solved || unlocked);
+                el.classList.toggle("locked-step", !solved && !unlocked);
+                el.title = !unlocked && !solved ? "请先完成上一关" : (solved ? "点击查看本关情报" : "当前关卡");
+                el.onclick = () => {
+                    if (!unlocked && !solved) {
+                        showToast("请先完成上一关任务。");
+                        return;
+                    }
+                    scrollToMission(i);
+                };
+            });
+        }
+
+        function isGameUnlocked(idx) {
+            if (!currentIntel) return false;
+            if (idx === 0) return true;
+            return currentIntel.games[idx - 1]?.solved;
+        }
+
+        function spawnCoinBurst() {
+            const el = document.createElement("div");
+            el.className = "coin-burst";
+            el.textContent = "💰 +50";
+            el.style.left = (45 + Math.random() * 10) + "vw";
+            el.style.top = "55vh";
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 900);
+        }
+
+        function isMapMissionAttackActive() {
+            const player = getPlayer();
+            const target = getAI(state.targetId);
+            return !!(player && target && currentIntel && currentIntel.targetId === target.id);
+        }
+
+        function collectMissionAttacks() {
+            if (!isMapMissionAttackActive()) return [];
+            const player = getPlayer();
+            const target = getAI(state.targetId);
+            return player && target ? [{ attacker: player, target }] : [];
+        }
+
+        function teamStateColor(team) {
+            return window.getStateColor?.(team?.stateId) || "#5aff9a";
+        }
+
+        // --- 游戏1：拦截转账码 ---
+        function stopTypingArc() {
+            if (typingArcTimer) { clearInterval(typingArcTimer); typingArcTimer = null; }
+        }
+
+        function updateTypingUI() {
+            const game = currentIntel?.games?.[0];
+            if (!game || game.kind !== "typing") return;
+            const fill = document.getElementById("typingArcFill");
+            const energyFill = document.getElementById("interceptEnergyFill");
+            const giant = document.getElementById("typingGiantChar");
+            const prog = document.getElementById("typingProgress");
+            if (fill) fill.style.width = (game.arcProgress * 100).toFixed(0) + "%";
+            if (energyFill) energyFill.style.width = (game.interceptEnergy * 100).toFixed(0) + "%";
+            if (giant && !game.solved) giant.textContent = game.keyword[game.typedIndex] || "✓";
+            if (prog) {
+                prog.innerHTML = [...game.keyword].map((ch, i) => {
+                    let cls = i < game.typedIndex ? "done" : (i === game.typedIndex && !game.solved ? "cur" : "");
+                    return `<span class="${cls}">${i < game.typedIndex ? ch : (i === game.typedIndex ? "_" : "·")}</span>`;
+                }).join("");
+            }
+        }
+
+        function startTypingArcIfNeeded() {
+            if (typingArcTimer) return;
+            const game = currentIntel?.games?.[0];
+            if (!game || game.kind !== "typing" || game.solved) return;
+            const cfg = getAgentCfg();
+            typingArcStart = Date.now();
+            typingArcTimer = setInterval(() => {
+                if (!currentIntel?.games?.[0] || currentIntel.games[0].solved) {
+                    stopTypingArc();
+                    return;
+                }
+                const g = currentIntel.games[0];
+                const elapsed = Date.now() - typingArcStart;
+                g.arcProgress = Math.min(1, elapsed / cfg.arcDurationMs);
+                updateTypingUI();
+                if (g.arcProgress >= 1) {
+                    if (!g.arcGraceUntil) {
+                        g.arcGraceUntil = Date.now() + GAME_CONFIG.arcGraceMs;
+                        showToast("密钥即将被截走！3 秒内快敲！");
+                        playAlarmSound();
+                    } else if (Date.now() > g.arcGraceUntil) {
+                        g.arcGraceUntil = null;
+                        g.typedIndex = Math.max(0, g.typedIndex - GAME_CONFIG.arcFailBackoffChars);
+                        g.arcProgress = Math.max(0, g.arcProgress - 0.2);
+                        typingArcStart = Date.now();
+                        state.missionStats.typingFails = (state.missionStats.typingFails || 0) + 1;
+                        showToast("敌方用了更长密钥，下次盯紧大字母！进度倒退 2 字。");
+                        saveState();
+                    }
+                }
+            }, 80);
+        }
+
+        function submitTypingChar(key) {
+            const game = currentIntel?.games?.[0];
+            if (!game || game.kind !== "typing" || game.solved || !isGameUnlocked(0)) return;
+            const expected = game.keyword[game.typedIndex];
+            if (key === expected) {
+                game.typedIndex++;
+                game.interceptEnergy = game.typedIndex / game.keyword.length;
+                game.arcProgress = Math.max(0, game.arcProgress - GAME_CONFIG.arcRetreatPerChar);
+                typingArcStart += GAME_CONFIG.arcRetreatPerChar * getAgentCfg().arcDurationMs;
+                game.arcGraceUntil = null;
+                playCoinSound();
+                if (game.typedIndex >= game.keyword.length) {
+                    game.solved = true;
+                    game.interceptEnergy = 1;
+                    currentIntel.fragments[0] = game.reveal;
+                    stopTypingArc();
+                    confetti();
+                    playSuccessSound();
+                    showToast("转账密钥截获成功！片段 1 已到手！");
+                    onLevelComplete(0);
+                    renderFragments();
+                    renderMissionSteps();
+                    renderMiniGames();
+                    scrollToMission(1);
+                    showToast("第二关已解锁：破译特工坐标密语 ↓");
+                    saveStateNow();
+                    return;
+                }
+                renderFragments();
+                renderMissionSteps();
+                updateTypingUI();
+                saveState();
+            } else {
+                if (game.mistakesLeft > 0) {
+                    game.mistakesLeft--;
+                    const card = document.getElementById("typingGameCard");
+                    if (card) { card.classList.add("signal-warn"); setTimeout(() => card.classList.remove("signal-warn"), 500); }
+                    showToast(`信号干扰！还可容错 ${game.mistakesLeft} 次`);
+                } else {
+                    state.missionStats.typingFails = (state.missionStats.typingFails || 0) + 1;
+                    showToast("拦截失败！密钥飘走了，重来！");
+                    game.typedIndex = Math.max(0, game.typedIndex - 1);
+                    game.mistakesLeft = getAgentCfg().mistakes;
+                    typingArcStart = Date.now();
+                }
+                updateTypingUI();
+                saveState();
+            }
+        }
+
+        function handleTypingKey(e) {
+            const attackTab = document.getElementById("attack");
+            if (!attackTab || !attackTab.classList.contains("active")) return;
+            if (e.target && ["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName) && e.target.id !== "typingFocusTrap") return;
+            const game = currentIntel?.games?.[0];
+            if (!game || game.kind !== "typing" || game.solved || !isGameUnlocked(0)) return;
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+            const key = e.key.length === 1 ? e.key.toUpperCase() : "";
+            if (!key) return;
+            e.preventDefault();
+            submitTypingChar(key);
+        }
+
+        function renderTypingGame(game, idx) {
+            const locked = !isGameUnlocked(idx);
+            const cfg = getAgentCfg();
+            const cur = game.keyword[game.typedIndex] || "✓";
+            const eliteWord = cfg.showWholeWord ? `<p class="cipher">整词传输：${escapeHtml(game.keyword)}</p>` : "";
+            return `
+                <div class="mini-game-card ${game.solved ? "solved" : ""} ${locked ? "locked" : ""}" id="miniGame0">
+                    <h3>${game.solved ? "✅" : "💰"} ${game.title}</h3>
+                    <p class="muted">从 <strong>${escapeHtml(game.originLabel)}</strong> 飞向你的基地的转账密钥正在传输！在光点到达前逐字截获。</p>
+                    ${eliteWord}
+                    ${game.solved ? `<div class="reveal">密钥片段：<strong>${escapeHtml(game.reveal)}</strong></div>
+                    <div class="agent-note">${escapeHtml(game.agentNote || "")}</div>` : `
+                    <div class="typing-stage" id="typingGameCard">
+                        <div class="muted">现在敲这个字符 ↓</div>
+                        <div class="typing-giant-char" id="typingGiantChar">${escapeHtml(cur)}</div>
+                        <div class="typing-progress" id="typingProgress"></div>
+                        <div class="intercept-energy-wrap">
+                            <small>拦截能量（满格解锁片段，不再中途刷金币）</small>
+                            <div class="intercept-energy-bar"><div class="intercept-energy-fill" id="interceptEnergyFill" style="width:${(game.interceptEnergy*100).toFixed(0)}%"></div></div>
+                        </div>
+                        <div class="arc-bar-wrap"><div class="arc-bar-fill" id="typingArcFill" style="width:${(game.arcProgress*100).toFixed(0)}%"></div></div>
+                        <p class="muted" style="font-size:.82rem">容错剩余：${game.mistakesLeft} 次 · 敲对一字弧线会回退 · 请用键盘输入</p>
+                        <input id="typingFocusTrap" style="opacity:0;position:absolute;width:1px;height:1px" autocomplete="off" />
+                    </div>`}
+                </div>`;
+        }
+
+        // --- 游戏2：老虎机转轮 ---
+        const SLOT_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const SLOT_DIGITS = "0123456789";
+        const SLOT_ITEM_H = 48;
+        const SLOT_DRAG_PX = 40;
+        const SLOT_CENTER = 52;
+        const SLOT_DIGIT_CENTER = 20;
+
+        function buildSlotStripHtml() {
+            let html = "";
+            for (let copy = 0; copy < 5; copy++) {
+                for (const ch of SLOT_ALPHABET) html += `<span class="slot-cell">${ch}</span>`;
+            }
+            return html;
+        }
+
+        function buildSlotDigitStripHtml() {
+            let html = "";
+            for (let copy = 0; copy < 5; copy++) {
+                for (const ch of SLOT_DIGITS) html += `<span class="slot-cell">${ch}</span>`;
+            }
+            return html;
+        }
+
+        function slotLetterIndex(ch) {
+            return SLOT_ALPHABET.indexOf(String(ch || "").toUpperCase());
+        }
+
+        function defaultReelOffset(letter) {
+            const idx = slotLetterIndex(letter);
+            return idx >= 0 ? SLOT_CENTER + idx : SLOT_CENTER;
+        }
+
+        function defaultDigitReelOffset(digit) {
+            const idx = parseInt(digit, 10);
+            return Number.isFinite(idx) ? SLOT_DIGIT_CENTER + idx : SLOT_DIGIT_CENTER;
+        }
+
+        function normalizeReelOffset(wheel) {
+            const kind = dialWheelKind(wheel);
+            if (kind === "letter") {
+                const idx = slotLetterIndex(wheel.current);
+                if (idx < 0) return false;
+                if (wheel.reelOffset == null || wheel.reelOffset < 20 || wheel.reelOffset > 84) {
+                    wheel.reelOffset = SLOT_CENTER + idx;
+                    return true;
+                }
+                return false;
+            }
+            if (kind === "digit") {
+                const idx = parseInt(wheel.current, 10);
+                if (!Number.isFinite(idx)) return false;
+                if (wheel.reelOffset == null || wheel.reelOffset < 8 || wheel.reelOffset > 32) {
+                    wheel.reelOffset = SLOT_DIGIT_CENTER + idx;
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
+
+        function repairDialGame(game) {
+            if (!game || game.kind !== "dial") return;
+            const shift = game.shift ?? 3;
+            game.wheels.forEach(w => {
+                w.kind = dialWheelKind(w);
+                if (w.kind === "digit" && w.current === w.target && !game.solved) {
+                    w.current = shiftDigit(w.target, shift);
+                }
+                if (w.kind === "letter" && w.reelOffset == null) w.reelOffset = defaultReelOffset(w.current);
+                if (w.kind === "digit" && w.reelOffset == null) w.reelOffset = defaultDigitReelOffset(w.current);
+            });
+            game.cipherDisplay = game.wheels.map(w => w.current).join("");
+            if (!game.initialWheels) {
+                game.initialCipher = game.cipherDisplay;
+                game.initialWheels = game.wheels.map(w => ({
+                    current: w.current,
+                    reelOffset: w.reelOffset ?? 0,
+                    isLetter: w.isLetter,
+                    kind: w.kind,
+                    target: w.target
+                }));
+            } else {
+                let touched = false;
+                game.initialWheels.forEach((init, i) => {
+                    const w = game.wheels[i];
+                    if (!init || !w) return;
+                    init.kind = init.kind || dialWheelKind(w);
+                    if (init.kind === "digit" && init.current === init.target && !game.solved) {
+                        init.current = shiftDigit(init.target, shift);
+                        init.reelOffset = defaultDigitReelOffset(init.current);
+                        touched = true;
+                    }
+                });
+                if (touched) game.initialCipher = game.initialWheels.map(x => x.current).join("");
+            }
+        }
+
+        function updateSlotReelVisual(reelEl, wheel, animate = true) {
+            const strip = reelEl?.querySelector(".slot-reel-strip");
+            if (!strip || strip.classList.contains("static")) return;
+            const kind = dialWheelKind(wheel);
+            const offset = wheel.reelOffset ?? (kind === "digit"
+                ? defaultDigitReelOffset(wheel.current)
+                : defaultReelOffset(wheel.current));
+            strip.classList.toggle("no-transition", !animate);
+            strip.style.transform = `translateY(${-(offset * SLOT_ITEM_H) + SLOT_ITEM_H}px)`;
+            if (!animate) requestAnimationFrame(() => strip.classList.remove("no-transition"));
+        }
+
+        function renderSlotWheel(w, wi, game, idx) {
+            const match = w.current === w.target;
+            const kind = dialWheelKind(w);
+            const rotatable = isDialWheelRotatable(w) && !game.solved;
+            const classes = ["slot-reel", match ? "match" : "", kind === "static" ? "fixed" : "", game.solved ? "solved" : ""].filter(Boolean).join(" ");
+            const stripContent = kind === "letter" && !game.solved
+                ? buildSlotStripHtml()
+                : kind === "digit" && !game.solved
+                    ? buildSlotDigitStripHtml()
+                    : `<span class="slot-cell">${escapeHtml(w.current)}</span>`;
+            const stripClass = rotatable ? "slot-reel-strip" : "slot-reel-strip static";
+            const hint = rotatable ? "拖拽 / 滚轮" : (game.solved ? "OK" : "—");
+            return `<div class="${classes}${rotatable ? " interactive" : ""}" data-wheel="${wi}" data-dial-game="${idx}"${rotatable ? ' tabindex="0"' : ""}>
+                <div class="slot-reel-window">
+                    <div class="slot-reel-highlight"></div>
+                    <div class="${stripClass}">${stripContent}</div>
+                </div>
+                <div class="slot-hint">${hint}</div>
+            </div>`;
+        }
+
+        function syncDialGameUI(game, gameIdx) {
+            repairDialGame(game);
+            game.cipherDisplay = game.wheels.map(w => w.current).join("");
+            const card = document.getElementById("miniGame" + gameIdx);
+            if (!card) return;
+            const cipherEl = card.querySelector(".cipher");
+            if (cipherEl) cipherEl.textContent = game.cipherDisplay;
+            game.wheels.forEach((w, wi) => {
+                const reel = card.querySelector(`.slot-reel[data-wheel="${wi}"]`);
+                if (!reel) return;
+                reel.classList.toggle("match", w.current === w.target);
+                updateSlotReelVisual(reel, w, true);
+            });
+        }
+
+        function bindSlotReel(reelEl, game, gameIdx, wheelIdx) {
+            const w = game.wheels[wheelIdx];
+            if (!isDialWheelRotatable(w) || game.solved) return;
+
+            reelEl.addEventListener("wheel", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (game.solved) return;
+                dialAdjust(game, wheelIdx, e.deltaY > 0 ? 1 : -1);
+            }, { passive: false });
+
+            reelEl.addEventListener("mousedown", (e) => {
+                if (e.button !== 0 || game.solved) return;
+                repairDialGame(game);
+                const wheel = game.wheels[wheelIdx];
+                const startY = e.clientY;
+                const startOffset = wheel.reelOffset ?? (dialWheelKind(wheel) === "digit"
+                    ? defaultDigitReelOffset(wheel.current)
+                    : defaultReelOffset(wheel.current));
+                reelEl.classList.add("slot-dragging");
+                e.preventDefault();
+
+                const onMove = (ev) => {
+                    if (game.solved) return;
+                    const floatOff = startOffset + (ev.clientY - startY) / SLOT_DRAG_PX;
+                    updateSlotReelVisual(reelEl, { reelOffset: floatOff }, false);
+                };
+
+                const endDrag = (ev) => {
+                    reelEl.classList.remove("slot-dragging");
+                    window.removeEventListener("mousemove", onMove);
+                    window.removeEventListener("mouseup", endDrag);
+                    if (game.solved) return;
+                    const steps = Math.round((ev.clientY - startY) / SLOT_DRAG_PX);
+                    if (steps !== 0) dialAdjust(game, wheelIdx, steps);
+                    else updateSlotReelVisual(reelEl, game.wheels[wheelIdx], true);
+                };
+
+                window.addEventListener("mousemove", onMove);
+                window.addEventListener("mouseup", endDrag);
+            });
+        }
+
+        function bindAllSlotReels() {
+            const game = currentIntel?.games?.[1];
+            if (!game || game.kind !== "dial" || game.solved) return;
+            repairDialGame(game);
+            const card = document.getElementById("miniGame1");
+            if (!card) return;
+            card.querySelectorAll(".slot-reel.interactive").forEach(reel => {
+                const wi = Number(reel.dataset.wheel);
+                updateSlotReelVisual(reel, game.wheels[wi], false);
+                bindSlotReel(reel, game, 1, wi);
+            });
+        }
+
+        function checkDialSolved(game) {
+            return game.wheels.every(w => w.current === w.target);
+        }
+
+        function resetDialGame(game) {
+            if (!game || game.kind !== "dial" || game.solved || !game.initialWheels) return;
+            game.wheels.forEach((w, i) => {
+                const init = game.initialWheels[i];
+                if (!init) return;
+                w.current = init.current;
+                w.kind = init.kind || dialWheelKind(w);
+                if (isDialWheelRotatable(w)) {
+                    w.reelOffset = init.reelOffset ?? (w.kind === "digit"
+                        ? defaultDigitReelOffset(init.current)
+                        : defaultReelOffset(init.current));
+                }
+            });
+            game.cipherDisplay = game.initialCipher || game.wheels.map(x => x.current).join("");
+            syncDialGameUI(game, 1);
+            playClickSound();
+            showToast("转轮已恢复初始状态");
+            saveStateNow();
+        }
+
+        function dialAdjust(game, wheelIdx, delta) {
+            const w = game.wheels[wheelIdx];
+            const kind = dialWheelKind(w);
+            if (!isDialWheelRotatable(w) || game.solved || !delta) return;
+            const before = w.current;
+            if (kind === "letter") {
+                w.current = shiftLetter(w.current, delta);
+                w.reelOffset = (w.reelOffset ?? defaultReelOffset(shiftLetter(before, -delta))) + delta;
+            } else {
+                w.current = shiftDigit(w.current, delta);
+                w.reelOffset = (w.reelOffset ?? defaultDigitReelOffset(shiftDigit(before, -delta))) + delta;
+            }
+            const jumped = normalizeReelOffset(w);
+            game.spinCount = (game.spinCount || 0) + Math.abs(delta);
+            state.missionStats.dialSpins = (state.missionStats.dialSpins || 0) + Math.abs(delta);
+            playClickSound();
+            const gameIdx = currentIntel.games.indexOf(game);
+            const card = document.getElementById("miniGame" + gameIdx);
+            const reel = card?.querySelector(`.slot-reel[data-wheel="${wheelIdx}"]`);
+            if (checkDialSolved(game)) {
+                game.solved = true;
+                currentIntel.fragments[1] = game.reveal;
+                state.dialLessonSeen = true;
+                if (window.flashMapCity) window.flashMapCity(game.city.lat, game.city.lon, game.city.label);
+                confetti();
+                playSuccessSound();
+                showToast(`密电片段已恢复！坐标 ${game.city.label} 只是掩护情报。`);
+                onLevelComplete(1);
+                renderFragments();
+                renderMissionSteps();
+                renderMiniGames();
+                scrollToMission(2);
+            } else {
+                game.cipherDisplay = game.wheels.map(x => x.current).join("");
+                if (card) {
+                    const cipherEl = card.querySelector(".cipher");
+                    if (cipherEl) cipherEl.textContent = game.cipherDisplay;
+                    if (reel) {
+                        reel.classList.toggle("match", w.current === w.target);
+                        updateSlotReelVisual(reel, w, !jumped);
+                    }
+                }
+            }
+            saveStateNow();
+        }
+
+        function renderDialHint(game) {
+            if (game.solved || !game.hintMode) return "";
+            if (game.hintMode === "lesson") {
+                return `<div class="notice">
+                    见习提示：字母和数字会<strong>整体偏移</strong>。看纸条 A→D→G，每个字母都往后排 3 格；数字同理 0→3→6。
+                    <div class="cipher-strip"><span>A</span><span>→</span><span>D</span><span>→</span><span>G</span></div>
+                </div>`;
+            }
+            if (game.hintMode === "shift") {
+                return `<div class="notice">偏移量提示：字母和数字整体移动了 <strong>${game.shift}</strong> 格。试试转轮方向！</div>`;
+            }
+            return "";
+        }
+
+        function renderDialGame(game, idx) {
+            const locked = !isGameUnlocked(idx);
+            repairDialGame(game);
+            const wheelsHtml = game.wheels.map((w, wi) => renderSlotWheel(w, wi, game, idx)).join("");
+            return `
+                <div class="mini-game-card ${game.solved ? "solved" : ""} ${locked ? "locked" : ""}" id="miniGame1">
+                    <h3>${game.solved ? "✅" : "🗺️"} ${game.title}</h3>
+                    <p class="muted">总部在 <strong>${escapeHtml(game.city.label)}</strong> 截获密电（掩护坐标，不是答案）：</p>
+                    <p class="cipher" style="text-align:center">${escapeHtml(game.cipherDisplay)}</p>
+                    ${renderDialHint(game)}
+                    <p class="muted">拖动转轮或滚轮调节字母，恢复密钥片段。</p>
+                    ${!game.solved && !locked ? `<div class="dial-actions"><button type="button" class="secondary dial-reset-btn" data-dial-reset="${idx}">恢复初始</button></div>` : ""}
+                    <div class="slot-machine-label">◆ VAULT SLOT ◆</div>
+                    <div class="dial-row">${wheelsHtml}</div>
+                    ${game.solved ? `<div class="reveal">密钥片段：<strong>${escapeHtml(game.reveal)}</strong></div>
+                    <div class="agent-note">${escapeHtml(game.agentNote || "")}<br/>密电片段已恢复，坐标只是掩护情报。</div>` : ""}
+                </div>`;
+        }
+
+        // --- 游戏3：记忆潜入网格 ---
+        function stopGridScoutTimer() {
+            if (gridScoutTimer) { clearInterval(gridScoutTimer); gridScoutTimer = null; }
+        }
+
+        function stopGridMeltdownTimer() {
+            if (gridMeltdownTimer) { clearInterval(gridMeltdownTimer); gridMeltdownTimer = null; }
+        }
+
+        function stopGridPhaseTimers() {
+            stopGridScoutTimer();
+            stopGridMeltdownTimer();
+            if (gridScanTimeout) { clearTimeout(gridScanTimeout); gridScanTimeout = null; }
+        }
+
+        function playShieldHitSound() {
+            playTone(920, 0.1, "square", 0.07);
+            setTimeout(() => playTone(620, 0.22, "square", 0.08), 90);
+        }
+
+        function flashVaultWarning() {
+            const wrap = document.getElementById("vaultGridWrap");
+            if (!wrap) return;
+            wrap.classList.add("signal-warn");
+            setTimeout(() => wrap.classList.remove("signal-warn"), 500);
+        }
+
+        function pathToFootprint(path) {
+            const arrows = [];
+            for (let i = 1; i < path.length; i++) {
+                const a = path[i - 1], b = path[i];
+                if (b.r > a.r) arrows.push("↓");
+                else if (b.r < a.r) arrows.push("↑");
+                else if (b.c > a.c) arrows.push("→");
+                else if (b.c < a.c) arrows.push("←");
+            }
+            return arrows.join(" ");
+        }
+
+        function isAdjacent(a, b) {
+            return Math.abs(a.r - b.r) + Math.abs(a.c - b.c) === 1;
+        }
+
+        function reshuffleVaultLasers(game) {
+            const blocked = new Set([
+                `${game.start.r},${game.start.c}`,
+                `${game.end.r},${game.end.c}`,
+                `${game.playerPos.r},${game.playerPos.c}`
+            ]);
+            const pathFrom = { r: game.playerPos.r, c: game.playerPos.c };
+            for (let attempt = 0; attempt < 80; attempt++) {
+                for (let r = 0; r < game.size; r++) {
+                    for (let c = 0; c < game.size; c++) {
+                        const key = `${r},${c}`;
+                        if (blocked.has(key)) continue;
+                        game.grid[r][c] = "safe";
+                    }
+                }
+                game.grid[game.start.r][game.start.c] = "start";
+                game.grid[game.end.r][game.end.c] = "goal";
+                let placed = 0;
+                const target = randomInt(6, 9);
+                while (placed < target) {
+                    const r = randomInt(0, game.size - 1);
+                    const c = randomInt(0, game.size - 1);
+                    const key = `${r},${c}`;
+                    if (blocked.has(key) || game.grid[r][c] === "laser") continue;
+                    game.grid[r][c] = "laser";
+                    placed++;
+                }
+                if (bfsPath(game.grid, pathFrom, game.end, game.size)) return;
+            }
+            game.grid = buildVaultGridLayout(game.size, game.start, game.end, randomInt(4, 6), pathFrom);
+        }
+
+        function vaultLevelReset(game) {
+            game.solved = false;
+            game.phase = "ready";
+            game.scoutCountdown = randomInt(5, 8);
+            game.shields = 3;
+            game.scansLeft = 2;
+            game.meltdownSec = 0;
+            game.revealed = {};
+            game.footprint = "";
+            game.grid = buildVaultGridLayout(game.size, game.start, game.end, randomInt(6, 9));
+            game.playerPos = { r: game.start.r, c: game.start.c };
+            game.playerPath = [{ r: game.start.r, c: game.start.c }];
+        }
+
+        function updateGridHud(game) {
+            const banner = document.getElementById("gridScoutBanner");
+            if (banner) {
+                if (game.phase === "ready") {
+                    banner.textContent = "阅读任务说明，准备好了再点「开始潜入」。";
+                } else if (game.phase === "scout") {
+                    banner.textContent = `特工，记住这条安全的脚印！倒计时 ${game.scoutCountdown}...`;
+                } else if (game.phase === "meltdown") {
+                    banner.textContent = `核冷却系统触发自毁倒计时 ${game.meltdownSec} 秒！`;
+                } else if (game.phase === "scan_flash") {
+                    banner.textContent = "热感扫描：亮灯 2 秒——只显示换位后的激光！";
+                } else if (game.solved) {
+                    banner.textContent = "核能宝石已到手，潜入成功！";
+                } else {
+                    banner.textContent = "摸黑潜入：从左上角「入」出发，只能点相邻格子走到右下角宝石。";
+                }
+            }
+            const shields = document.getElementById("gridShields");
+            if (shields) {
+                shields.textContent = game.shields > 0 ? "❤️".repeat(game.shields) : "🖤 护盾耗尽";
+            }
+            const scanBtn = document.getElementById("gridScanBtn");
+            if (scanBtn) {
+                scanBtn.textContent = `紧急热感扫描（剩余 ${game.scansLeft} 次）`;
+                const disabled = game.scansLeft <= 0 || game.solved ||
+                    game.phase === "ready" || game.phase === "scout" || game.phase === "scan_flash" || game.phase === "meltdown";
+                scanBtn.disabled = disabled;
+            }
+        }
+
+        function startGridMeltdown(game) {
+            if (gridMeltdownTimer) return;
+            game.phase = "meltdown";
+            game.meltdownSec = 5;
+            stopGridMeltdownTimer();
+            updateGridHud(game);
+            renderMiniGames();
+            gridMeltdownTimer = setInterval(() => {
+                const g = currentIntel?.games?.[2];
+                if (!g || g.phase !== "meltdown") { stopGridMeltdownTimer(); return; }
+                g.meltdownSec--;
+                updateGridHud(g);
+                if (g.meltdownSec <= 0) {
+                    stopGridMeltdownTimer();
+                    vaultLevelReset(g);
+                    showToast("自毁程序已重置第三关——前两关情报已保留。");
+                    renderMiniGames();
+                    saveStateNow();
+                }
+            }, 1000);
+        }
+
+        function vaultStartScout(game) {
+            if (!game || game.solved || game.phase !== "ready") return;
+            game.phase = "scout";
+            game.scoutCountdown = randomInt(5, 8);
+            showToast("开牌！盯住起点到宝石之间的绿色安全走廊！");
+            renderMiniGames();
+            startGridScoutIfNeeded();
+            saveState();
+        }
+
+        function startGridScoutIfNeeded() {
+            const game = currentIntel?.games?.[2];
+            if (!game || game.kind !== "grid" || game.solved || game.phase !== "scout") {
+                stopGridScoutTimer();
+                return;
+            }
+            if (gridScoutTimer) return;
+            gridScoutTimer = setInterval(() => {
+                const g = currentIntel?.games?.[2];
+                if (!g || g.solved || g.phase !== "scout") { stopGridScoutTimer(); return; }
+                g.scoutCountdown--;
+                updateGridHud(g);
+                if (g.scoutCountdown <= 0) {
+                    stopGridScoutTimer();
+                    g.phase = "hidden";
+                    showToast("关灯！凭记忆潜入——护盾保护你 3 次失误。");
+                    renderMiniGames();
+                    saveState();
+                }
+            }, 1000);
+        }
+
+        function vaultEmergencyScan(game) {
+            if (!game || game.solved || game.scansLeft <= 0) return;
+            if (game.phase === "scout" || game.phase === "scan_flash" || game.phase === "meltdown" || game.phase === "ready") return;
+            game.scansLeft--;
+            reshuffleVaultLasers(game);
+            game.revealed = {};
+            game.phase = "scan_flash";
+            showToast("激光阵已换位！亮灯 2 秒——只显示新的激光位置。");
+            renderMiniGames();
+            saveState();
+            if (gridScanTimeout) clearTimeout(gridScanTimeout);
+            gridScanTimeout = setTimeout(() => {
+                gridScanTimeout = null;
+                const g = currentIntel?.games?.[2];
+                if (!g || g.solved) return;
+                g.phase = "hidden";
+                showToast("扫描结束！继续摸黑前进。");
+                renderMiniGames();
+                saveState();
+            }, 2000);
+        }
+
+        function vaultCellIcon(type, isPlayer, inPath) {
+            if (type === "start") return "入";
+            if (type === "goal") return "💎";
+            if (type === "laser") return "🚨";
+            if (isPlayer) return "●";
+            if (inPath) return "·";
+            return "";
+        }
+
+        function vaultCellClass(game, r, c) {
+            if (!game?.grid?.[r] || game.grid[r][c] === undefined) {
+                return { cls: "vault-cell vault-fog", icon: "" };
+            }
+            const type = game.grid[r][c];
+            const key = `${r},${c}`;
+            const isPlayer = game.playerPos.r === r && game.playerPos.c === c;
+            const inPath = game.playerPath.some(p => p.r === r && p.c === c);
+            const revealed = game.revealed[key];
+            let cls = "vault-cell";
+
+            if (game.phase === "ready") {
+                cls += " vault-fog";
+                return { cls, icon: "" };
+            }
+
+            if (game.phase === "scan_flash") {
+                if (type === "laser") {
+                    cls += " laser scan-laser-flash";
+                    return { cls, icon: "🚨" };
+                }
+                if (isPlayer) {
+                    cls += " current-path";
+                    return { cls, icon: "●" };
+                }
+                cls += " vault-fog";
+                return { cls, icon: "" };
+            }
+
+            if (game.phase === "scout" || game.solved) {
+                if (type === "laser") cls += " laser";
+                else if (type === "goal") cls += " goal goal-pulse";
+                else if (type === "start") cls += " start safe";
+                else cls += " safe";
+                if (isPlayer) cls += " current-path";
+                if (inPath && !isPlayer) cls += " path";
+                return { cls, icon: vaultCellIcon(type, isPlayer, inPath) };
+            }
+
+            if (revealed) {
+                if (type === "laser") cls += " laser";
+                else cls += " revealed-safe";
+                if (type === "start") cls += " start";
+                if (type === "goal") cls += " goal";
+                if (isPlayer) cls += " current-path";
+                return { cls, icon: vaultCellIcon(type, isPlayer, false) };
+            }
+
+            cls += " vault-fog";
+            if (isPlayer) cls += " current-path";
+            return { cls, icon: isPlayer ? "●" : "" };
+        }
+
+        function vaultCellClick(game, r, c) {
+            if (!game || game.kind !== "grid" || !game.grid?.[r] || game.grid[r][c] === undefined) return;
+            if (game.solved || !isGameUnlocked(2)) return;
+            if (game.phase === "scout" || game.phase === "scan_flash" || game.phase === "meltdown" || game.phase === "ready") return;
+            if (game.playerPos.r === r && game.playerPos.c === c) return;
+            if (!isAdjacent(game.playerPos, { r, c })) {
+                showToast("只能走相邻格子！");
+                return;
+            }
+
+            const key = `${r},${c}`;
+            const type = game.grid[r][c];
+            if (!game.revealed[key]) game.revealed[key] = true;
+
+            if (type === "laser") {
+                state.missionStats.gridFails = (state.missionStats.gridFails || 0) + 1;
+                flashVaultWarning();
+                playShieldHitSound();
+                if (game.shields > 0) {
+                    game.shields--;
+                    showToast(game.shields > 0
+                        ? `哔——！踩到激光阵！特工护盾剩余 ${game.shields} 次。`
+                        : "哔——！护盾耗尽！再踩雷将触发自毁倒计时！");
+                    renderFragments();
+                    renderMissionSteps();
+                    renderMiniGames();
+                    saveState();
+                    return;
+                }
+                showToast("核冷却系统触发自毁倒计时 5 秒！");
+                startGridMeltdown(game);
+                saveState();
+                return;
+            }
+
+            game.playerPos = { r, c };
+            if (!game.playerPath.some(p => p.r === r && p.c === c)) {
+                game.playerPath.push({ r, c });
+            }
+
+            if (r === game.end.r && c === game.end.c) {
+                game.solved = true;
+                game.footprint = pathToFootprint(game.playerPath);
+                currentIntel.fragments[2] = game.reveal;
+                if (!state.gridAdvancedUnlocked) {
+                    state.gridAdvancedUnlocked = true;
+                    saveStateNow();
+                }
+                stopGridPhaseTimers();
+                confetti();
+                playSuccessSound();
+                showToast("总部用你的路线生成了第三段密钥！");
+                onLevelComplete(2);
+            }
+            renderFragments();
+            renderMissionSteps();
+            renderMiniGames();
+            saveState();
+        }
+
+        function renderGridGame(game, idx) {
+            repairGridGame(game);
+            const locked = !isGameUnlocked(idx);
+            let cells = "";
+            for (let r = 0; r < game.size; r++) {
+                for (let c = 0; c < game.size; c++) {
+                    const { cls, icon } = vaultCellClass(game, r, c);
+                    cells += `<div class="${cls}" data-gi="${idx}" data-gr="${r}" data-gc="${c}">${icon}</div>`;
+                }
+            }
+            const scanDisabled = game.scansLeft <= 0 || game.solved ||
+                game.phase === "ready" || game.phase === "scout" || game.phase === "scan_flash" || game.phase === "meltdown";
+            const phaseHint = game.phase === "ready"
+                ? "准备阶段：先看懂规则，心理准备好再开始。开始后全场亮灯 5–8 秒供记忆。"
+                : game.phase === "scout"
+                ? "阶段一·开牌：记住绿色安全走廊，从左上角「入」走到右下角 💎。"
+                : game.phase === "scan_flash"
+                    ? "热感扫描：亮灯 2 秒，只显示换位后的激光位置（🚨）。"
+                    : "阶段二·关灯：摸黑点击相邻格子；踩雷扣护盾，不重置整关。";
+            const startBlock = !locked && !game.solved && game.phase === "ready"
+                ? `<div class="vault-start-wrap">
+                    <p>🟢 绿色 = 安全地板　🔴 红色 = 激光阵　💎 右下角 = 核能宝石<br/>
+                    起点在左上角。开牌时记住「入」到宝石最近的一条绿走廊。</p>
+                    <button class="vault-start-btn" id="gridStartBtn" data-start-grid="${idx}">开始潜入</button>
+                   </div>`
+                : "";
+            return `
+                <div class="mini-game-card ${game.solved ? "solved" : ""} ${locked ? "locked" : ""}" id="miniGame2">
+                    <h3>${game.solved ? "✅" : "🚨"} ${game.title}</h3>
+                    <div class="vault-hud">
+                        <span class="vault-shields" id="gridShields">${"❤️".repeat(game.shields || 0)}</span>
+                        <span class="vault-scout-banner" id="gridScoutBanner">阅读任务说明，准备好了再点「开始潜入」。</span>
+                    </div>
+                    <p class="muted">${phaseHint}</p>
+                    <div class="vault-grid-wrap" id="vaultGridWrap">${cells}</div>
+                    ${startBlock}
+                    <button class="vault-scan-btn" id="gridScanBtn" data-scan-grid="${idx}" ${scanDisabled ? "disabled" : ""}>
+                        紧急热感扫描（剩余 ${game.scansLeft} 次）
+                    </button>
+                    ${game.footprint ? `<div class="footprint-code">${escapeHtml(game.footprint)}</div>
+                    <p class="muted" style="text-align:center;font-size:.82rem">脚印暗号已编码为总部第三段密钥：<strong>${escapeHtml(game.reveal)}</strong></p>` : ""}
+                    ${game.solved ? `<div class="reveal">密钥片段：<strong>${escapeHtml(game.reveal)}</strong></div>
+                    <div class="agent-note">${escapeHtml(game.agentNote || "")}</div>` : ""}
+                </div>`;
+        }
+
+        function renderMiniGames() {
+            const grid = $("puzzleGrid");
+            grid.innerHTML = "";
+            if (!currentIntel) {
+                grid.innerHTML = `<div class="notice">请先加载目标情报。</div>`;
+                return;
+            }
+            currentIntel.games.forEach((game, idx) => {
+                let html = "";
+                if (game.kind === "typing") html = renderTypingGame(game, idx);
+                else if (game.kind === "dial") html = renderDialGame(game, idx);
+                else if (game.kind === "grid") html = renderGridGame(game, idx);
+                const wrap = document.createElement("div");
+                wrap.innerHTML = html;
+                grid.appendChild(wrap.firstElementChild);
+            });
+
+            grid.querySelectorAll("[data-dial-reset]").forEach(btn => {
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    resetDialGame(currentIntel.games[Number(btn.dataset.dialReset)]);
+                };
+            });
+            grid.querySelectorAll("button[data-start-grid]").forEach(btn => {
+                btn.onclick = () => vaultStartScout(currentIntel.games[Number(btn.dataset.startGrid)]);
+            });
+            grid.querySelectorAll("button[data-scan-grid]").forEach(btn => {
+                btn.onclick = () => vaultEmergencyScan(currentIntel.games[Number(btn.dataset.scanGrid)]);
+            });
+            grid.querySelectorAll(".vault-cell").forEach(cell => {
+                cell.onclick = () => {
+                    const g = currentIntel.games[Number(cell.dataset.gi)];
+                    if (!g || g.kind !== "grid") return;
+                    vaultCellClick(g, Number(cell.dataset.gr), Number(cell.dataset.gc));
+                };
+            });
+            const g3 = currentIntel.games[2];
+            if (g3?.kind === "grid") {
+                updateGridHud(g3);
+                startGridScoutIfNeeded();
+            }
+            const trap = document.getElementById("typingFocusTrap");
+            if (trap && currentIntel.games[0] && !currentIntel.games[0].solved && isGameUnlocked(0)) {
+                trap.focus();
+                updateTypingUI();
+            }
+            bindAllSlotReels();
+        }
+
+        function autofillPassword() {
+            if (!currentIntel || !currentIntel.fragments.every(Boolean)) { showToast("请先完成三关小游戏。"); return; }
+            $("passwordGuess").value = currentIntel.fragments.join("");
+        }
+
+        function attemptUnlock() {
+            const player = getPlayer();
+            const target = getAI(state.targetId);
+            if (!player || !target) { showToast("请先入职并选择目标。"); return; }
+            const guess = $("passwordGuess").value.toUpperCase();
+            if (guess === target.password) {
+                breachUnlocked = true;
+                player.wins = (player.wins || 0) + 1;
+                target.losses = (target.losses || 0) + 1;
+                render();
+                confetti();
+                showToast(`金库破解成功：${target.name} 已解锁！`);
+            } else {
+                showToast("密钥不正确，检查三段片段。");
+                shake($("passwordGuess"));
+            }
+        }
+
+        function doTransfer() {
+            const player = getPlayer();
+            const target = getAI(state.targetId);
+            const preview = getMissionTransferPreview();
+            const amount = preview?.amount || 0;
+            if (!player || !target || !breachUnlocked) { showToast("请先解锁目标。"); return; }
+            if (!amount) { showToast("请先完成三关任务。"); return; }
+            if (target.balance < amount) { showToast("目标队伍没有足够的模拟资金。"); return; }
+            target.balance -= amount;
+            player.balance += amount;
+            state.transactions.unshift({ at: Date.now(), from: target.name, to: player.name, amount });
+            target.password = randomPassword(8);
+            target.passwordUpdatedAt = Date.now();
+            stopTypingArc();
+            stopGridPhaseTimers();
+            currentIntel = buildIntelForTarget(target);
+            breachUnlocked = false;
+            $("passwordGuess").value = "";
+            drawRoute(target, player);
+            saveState();
+            render();
+            startTypingArcIfNeeded();
+            startGridScoutIfNeeded();
+            confetti();
+            showToast(`RM ${amount} 已从 ${target.name} 转入 ${player.name}。目标密码已轮换。`);
+        }
+
+        function drawRoute(from, to) {
+            routeLayer.innerHTML = "";
+            const x1 = from.x * 12,
+                y1 = from.y * 6.5,
+                x2 = to.x * 12,
+                y2 = to.y * 6.5;
+            const mx = (x1 + x2) / 2,
+                my = Math.min(y1, y2) - 80;
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttribute("d", `M ${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}`);
+            path.setAttribute("fill", "none");
+            path.setAttribute("stroke", "rgba(255,214,90,.95)");
+            path.setAttribute("stroke-width", "4");
+            path.setAttribute("stroke-dasharray", "10 10");
+            path.setAttribute("stroke-linecap", "round");
+            routeLayer.appendChild(path);
+            clearTimeout(routeTimer);
+            routeTimer = setTimeout(() => routeLayer.innerHTML = "", 2400);
+        }
+
+        function autoRotateAITeams() {
+            let changed = false;
+            const ms = getRoundMs();
+            state.aiTeams.forEach(team => {
+                if (Date.now() - team.passwordUpdatedAt < ms) return;
+                if (state.targetId === team.id && isMissionActive()) {
+                    team.passwordUpdatedAt = Date.now();
+                    return;
+                }
+                team.password = randomPassword(8);
+                team.passwordUpdatedAt = Date.now();
+                team.wins = team.wins || 0;
+                changed = true;
+                if (state.targetId === team.id) {
+                    const kept = currentIntel ? [...currentIntel.fragments] : [null, null, null];
+                    stopTypingArc();
+                    stopGridPhaseTimers();
+                    currentIntel = buildIntelForTarget(team);
+                    kept.forEach((f, i) => {
+                        if (f && currentIntel.games[i]) {
+                            currentIntel.fragments[i] = f;
+                            currentIntel.games[i].solved = true;
+                        }
+                    });
+                    breachUnlocked = false;
+                    $("passwordGuess").value = "";
+                    showToast(`${team.name} 轮换了密码，已完成关卡的情报已保留。`);
+                }
+            });
+            if (changed) { saveStateNow(); render(); }
+        }
+
+        function renderScoreboard() {
+            const box = $("scoreboard");
+            const teams = getAllTeams().sort((a, b) => b.balance - a.balance);
+            box.innerHTML = teams.length ? "" : `<div class="notice">还没有队伍注册。</div>`;
+            teams.forEach((team, idx) => {
+                const row = document.createElement("div");
+                row.className = "score-row";
+                const label = team.isAI ?
+                    `电脑队伍 · 轮换剩余 ${formatRemaining(getRoundMs() - (Date.now() - team.passwordUpdatedAt))}` :
+                    `玩家队伍 · ${isExpired(team) ? "⚠️ 已过期" : "活跃"}`;
+                const nameColor = teamStateColor(team);
+                row.innerHTML =
+                    `<div class="rank">${idx+1}</div><div><b style="color:${nameColor}">${escapeHtml(team.name)}</b><span>${team.state ? escapeHtml(team.state) + " · " : ""}${label} · 解锁 ${team.wins || 0} · 被破 ${team.losses || 0}</span></div><div class="money">RM ${money(team.balance)}</div>`;
+                box.appendChild(row);
+            });
+        }
+
+        function renderTransactions() {
+            const box = $("transactions");
+            box.innerHTML = state.transactions.length ? "" : `<div class="notice">尚无转账记录。</div>`;
+            state.transactions.slice(0, 20).forEach(tx => {
+                const div = document.createElement("div");
+                div.className = "tx";
+                div.innerHTML =
+                    `<strong>RM ${money(tx.amount)}</strong> 从 <strong>${escapeHtml(tx.from)}</strong> 转入 <strong>${escapeHtml(tx.to)}</strong><br/>${new Date(tx.at).toLocaleTimeString()}`;
+                box.appendChild(div);
+            });
+        }
+
+        function exportReport() {
+            const teams = getAllTeams().sort((a, b) => b.balance - a.balance);
+            let report = "Currency Safe: 金库行动 - 特工任务报告\n";
+            report += `生成时间：${new Date().toLocaleString()}\n`;
+            const st = state.missionStats || {};
+            report += `\n课堂统计：\n`;
+            report += `- 任务开始次数：${st.missionsStarted || 0}\n`;
+            report += `- 完成关卡数：${st.levelsDone || 0}\n`;
+            report += `- 打字失败：${st.typingFails || 0}\n`;
+            report += `- 转轮操作：${st.dialSpins || 0}\n`;
+            report += `- 网格失误：${st.gridFails || 0}\n`;
+            report += `- 记忆潜入已通关：${state.gridAdvancedUnlocked ? "是" : "否"}\n`;
+            if (currentIntel) {
+                const done = currentIntel.games.filter(g => g.solved).length;
+                report += `- 当前任务进度：${done}/3 关\n`;
+            }
+            report += "\n排行榜：\n";
+            teams.forEach((team, idx) => {
+                report += `${idx+1}. ${team.name} - RM ${team.balance} - 解锁 ${team.wins || 0} - 被破 ${team.losses || 0}\n`;
+            });
+            report += "\n转账日志：\n";
+            state.transactions.forEach(tx => {
+                report += `${new Date(tx.at).toLocaleTimeString()} - RM ${tx.amount} 从 ${tx.from} 到 ${tx.to}\n`;
+            });
+            const blob = new Blob([report], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "currency_safe_singleplayer_report.txt";
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function showTab(id) {
+            document.querySelectorAll(".tab").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === id));
+            document.querySelectorAll(".section").forEach(sec => sec.classList.toggle("active", sec.id === id));
+        }
+
+        function render() {
+            renderHud();
+            renderForms();
+            renderAttack();
+            renderMapLeaderboard();
+            renderMapStats();
+            renderScoreboard();
+            renderTransactions();
+            if (window.updateTeamMarkers3D) window.updateTeamMarkers3D();
+            if (currentIntel?.games?.[0] && !currentIntel.games[0].solved && isGameUnlocked(0)) {
+                startTypingArcIfNeeded();
+            }
+        }
+
+        // --- 绑定事件 ---
+        document.querySelectorAll(".tab").forEach(btn => btn.onclick = () => showTab(btn.dataset.tab));
+        $("registerBtn").onclick = registerPlayer;
+        $("selectTargetBtn").onclick = loadTargetIntel;
+        $("refreshIntelBtn").onclick = () => {
+            if (!deployTargetIntel(true)) return;
+            showToast("任务已重新部署。");
+        };
+        $("closeAlertUpgrade").onclick = () => $("alertUpgradeModal").classList.remove("show");
+        $("closeVaultDoor").onclick = () => {
+            $("vaultDoorModal").classList.remove("show");
+            autofillPassword();
+            $("breachBtn")?.focus();
+        };
+        $("targetTeamSelect").onchange = () => deployTargetIntel(true);
+        window.addEventListener("beforeunload", (e) => {
+            if (isMissionActive()) {
+                saveStateNow();
+                e.preventDefault();
+                e.returnValue = "闯关进度已自动保存，确定离开？";
+            }
+        });
+        $("autofillBtn").onclick = autofillPassword;
+        $("breachBtn").onclick = attemptUnlock;
+        $("transferBtn").onclick = doTransfer;
+        $("exportBtn").onclick = exportReport;
+        $("resetBtn").onclick = () => { if (confirm("重置整个模拟？")) { localStorage.removeItem(storageKey);
+                location.reload(); } };
+        $("howBtn").onclick = () => $("howModal").classList.add("show");
+        $("closeHowBtn").onclick = () => $("howModal").classList.remove("show");
+        $("howModal").onclick = (e) => { if (e.target === $("howModal")) $("howModal").classList.remove("show"); };
+        document.addEventListener("keydown", handleTypingKey);
+        window.addEventListener("mousemove", e => { const g = $("mouseGlow");
+            g.style.left = e.clientX + "px";
+            g.style.top = e.clientY + "px"; });
+        setInterval(() => {
+            const player = getPlayer();
+            if (player && isExpired(player)) autoRotateIfExpired(player);
+            autoRotateAITeams();
+            renderHud();
+            renderForms();
+            renderMapLeaderboard();
+            renderMapStats();
+            renderScoreboard(); }, 1000);
+
+        initStateSelect();
+        render();
+        if (currentIntel) {
+            startTypingArcIfNeeded();
+            startGridScoutIfNeeded();
+        }
+
+        // ==========================================================
+        // 2D Live Cyber Threat Map — Malaysia
+        // ==========================================================
+        (function initThreatMap2D() {
+            const canvas = document.getElementById('threatMapCanvas');
+            const markersEl = document.getElementById('threatMapMarkers');
+            const cityFlashEl = document.getElementById('cityFlashMarker');
+            if (!canvas || !markersEl) return;
+
+            const MAP_W = MAP_CONFIG.w;
+            const MAP_H = MAP_CONFIG.h;
+            const ctx = canvas.getContext('2d');
+            let dpr = 1;
+            let mapReady = false;
+            let cityFlashTimer = null;
+
+            const mapImg = new Image();
+            mapImg.src = MAP_CONFIG.image;
+
+            const THREAT_HUBS = MALAYSIA_STATES.map(s => ({ mapX: s.mapX, mapY: s.mapY }));
+
+            const attacks = [];
+            const MAX_ATTACKS = 80;
+            const ATTACK_COLORS = ['#ff3355', '#ff6644', '#00d4ff', '#ff9933', '#66ffcc'];
+
+            function mapPointToXY(point) {
+                return {
+                    x: (point.mapX / 100) * MAP_W,
+                    y: (point.mapY / 100) * MAP_H
+                };
+            }
+
+            function randHub() {
+                const h = THREAT_HUBS[Math.floor(Math.random() * THREAT_HUBS.length)];
+                return mapPointToXY(h);
+            }
+
+            function drawCalibrationGrid() {
+                if (!MAP_CONFIG.showCalibrationGrid) return;
+                ctx.strokeStyle = 'rgba(0, 160, 220, 0.12)';
+                ctx.lineWidth = 1;
+                for (let p = 0; p <= 100; p += 10) {
+                    const x = (p / 100) * MAP_W;
+                    const y = (p / 100) * MAP_H;
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, MAP_H);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(MAP_W, y);
+                    ctx.stroke();
+                }
+                ctx.font = '8px SFMono-Regular, Consolas, monospace';
+                for (let px = 0; px <= 100; px += 10) {
+                    for (let py = 0; py <= 100; py += 10) {
+                        const x = (px / 100) * MAP_W;
+                        const y = (py / 100) * MAP_H;
+                        ctx.fillStyle = 'rgba(0, 210, 255, 0.75)';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 2, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = 'rgba(113, 255, 232, 0.9)';
+                        ctx.fillText(`${px},${py}`, x + 3, y - 2);
+                    }
+                }
+            }
+
+            function teamToMapXY(team) {
+                return MapAttackLines.teamToMapXY(team, MAP_W, MAP_H);
+            }
+
+            function drawAllMissionAttackLinks(now) {
+                return MapAttackLines.drawAll(ctx, collectMissionAttacks(), MAP_W, MAP_H, now);
+            }
+
+            function spawnAttack() {
+                if (collectMissionAttacks().length) return;
+                if (attacks.length >= MAX_ATTACKS) return;
+                const src = randHub();
+                let dst = randHub();
+                let guard = 0;
+                while (Math.hypot(dst.x - src.x, dst.y - src.y) < 22 && guard++ < 20) dst = randHub();
+                const mx = (src.x + dst.x) / 2;
+                const my = Math.min(src.y, dst.y) - 50 - Math.random() * 120;
+                attacks.push({
+                    sx: src.x, sy: src.y, cx: mx, cy: my, ex: dst.x, ey: dst.y,
+                    progress: 0,
+                    speed: 0.006 + Math.random() * 0.014,
+                    color: ATTACK_COLORS[Math.floor(Math.random() * ATTACK_COLORS.length)]
+                });
+            }
+
+            function pointOnQuad(t, a) {
+                const u = 1 - t;
+                return {
+                    x: u * u * a.sx + 2 * u * t * a.cx + t * t * a.ex,
+                    y: u * u * a.sy + 2 * u * t * a.cy + t * t * a.ey
+                };
+            }
+
+            function drawMapBase() {
+                ctx.fillStyle = '#030810';
+                ctx.fillRect(0, 0, MAP_W, MAP_H);
+
+                ctx.strokeStyle = 'rgba(0, 160, 220, 0.06)';
+                ctx.lineWidth = 1;
+                for (let x = 0; x <= MAP_W; x += 60) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, MAP_H);
+                    ctx.stroke();
+                }
+                for (let y = 0; y <= MAP_H; y += 60) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(MAP_W, y);
+                    ctx.stroke();
+                }
+
+                if (mapReady) {
+                    ctx.save();
+                    ctx.globalAlpha = 0.88;
+                    ctx.drawImage(mapImg, 0, 0, mapImg.naturalWidth, mapImg.naturalHeight, 0, 0, MAP_W, MAP_H);
+                    ctx.restore();
+                    drawCalibrationGrid();
+                    ctx.save();
+                    ctx.globalCompositeOperation = 'lighter';
+                    ctx.globalAlpha = 0.12;
+                    ctx.fillStyle = 'rgba(0, 210, 255, 1)';
+                    ctx.fillRect(0, 0, MAP_W, MAP_H);
+                    ctx.restore();
+                }
+
+                THREAT_HUBS.forEach(h => {
+                    if (!MAP_CONFIG.showAttacks) return;
+                    const p = mapPointToXY(h);
+                    const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 6);
+                    g.addColorStop(0, 'rgba(0, 200, 255, 0.35)');
+                    g.addColorStop(1, 'rgba(0, 200, 255, 0)');
+                    ctx.fillStyle = g;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            }
+
+            function drawAttacks(now) {
+                const missionCount = drawAllMissionAttackLinks(now);
+                if (!MAP_CONFIG.showAttacks) return;
+                if (missionCount > 0) return;
+                for (let i = attacks.length - 1; i >= 0; i--) {
+                    const a = attacks[i];
+                    a.progress += a.speed;
+                    if (a.progress >= 1) { attacks.splice(i, 1); continue; }
+
+                    const t = a.progress;
+                    ctx.save();
+                    ctx.strokeStyle = a.color;
+                    ctx.lineWidth = 1.5;
+                    ctx.globalAlpha = 0.15 + 0.55 * (1 - t);
+                    ctx.shadowColor = a.color;
+                    ctx.shadowBlur = 10;
+                    ctx.beginPath();
+                    ctx.moveTo(a.sx, a.sy);
+                    ctx.quadraticCurveTo(a.cx, a.cy, a.ex, a.ey);
+                    ctx.stroke();
+
+                    const head = pointOnQuad(t, a);
+                    ctx.globalAlpha = 0.9;
+                    ctx.shadowBlur = 14;
+                    ctx.fillStyle = a.color;
+                    ctx.beginPath();
+                    ctx.arc(head.x, head.y, 3.5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    for (let j = 1; j <= 8; j++) {
+                        const tt = Math.max(0, t - j * 0.02);
+                        const p = pointOnQuad(tt, a);
+                        ctx.globalAlpha = 0.5 - j * 0.05;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.restore();
+                }
+            }
+
+            function resize() {
+                const wrap = document.getElementById('mapWrap');
+                if (!wrap) return;
+                const w = wrap.clientWidth;
+                const h = wrap.clientHeight;
+                if (w <= 0 || h <= 0) return;
+                window.__mapLayout = computeMapLayout(w, h);
+                dpr = Math.min(window.devicePixelRatio || 1, 2);
+                canvas.width = Math.floor(w * dpr);
+                canvas.height = Math.floor(h * dpr);
+                canvas.style.width = w + 'px';
+                canvas.style.height = h + 'px';
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                if (window.updateTeamMarkers3D) window.updateTeamMarkers3D();
+            }
+
+            function animate() {
+                const w = canvas.clientWidth;
+                const h = canvas.clientHeight;
+                const layout = computeMapLayout(w, h);
+                window.__mapLayout = layout;
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                ctx.clearRect(0, 0, w, h);
+                ctx.fillStyle = '#030810';
+                ctx.fillRect(0, 0, w, h);
+                ctx.save();
+                ctx.translate(layout.offsetX, layout.offsetY);
+                ctx.scale(layout.scale, layout.scale);
+                drawMapBase();
+                drawAttacks(performance.now());
+                ctx.restore();
+                requestAnimationFrame(animate);
+            }
+
+            mapImg.onload = () => {
+                mapReady = true;
+                if (mapImg.naturalWidth > 0 && mapImg.naturalHeight > 0) {
+                    MAP_CONFIG.w = mapImg.naturalWidth;
+                    MAP_CONFIG.h = mapImg.naturalHeight;
+                }
+                resize();
+            };
+            mapImg.onerror = () => {
+                mapReady = false;
+                console.warn('Malaysia map image failed to load:', MAP_CONFIG.image);
+            };
+
+            for (let i = 0; i < 40; i++) setTimeout(spawnAttack, i * 60);
+            setInterval(() => {
+                spawnAttack();
+                if (Math.random() < 0.55) spawnAttack();
+                if (Math.random() < 0.25) spawnAttack();
+            }, 220);
+
+            canvas.addEventListener('click', () => {
+                for (let i = 0; i < 10; i++) setTimeout(spawnAttack, i * 40);
+            });
+
+            function updateThreatMapMarkers() {
+                const teams = getAllTeams();
+                const targetId = state.targetId;
+                const playerId = state.player ? state.player.id : null;
+                markersEl.innerHTML = '';
+                teams.forEach(team => {
+                    const isTarget = team.id === targetId;
+                    const isPlayer = team.id === playerId;
+                    const cls = [
+                        isPlayer ? "player" : "ai",
+                        isTarget ? "target" : ""
+                    ].filter(Boolean).join(" ");
+                    const pos = getTeamMapPercent(team);
+                    const el = document.createElement('div');
+                    el.className = 'threat-marker ' + cls;
+                    el.style.left = pos.x + '%';
+                    el.style.top = pos.y + '%';
+                    const placeLabel = team.state || team.city;
+                    const stateLabel = placeLabel ? ' · ' + placeLabel : '';
+                    const dotColor = teamStateColor(team);
+                    const labelColor = teamStateColor(team);
+                    el.innerHTML =
+                        `<span class="threat-marker-dot" style="background:${dotColor};box-shadow:0 0 14px ${dotColor}aa;border-color:${dotColor}"></span>` +
+                        `<span class="threat-marker-label" style="color:${labelColor}">${(team.icon || '💻')} ${escapeHtml(team.name)}${stateLabel}</span>`;
+                    el.onclick = (e) => {
+                        e.stopPropagation();
+                        if (team.isAI) {
+                            $('targetTeamSelect').value = team.id;
+                            deployTargetIntel(true);
+                        } else {
+                            showToast(team.name + ' 是你的队伍。');
+                        }
+                    };
+                    markersEl.appendChild(el);
+                });
+            }
+
+            window.updateTeamMarkers3D = updateThreatMapMarkers;
+
+            window.flashMapCity = (lat, lon, label) => {
+                if (!cityFlashEl) return;
+                const city = MALAYSIA_CITIES.find(c => c.label === label) ||
+                    MALAYSIA_CITIES.find(c => Math.abs(c.lat - lat) < 0.6 && Math.abs(c.lon - lon) < 0.6);
+                const pct = city ? coordsToMapPercent(city) : malaysiaLatLonToPercent(lat, lon);
+                cityFlashEl.style.left = pct.x + '%';
+                cityFlashEl.style.top = pct.y + '%';
+                cityFlashEl.style.display = 'block';
+                showToast('威胁地图已标记：' + (label || '目标城市'));
+                clearTimeout(cityFlashTimer);
+                cityFlashTimer = setTimeout(() => { cityFlashEl.style.display = 'none'; }, 8000);
+            };
+
+            window.flashMapCityPercent = (yPercent, xPercent, label) => {
+                if (!cityFlashEl) return;
+                cityFlashEl.style.left = xPercent + '%';
+                cityFlashEl.style.top = yPercent + '%';
+                cityFlashEl.style.display = 'block';
+                showToast('威胁地图已标记：' + (label || '目标城市'));
+                clearTimeout(cityFlashTimer);
+                cityFlashTimer = setTimeout(() => { cityFlashEl.style.display = 'none'; }, 8000);
+            };
+
+            window.__globeResize = resize;
+            resize();
+            updateThreatMapMarkers();
+
+            const mapWrapZoom = document.getElementById("mapWrap");
+            if (mapWrapZoom) {
+                mapWrapZoom.addEventListener("wheel", (e) => {
+                    e.preventDefault();
+                    zoomMapAt(mapWrapZoom, e.clientX, e.clientY, e.deltaY);
+                }, { passive: false });
+                setupMapPanning(mapWrapZoom);
+            }
+
+            animate();
+            console.log('2D Malaysia Cyber Threat Map ready.');
+        })();
+
+        // 额外 resize 监听
+        window.addEventListener('resize', () => {
+            if (window.__globeResize) setTimeout(window.__globeResize, 100);
+        });
+
+        const resizeObserver = new ResizeObserver(() => {
+            if (window.__globeResize) window.__globeResize();
+        });
+        const mapWrapEl = document.getElementById('mapWrap');
+        if (mapWrapEl) resizeObserver.observe(mapWrapEl);
+
+        /*
+        ═══════════════════════════════════════════════════════════════
+        ROADMAP / 排期（Currency Safe V3）
+        ═══════════════════════════════════════════════════════════════
+        ✅ Phase 1 课堂公平感（本版本已实现）
+           - 弧线失败倒退 2 字 + 3 秒缓冲；敲对弧线回退
+           - 闯关进度 localStorage 存档；刷新可续玩
+           - 闯关进行中暂停敌方密码轮换；见习 12 分钟轮换
+           - 游戏2 城市=掩护情报叙事；渐进式转轮提示
+           - 拦截能量条替代中途刷金币
+           - 2D 威胁地图弧线连目标/玩家坐标；点选目标自动部署任务
+           - 三关进度条可跳转；网格撤销/回起点
+           - 音效套件；金库门/警报升级弹窗；特工笔记
+           - 导出报告含课堂统计；saveState 防抖
+
+        🔜 Phase 2 课堂部署（建议下一迭代）
+           - 拆分 JS：game-typing / game-dial / game-grid / threat-map.js
+           - 马来西亚本地威胁地图（malaysia.png）；城市/队伍坐标对齐西马与东马
+           - renderMiniGames 完全增量 DOM 更新
+           - 教师看板（#teacher 口令）多特工进度汇总
+
+        🔜 Phase 3 深度教学
+           - 每关可折叠「什么是 2FA / 凯撒密码 / 最小权限」
+           - 课堂模式：统一难度、禁用精英、批量导出 CSV
+           - 脚印暗号与片段字符双向映射（进阶密码学）
+        ═══════════════════════════════════════════════════════════════
+        */
+    </script>
+</body>
+</html>

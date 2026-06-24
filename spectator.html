@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Currency Safe · Spectator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,700;14..32,900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/shared.css" />
+</head>
+<body>
+    <main class="portal portal-wide">
+        <div class="portal-logo">👁</div>
+        <h1>观战模式</h1>
+        <p class="subtitle">
+            房间 <span class="room-code" id="roomCodeDisplay">----</span>
+            · <span class="mode-badge practice" id="modeBadge">练习</span>
+            · <span id="matchTimeLabel">—</span>
+        </p>
+
+        <div class="tabs-row">
+            <button type="button" class="active" data-tab="map">地图</button>
+            <button type="button" data-tab="leaderboard">排行榜</button>
+            <button type="button" data-tab="activity">Activity</button>
+        </div>
+
+        <div class="card" id="tab-map">
+            <h2>马来西亚威胁地图 <span class="tag">只读 · 不可部署</span></h2>
+            <div class="map-preview-wrap" id="spectatorMap"></div>
+            <p class="notice" style="margin-bottom:0">图钉与名字按<strong>州属颜色</strong>区分；<strong>州色攻击线</strong>显示谁在攻谁（进攻方州色）。观战不可点击操作。</p>
+        </div>
+
+        <div class="card hidden" id="tab-leaderboard">
+            <h2>排行榜 <span class="tag" id="leaderboardLockTag"></span></h2>
+            <ul class="member-list" id="leaderboardList"></ul>
+        </div>
+
+        <div class="card hidden" id="tab-activity">
+            <h2>Activity 动态 <span class="tag">最新在上</span></h2>
+            <div class="activity-feed" id="activityFeed"></div>
+        </div>
+
+        <div class="btn-row">
+            <a href="lobby.html" class="btn secondary" id="backLobby">返回大厅</a>
+            <a href="index.html" class="btn secondary">首页</a>
+        </div>
+    </main>
+
+    <script src="js/malaysia-states.js"></script>
+    <script src="js/map-attack-lines.js"></script>
+    <script src="js/malaysia-map.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/room-shared.js"></script>
+    <script src="js/room-local.js"></script>
+    <script src="js/room-firebase.js"></script>
+    <script src="js/room.js"></script>
+    <script>
+        const $ = (id) => document.getElementById(id);
+        const roomId = (new URLSearchParams(location.search).get("room")
+            || sessionStorage.getItem(CurrencySafeRoom.SK.roomId) || "").toUpperCase();
+
+        if (!roomId) location.href = "index.html";
+
+        const ACTIVITY_LABELS = {
+            player_join: "加入",
+            player_leave: "离开",
+            spectator_join: "观战",
+            game_start: "开赛",
+            shuffle_teams: "Shuffle",
+            mode_change: "模式",
+            target_selected: "选目标",
+            mission_deployed: "部署",
+            level_complete: "过关",
+            level_fail: "失误",
+            password_rotated: "换密码",
+            password_expired: "过期",
+            vault_breach: "破解",
+            transfer: "转账",
+            game_end: "结束",
+            room_created: "建房"
+        };
+
+        document.querySelectorAll(".tabs-row button").forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll(".tabs-row button").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                const tab = btn.dataset.tab;
+                $("tab-map").classList.toggle("hidden", tab !== "map");
+                $("tab-leaderboard").classList.toggle("hidden", tab !== "leaderboard");
+                $("tab-activity").classList.toggle("hidden", tab !== "activity");
+            };
+        });
+
+        $("backLobby").href = "lobby.html?room=" + roomId;
+
+        function escapeHtml(t) {
+            const d = document.createElement("div");
+            d.textContent = t;
+            return d.innerHTML;
+        }
+
+        function formatElapsed(ms) {
+            const s = Math.max(0, Math.floor(ms / 1000));
+            return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+        }
+
+        function formatRemaining(ms) {
+            return formatElapsed(ms);
+        }
+
+        function progressDots(levels) {
+            if (!levels || !levels.length) return "—/3";
+            const done = levels.filter(Boolean).length;
+            return `${done}/3`;
+        }
+
+        function render(room) {
+            if (!room) room = CurrencySafeRoom.getRoom(roomId);
+            if (!room) {
+                location.href = "index.html";
+                return;
+            }
+            if (room.status === "lobby") {
+                location.href = "lobby.html?room=" + roomId;
+                return;
+            }
+            $("roomCodeDisplay").textContent = room.id;
+            const isComp = room.mode === "competitive";
+            if (room.status === "ended") {
+                location.href = "ended.html?room=" + roomId;
+                return;
+            }
+            $("modeBadge").textContent = isComp ? "竞赛 Competitive" : "练习 Practice";
+            $("modeBadge").className = "mode-badge " + (isComp ? "competitive" : "practice");
+            const rem = CurrencySafeRoomShared.getMatchRemainingMs(room);
+            $("matchTimeLabel").textContent = rem != null
+                ? formatRemaining(rem)
+                : "—";
+
+            if (window.MalaysiaMapPreview) {
+                const mapEl = $("spectatorMap");
+                if (mapEl._mapSetPlayers) mapEl._mapSetPlayers(room.players);
+                else MalaysiaMapPreview.render(mapEl, room.players, { showAttackLines: true });
+            }
+
+            $("leaderboardLockTag").textContent = room.leaderboardLocked ? "余额排序已锁定" : "";
+
+            const txs = room.transactions || [];
+            function fmtStats(p) {
+                const st = CurrencySafeRoomShared.transferStatsForPlayer(p, txs);
+                return `盗${st.stealCount}次 RM${st.stealTotal.toLocaleString()} · 被盗${st.robbedCount}次 RM${st.robbedTotal.toLocaleString()}`;
+            }
+
+            const sorted = [...room.players].sort((a, b) => {
+                const bal = (b.balance || 0) - (a.balance || 0);
+                if (bal !== 0) return bal;
+                const sa = CurrencySafeRoomShared.transferStatsForPlayer(a, txs);
+                const sb = CurrencySafeRoomShared.transferStatsForPlayer(b, txs);
+                return sb.stealTotal - sa.stealTotal;
+            });
+
+            $("leaderboardList").innerHTML = sorted.length
+                ? sorted.map((p, i) => {
+                    const prog = p.missionProgress;
+                    const dots = progressDots(prog?.levels);
+                    const target = prog?.targetName ? ` · 攻 ${escapeHtml(prog.targetName)}` : "";
+                    const nameColor = window.getStateColor?.(p.stateId) || "#5aff9a";
+                    return `<li>
+                        <span><strong style="color:${nameColor}">#${i + 1} ${escapeHtml(p.name)}</strong> · <span style="color:${nameColor}">${escapeHtml(p.state || "")}</span>${target}
+                        <br/><span class="progress-dots">三关 ${dots}</span></span>
+                        <span class="tag">RM ${(p.balance || 0).toLocaleString()} · ${escapeHtml(fmtStats(p))}</span>
+                    </li>`;
+                }).join("")
+                : `<li><span class="tag">暂无玩家</span></li>`;
+
+            const feed = room.activity || [];
+            $("activityFeed").innerHTML = feed.length
+                ? feed.map(a => {
+                    const label = ACTIVITY_LABELS[a.type] || a.type;
+                    return `<div class="item" data-type="${escapeHtml(a.type || "")}">
+                        <strong>${new Date(a.at).toLocaleTimeString()}</strong>
+                        <span class="tag">[${escapeHtml(label)}]</span>
+                        ${escapeHtml(a.message)}
+                    </div>`;
+                }).join("")
+                : `<div class="item">暂无动态</div>`;
+        }
+
+        CurrencySafeRoom.ready.then(() => Promise.resolve(CurrencySafeRoom.reconnectRoom(roomId)))
+            .then(() => {
+                CurrencySafeRoom.subscribe(roomId, render);
+                setInterval(() => {
+                    const room = CurrencySafeRoom.getRoom(roomId);
+                    if (room) render(room);
+                }, 1000);
+            });
+    </script>
+</body>
+</html>

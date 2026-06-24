@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Currency Safe · Lobby</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,700;14..32,900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/shared.css" />
+    <link rel="stylesheet" href="css/fx.css" />
+    <link rel="stylesheet" href="css/lobby-hud.css" />
+    <script src="js/i18n.js"></script>
+</head>
+<body class="lobby-page" data-i18n-page-title="pageTitleLobby">
+    <main class="portal portal-wide">
+        <div class="lobby-command-bar">
+            <div class="lobby-command-top">
+                <h1 data-i18n="lobbyCommand">作战大厅</h1>
+                <span class="status-pill" id="statusPill"><span id="statusLabel">—</span></span>
+            </div>
+            <div class="lobby-room-row">
+                <span data-i18n="roomCodeLabel">房间码</span>
+                <span class="room-code" id="roomCodeDisplay">----</span>
+                <button type="button" class="secondary" id="copyCodeBtn" style="padding:8px 14px;font-size:0.8rem" data-i18n="copy">复制</button>
+                <a href="ended.html" class="btn cyan hidden" id="viewResultsBtn" data-i18n="viewResults">查看颁奖</a>
+            </div>
+        </div>
+
+        <div class="hud-panel" id="hostPanel">
+            <h2><span data-i18n="gameMode">比赛模式</span> <span class="tag" id="hostBadge"></span></h2>
+            <div class="mode-toggle">
+                <button type="button" data-mode="practice" id="modePractice" data-i18n="modePracticeBtn">练习</button>
+                <button type="button" data-mode="competitive" id="modeCompetitive" data-i18n="modeCompetitiveBtn">竞赛</button>
+            </div>
+            <p class="notice" style="margin-top:0" id="modeDesc"></p>
+            <div class="checkbox-row">
+                <input type="checkbox" id="shuffleStatesCheck" />
+                <label for="shuffleStatesCheck" style="margin:0" data-i18n="shuffleRandomStates">Shuffle 时随机分配州属</label>
+            </div>
+            <label for="matchDurationInput" data-i18n="matchDuration">比赛时长（分钟）</label>
+            <input type="number" id="matchDurationInput" min="1" step="1" value="12" inputmode="numeric" />
+            <div class="btn-row">
+                <button type="button" class="cyan" id="shuffleBtn" data-i18n="shuffleTeams">Shuffle 分队</button>
+                <button type="button" class="primary" id="startGameBtn" data-i18n="startGame">开始游戏</button>
+            </div>
+            <div class="checkbox-row">
+                <input type="checkbox" id="forceStartCheck" />
+                <label for="forceStartCheck" style="margin:0" data-i18n="forceStart">强制开始（试讲 · 允许不足 2 人）</label>
+            </div>
+        </div>
+
+        <div class="hud-panel host-console" id="teacherPanel">
+            <h2><span data-i18n="hostConsole">HOST 控制台</span> <span class="tag" data-i18n="hostOnly">仅房主</span></h2>
+            <label for="kickPlayerSelect" data-i18n="kickPlayer">踢出玩家</label>
+            <select id="kickPlayerSelect"></select>
+            <div class="btn-row">
+                <button type="button" class="secondary" id="kickPlayerBtn" data-i18n="kick">踢出</button>
+                <button type="button" class="secondary" id="endGameBtn" data-i18n="endGame">结束比赛</button>
+                <button type="button" class="cyan" id="exportCsvBtn" data-i18n="exportCsv">导出 CSV</button>
+                <button type="button" class="cyan" id="exportReportBtn" data-i18n="exportReport">导出报告</button>
+            </div>
+        </div>
+
+        <div class="lobby-grid">
+            <div class="hud-panel">
+                <h2><span data-i18n="players">玩家</span> <span id="playerCount">0</span></h2>
+                <div id="playerList"></div>
+            </div>
+            <div class="hud-panel">
+                <h2><span data-i18n="spectators">观战</span> <span id="spectatorCount">0</span></h2>
+                <div id="spectatorList"></div>
+            </div>
+        </div>
+
+        <div class="hud-panel map-preview-card" id="mapPreviewCard">
+            <h2><span data-i18n="mapPreview">地图预览</span> <span class="tag" data-i18n="mapPreviewTag">Shuffle 后图钉同步更新</span></h2>
+            <div class="map-preview-wrap" id="lobbyMapPreview"></div>
+        </div>
+
+        <div class="hud-panel lobby-join-dock">
+            <h2 data-i18n="joinRoomCard">加入本房</h2>
+            <label for="joinName" data-i18n="displayName">显示名称 / 队名</label>
+            <input id="joinName" maxlength="24" data-i18n-placeholder="namePlaceholder" placeholder="例如：暗影金库小队" />
+            <label for="joinState" data-i18n="homeStatePlayer">金库所在州属（Player）</label>
+            <select id="joinState"></select>
+            <div class="btn-row">
+                <button type="button" class="primary" id="joinPlayerBtn" data-i18n="joinAsPlayer">以玩家加入</button>
+                <button type="button" class="cyan" id="joinSpectatorBtn" data-i18n="joinAsSpectator">以观战加入</button>
+            </div>
+            <div id="lobbyNotice" class="notice hidden"></div>
+        </div>
+
+        <div class="btn-row">
+            <a href="index.html" class="btn secondary" id="leaveBtn" data-i18n="leaveRoom">离开房间</a>
+        </div>
+    </main>
+
+    <script src="js/malaysia-states.js"></script>
+    <script src="js/map-attack-lines.js"></script>
+    <script src="js/malaysia-map.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/room-shared.js"></script>
+    <script src="js/room-local.js"></script>
+    <script src="js/room-firebase.js"></script>
+    <script src="js/room.js"></script>
+    <script>
+        const $ = (id) => document.getElementById(id);
+        const t = (k) => CurrencySafeI18n.t(k);
+        const S = window.CurrencySafeRoomShared;
+        const params = new URLSearchParams(location.search);
+        let roomId = (params.get("room") || sessionStorage.getItem(CurrencySafeRoom.SK.roomId) || "").toUpperCase();
+        let unsub = null;
+        let refreshTimer = null;
+
+        CurrencySafeI18n.mountLangBar({
+            onChange: () => {
+                const room = CurrencySafeRoom.getRoom(roomId);
+                if (room) renderRoom(room);
+            }
+        });
+        CurrencySafeI18n.unlockLang();
+
+        function showNotice(msg, isError) {
+            const el = $("lobbyNotice");
+            el.textContent = msg;
+            el.className = "notice " + (isError ? "error" : "success");
+            el.classList.remove("hidden");
+        }
+
+        function initStateSelect() {
+            $("joinState").innerHTML = MALAYSIA_STATES.map(s =>
+                `<option value="${s.id}">${s.label}</option>`
+            ).join("");
+            $("joinState").value = "selangor";
+        }
+
+        function applyMatchDuration() {
+            const input = $("matchDurationInput");
+            if (!input) return;
+            runAction(CurrencySafeRoom.setMatchDuration(roomId, input.value), () => {
+                showNotice(t("matchDurationSet"), false);
+            });
+        }
+
+        function money(n) {
+            return Number(n || 0).toLocaleString("en-MY");
+        }
+
+        function renderAgentCard(p, i, room, isPlayer) {
+            const color = window.getStateColor?.(p.stateId) || "#5aff9a";
+            const host = p.id === room.hostId ? ` · ${t("hostTag")}` : "";
+            const bal = isPlayer ? `<br/>RM ${money(p.balance)}` : "";
+            return `<div class="agent-card">
+                <div class="agent-card-bar" style="background:${color}"></div>
+                <div class="agent-card-body">
+                    <strong style="color:${color}">${escapeHtml(p.name)}</strong>
+                    <span>${escapeHtml(p.state || "")}${bal}</span>
+                </div>
+                <div class="agent-card-meta">#${i + 1}${host}</div>
+            </div>`;
+        }
+
+        function setRoomStatus(room) {
+            const pill = $("statusPill");
+            const label = $("statusLabel");
+            pill.classList.remove("live", "ended");
+            if (room.status === "playing") {
+                pill.classList.add("live");
+                label.textContent = t("lobbyStatusLive");
+            } else if (room.status === "ended") {
+                pill.classList.add("ended");
+                label.textContent = t("lobbyStatusEnded");
+            } else {
+                label.textContent = t("lobbyStatusWaiting");
+            }
+            const viewBtn = $("viewResultsBtn");
+            if (room.status === "ended") {
+                viewBtn.classList.remove("hidden");
+                viewBtn.href = "ended.html?room=" + room.id;
+            } else {
+                viewBtn.classList.add("hidden");
+            }
+        }
+
+        function renderRoom(room) {
+            if (!room) room = CurrencySafeRoom.getRoom(roomId);
+            if (!room) {
+                location.href = "index.html";
+                return;
+            }
+            if (room.status !== "playing") CurrencySafeI18n.unlockLang();
+            CurrencySafeI18n.applyToDocument();
+            setRoomStatus(room);
+
+            sessionStorage.setItem(CurrencySafeRoom.SK.roomId, room.id);
+            $("roomCodeDisplay").textContent = room.id;
+            $("playerCount").textContent = "(" + room.players.length + ")";
+            $("spectatorCount").textContent = "(" + (room.spectators || []).length + ")";
+
+            $("playerList").innerHTML = room.players.length
+                ? room.players.map((p, i) => renderAgentCard(p, i, room, true)).join("")
+                : `<div class="notice" style="margin:0">${escapeHtml(t("waitingPlayers"))}</div>`;
+
+            $("spectatorList").innerHTML = (room.spectators || []).length
+                ? room.spectators.map((s, i) => renderAgentCard(s, i, room, false)).join("")
+                : `<div class="notice" style="margin:0">${escapeHtml(t("noSpectators"))}</div>`;
+
+            const host = CurrencySafeRoom.isHost(room);
+            $("hostPanel").style.display = host ? "block" : "none";
+            $("teacherPanel").style.display = host ? "block" : "none";
+            $("hostBadge").textContent = host ? t("hostBadge") : "";
+            $("kickPlayerSelect").innerHTML = room.players
+                .filter(p => p.id !== room.hostId)
+                .map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`)
+                .join("") || `<option value="">${escapeHtml(t("noKickTarget"))}</option>`;
+            $("endGameBtn").style.display = room.status === "playing" ? "inline-block" : "none";
+            $("modePractice").classList.toggle("active", room.mode === "practice");
+            $("modeCompetitive").classList.toggle("active", room.mode === "competitive");
+            $("shuffleStatesCheck").checked = !!room.shuffleRandomStates;
+            const roundMs = room.settings?.roundMs ?? S.defaultRoomSettings(room.mode).roundMs;
+            const durInput = $("matchDurationInput");
+            if (durInput && document.activeElement !== durInput) {
+                durInput.value = String(Math.max(1, Math.round(roundMs / 60000)));
+            }
+
+            if (window.MalaysiaMapPreview) {
+                const mapEl = $("lobbyMapPreview");
+                if (mapEl._mapSetPlayers) mapEl._mapSetPlayers(room.players);
+                else MalaysiaMapPreview.render(mapEl, room.players, {
+                    orderNumbers: true,
+                    showAttackLines: false
+                });
+            }
+
+            $("modeDesc").textContent = room.mode === "practice"
+                ? t("modeDescPractice")
+                : t("modeDescCompetitive");
+
+            const me = room.players.find(p => p.id === CurrencySafeRoom.getClientId());
+            const spec = (room.spectators || []).find(s => s.id === CurrencySafeRoom.getClientId());
+            if (me) {
+                $("joinName").value = me.name;
+                if (me.stateId) $("joinState").value = me.stateId;
+            } else if (spec) {
+                $("joinName").value = spec.name;
+            }
+
+            if (room.status === "ended") {
+                location.href = "ended.html?room=" + room.id;
+                return;
+            } else if (room.status === "playing") {
+                if (me) {
+                    sessionStorage.setItem(CurrencySafeRoom.SK.roomRole, "player");
+                    location.href = "game.html?room=" + room.id;
+                } else {
+                    location.href = "spectator.html?room=" + room.id;
+                }
+            }
+            CurrencySafeI18n.syncLangBarButtons();
+        }
+
+        function runAction(promise, onOk) {
+            Promise.resolve(promise).then(res => {
+                if (res && res.ok === false) showNotice(res.error, true);
+                else if (onOk) onOk(res);
+            });
+        }
+
+        function escapeHtml(text) {
+            const d = document.createElement("div");
+            d.textContent = text;
+            return d.innerHTML;
+        }
+
+        if (!roomId) {
+            location.href = "index.html";
+        } else {
+            CurrencySafeRoom.ready.then(() => {
+                initStateSelect();
+                return Promise.resolve(CurrencySafeRoom.reconnectRoom(roomId));
+            }).then(() => {
+                unsub = CurrencySafeRoom.subscribe(roomId, renderRoom);
+                refreshTimer = setInterval(() => {
+                    const room = CurrencySafeRoom.getRoom(roomId);
+                    if (room) renderRoom(room);
+                }, 1000);
+            });
+        }
+
+        $("copyCodeBtn").onclick = async () => {
+            try {
+                await navigator.clipboard.writeText(roomId);
+                showNotice(t("copiedCode") + roomId, false);
+            } catch {
+                showNotice(t("copyFallback") + roomId, false);
+            }
+        };
+
+        $("modePractice").onclick = () => {
+            runAction(CurrencySafeRoom.setRoomMode(roomId, "practice"), () => showNotice(t("modePracticeSet"), false));
+        };
+
+        $("modeCompetitive").onclick = () => {
+            runAction(CurrencySafeRoom.setRoomMode(roomId, "competitive"), () => showNotice(t("modeCompetitiveSet"), false));
+        };
+
+        $("shuffleBtn").onclick = () => {
+            runAction(CurrencySafeRoom.shufflePlayers(roomId, $("shuffleStatesCheck").checked), () => {
+                showNotice(t("shuffleDone"), false);
+                $("mapPreviewCard").classList.add("shuffle-flash");
+                setTimeout(() => $("mapPreviewCard").classList.remove("shuffle-flash"), 700);
+            });
+        };
+
+        $("matchDurationInput").onchange = applyMatchDuration;
+        $("matchDurationInput").onblur = applyMatchDuration;
+
+        $("startGameBtn").onclick = () => {
+            runAction(CurrencySafeRoom.startGame(roomId, $("forceStartCheck").checked), res => {
+                if (!res || res.ok === false) return;
+                sessionStorage.setItem(CurrencySafeRoom.SK.roomRole, "player");
+                location.href = "game.html?room=" + roomId;
+            });
+        };
+
+        $("joinPlayerBtn").onclick = () => {
+            runAction(CurrencySafeRoom.joinRoomAsPlayer(roomId, $("joinName").value, $("joinState").value), () => {
+                showNotice(t("joinedPlayer"), false);
+            });
+        };
+
+        $("joinSpectatorBtn").onclick = () => {
+            runAction(CurrencySafeRoom.joinRoomAsSpectator(roomId, $("joinName").value), () => {
+                showNotice(t("joinedSpectator"), false);
+            });
+        };
+
+        $("kickPlayerBtn").onclick = () => {
+            const pid = $("kickPlayerSelect").value;
+            if (!pid) { showNotice(t("selectKick"), true); return; }
+            if (!confirm(t("confirmKick"))) return;
+            runAction(CurrencySafeRoom.kickPlayer(roomId, pid), () => showNotice(t("kicked"), false));
+        };
+
+        $("endGameBtn").onclick = () => {
+            if (!confirm(t("confirmEnd"))) return;
+            runAction(CurrencySafeRoom.endGame(roomId), () => {
+                location.href = "ended.html?room=" + roomId;
+            });
+        };
+
+        $("exportCsvBtn").onclick = () => {
+            const res = CurrencySafeRoom.exportRoomCsv(roomId);
+            if (res && res.ok === false) showNotice(res.error, true);
+            else showNotice(t("csvDownloaded"), false);
+        };
+
+        $("exportReportBtn").onclick = () => {
+            const res = CurrencySafeRoom.exportRoomReport(roomId);
+            if (res && res.ok === false) showNotice(res.error, true);
+            else showNotice(t("reportDownloaded"), false);
+        };
+
+        $("leaveBtn").onclick = (e) => {
+            e.preventDefault();
+            if (unsub) unsub();
+            if (refreshTimer) clearInterval(refreshTimer);
+            Promise.resolve(CurrencySafeRoom.leaveRoom(roomId)).then(() => {
+                location.href = "index.html";
+            });
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+/* Confetti + balance FX (game + ended) */
+.cs-confetti {
+    position: fixed;
+    width: 10px;
+    height: 16px;
+    pointer-events: none;
+    z-index: 9000;
+    animation: cs-confetti-fall 0.9s ease-out forwards;
+    border-radius: 3px;
+}
+#missionFxLayer,
+#podiumFxLayer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 30;
+}
+.mission-panel {
+    position: relative;
+}
+.pill-credit {
+    animation: hud-pulse-credit 0.55s ease-out 2;
+    border-color: rgba(255, 214, 90, 0.75) !important;
+}
+.pill-credit #hudBalance {
+    color: var(--amber);
+    text-shadow: 0 0 12px rgba(255, 214, 90, 0.45);
+}
+.balance-delta {
+    position: absolute;
+    right: 8px;
+    top: -6px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--amber);
+    animation: balance-delta-rise 0.85s ease-out forwards;
+    pointer-events: none;
+}
+@keyframes cs-confetti-fall {
+    to {
+        transform: translate(var(--x), var(--y)) rotate(650deg);
+        opacity: 0;
+    }
+}
+@keyframes hud-pulse-credit {
+    0%, 100% { box-shadow: var(--glow, 0 0 20px rgba(255, 214, 90, 0.1)); }
+    50% { box-shadow: 0 0 22px rgba(255, 214, 90, 0.45); }
+}
+@keyframes balance-delta-rise {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-18px); }
+}
+
+/* Pin label — always visible, two lines */
+.threat-marker-label,
+.map-preview-label {
+    opacity: 1 !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    line-height: 1.25;
+}
+.pin-line.pin-balance {
+    font-size: 0.62rem;
+    color: var(--amber);
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
+.map-preview-label .pin-balance {
+    font-size: 0.58rem;
+}
+
+/* Scoreboard transfer stats */
+.score-stat-line {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 2px;
+}

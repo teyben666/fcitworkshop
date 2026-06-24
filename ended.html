@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Currency Safe · 比赛结束</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,700;14..32,900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/shared.css" />
+    <link rel="stylesheet" href="css/fx.css" />
+    <link rel="stylesheet" href="css/ended.css" />
+    <script src="js/i18n.js"></script>
+</head>
+<body class="ended-page" data-i18n-page-title="pageTitleEnded">
+    <div class="ended-scanline"></div>
+    <main class="ended-stage">
+        <div class="portal-logo" style="margin:0 auto 16px"><img src="logo-dark.png" alt="" onerror="this.parentElement.textContent='🏆'" /></div>
+        <h1 class="ended-title" data-i18n="missionComplete">任务完成</h1>
+        <p class="ended-sub"><span data-i18n="roomCodeLabel">房间码</span> <span class="room-code" id="roomCodeDisplay">----</span></p>
+
+        <div class="podium" id="podium">
+            <div id="podiumFxLayer"></div>
+            <div class="podium-slot" data-rank="3" id="slot3">
+                <div class="podium-placeholder">🥉 ···</div>
+            </div>
+            <div class="podium-slot" data-rank="1" id="slot1">
+                <div class="podium-placeholder">🥇 ···</div>
+            </div>
+            <div class="podium-slot" data-rank="2" id="slot2">
+                <div class="podium-placeholder">🥈 ···</div>
+            </div>
+        </div>
+
+        <div class="ended-you hidden" id="endedYou">
+            <h3 data-i18n="yourResult">你的战绩</h3>
+            <div id="endedYouBody"></div>
+        </div>
+
+        <div class="ended-actions">
+            <button type="button" class="cyan hidden" id="stopCelebrationBtn" data-i18n="stopCelebration">停止庆祝</button>
+            <button type="button" class="cyan" id="exportCsvBtn" data-i18n="exportCsv">导出 CSV</button>
+            <button type="button" class="primary" id="backHomeBtn" data-i18n="backHome">返回首页</button>
+        </div>
+    </main>
+
+    <script src="js/malaysia-states.js"></script>
+    <script src="js/fx.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/room-shared.js"></script>
+    <script src="js/room-local.js"></script>
+    <script src="js/room-firebase.js"></script>
+    <script src="js/room.js"></script>
+    <script>
+        const $ = (id) => document.getElementById(id);
+        const t = (k) => CurrencySafeI18n.t(k);
+        const S = window.CurrencySafeRoomShared;
+        const roomId = (new URLSearchParams(location.search).get("room")
+            || sessionStorage.getItem(CurrencySafeRoom.SK.roomId) || "").toUpperCase();
+        let revealStarted = false;
+
+        CurrencySafeI18n.mountLangBar();
+        CurrencySafeI18n.unlockLang();
+
+        function escapeHtml(text) {
+            const d = document.createElement("div");
+            d.textContent = text;
+            return d.innerHTML;
+        }
+
+        function money(n) {
+            return Number(n || 0).toLocaleString("en-MY");
+        }
+
+        function formatStats(p, txs) {
+            const st = S.transferStatsForPlayer(p, txs);
+            return `${t("statSteal")} ${st.stealCount} ${t("statTimes")} · RM ${money(st.stealTotal)} · ` +
+                `${t("statRobbed")} ${st.robbedCount} ${t("statTimes")} · RM ${money(st.robbedTotal)}`;
+        }
+
+        function fillSlot(slotEl, player, rank, txs) {
+            if (!player) {
+                slotEl.innerHTML = `<div class="podium-placeholder">—</div>`;
+                return;
+            }
+            const color = window.getStateColor?.(player.stateId) || "#5aff9a";
+            const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : "🥉";
+            slotEl.innerHTML =
+                `<div class="podium-rank">${medal}</div>` +
+                `<div class="podium-name" style="color:${color}">${escapeHtml(player.name)}</div>` +
+                `<div class="podium-state" style="color:${color}">${escapeHtml(player.state || "")}</div>` +
+                `<div class="podium-balance">RM ${money(player.balance)}</div>` +
+                `<div class="score-stat-line">${escapeHtml(formatStats(player, txs))}</div>`;
+        }
+
+        async function runPodiumReveal(room) {
+            if (revealStarted) return;
+            revealStarted = true;
+            const sorted = [...room.players].sort((a, b) => (b.balance || 0) - (a.balance || 0));
+            const txs = room.transactions || [];
+            const order = sorted.length >= 3
+                ? [{ p: sorted[2], rank: 3, slot: $("slot3") },
+                   { p: sorted[1], rank: 2, slot: $("slot2") },
+                   { p: sorted[0], rank: 1, slot: $("slot1") }]
+                : sorted.length === 2
+                    ? [{ p: sorted[1], rank: 2, slot: $("slot2") },
+                       { p: sorted[0], rank: 1, slot: $("slot1") }]
+                    : [{ p: sorted[0], rank: 1, slot: $("slot1") }];
+
+            for (const item of order) {
+                await CurrencySafeFx.delay(item.rank === 1 ? 1400 : 1200);
+                if (item.p) fillSlot(item.slot, item.p, item.rank, txs);
+                item.slot.classList.add("revealed");
+            }
+
+            const meId = CurrencySafeRoom.getClientId();
+            const me = room.players.find(p => p.id === meId);
+            if (me) {
+                await CurrencySafeFx.delay(800);
+                const myRank = sorted.findIndex(p => p.id === meId) + 1;
+                $("endedYouBody").innerHTML =
+                    `<strong style="color:${window.getStateColor?.(me.stateId) || "#5aff9a"}">#${myRank} ${escapeHtml(me.name)}</strong> · RM ${money(me.balance)}<br/>` +
+                    `<span class="score-stat-line">${escapeHtml(formatStats(me, txs))}</span>`;
+                $("endedYou").classList.remove("hidden");
+                $("endedYou").classList.add("visible");
+            }
+
+            await CurrencySafeFx.delay(500);
+            CurrencySafeFx.confetti({ zone: "podium" });
+            await CurrencySafeFx.delay(1200);
+            CurrencySafeFx.startConfettiLoop({ zone: "fullscreen" });
+            $("stopCelebrationBtn").classList.remove("hidden");
+        }
+
+        function renderRoom(room) {
+            if (!room) room = CurrencySafeRoom.getRoom(roomId);
+            if (!room) { location.href = "index.html"; return; }
+            if (room.status === "lobby") {
+                location.href = "lobby.html?room=" + room.id;
+                return;
+            }
+            if (room.status === "playing") {
+                const me = room.players.find(p => p.id === CurrencySafeRoom.getClientId());
+                const isSpec = CurrencySafeRoom.getSessionRole() === "spectator"
+                    || (room.spectators || []).some(s => s.id === CurrencySafeRoom.getClientId());
+                if (isSpec) location.href = "spectator.html?room=" + room.id;
+                else if (me) location.href = "game.html?room=" + room.id;
+                else location.href = "lobby.html?room=" + room.id;
+                return;
+            }
+            $("roomCodeDisplay").textContent = room.id;
+            CurrencySafeI18n.applyToDocument();
+            runPodiumReveal(room);
+        }
+
+        if (!roomId) location.href = "index.html";
+        else {
+            CurrencySafeRoom.ready.then(() => Promise.resolve(CurrencySafeRoom.reconnectRoom(roomId)))
+                .then(() => CurrencySafeRoom.subscribe(roomId, renderRoom));
+        }
+
+        $("stopCelebrationBtn").onclick = () => {
+            CurrencySafeFx.stopConfettiLoop();
+            $("stopCelebrationBtn").classList.add("hidden");
+        };
+
+        $("exportCsvBtn").onclick = () => {
+            const res = CurrencySafeRoom.exportRoomCsv(roomId);
+            if (res && res.ok === false) alert(res.error);
+        };
+
+        $("backHomeBtn").onclick = () => {
+            CurrencySafeFx.stopConfettiLoop();
+            location.href = "index.html";
+        };
+    </script>
+</body>
+</html>

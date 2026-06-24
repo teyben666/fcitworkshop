@@ -1,0 +1,527 @@
+/**
+ * Currency Safe UI i18n — 首页/大厅右上角选语言，开赛进游戏后锁定
+ */
+(function () {
+    const SK = { uiLang: "csUiLang", uiLangLocked: "csUiLangLocked" };
+
+    const STR = {
+        zh: {
+            pageTitleHome: "Currency Safe",
+            pageTitleLobby: "Currency Safe · 大厅",
+            pageTitleGame: "Currency Safe · 金库行动",
+            gameTitle: "Currency Safe: 金库行动",
+            reportTitle: "Currency Safe: 金库行动 - 特工任务报告",
+            homeSubtitle: "金库行动 · 真人互攻或单人练习 · 创建/加入房间",
+            createRoom: "创建房间",
+            joinRoom: "加入房间",
+            roomCode: "房间码",
+            roomCodePlaceholder: "例如 AB12",
+            enterRoom: "进入房间",
+            cancel: "取消",
+            syncLocal: "同步：localStorage 演示 · 配置 js/firebase-config.js 启用多设备",
+            syncFirebase: "同步：Firebase 实时数据库 · 多设备可用",
+            createFailed: "创建房间失败。",
+            enterCode: "请输入房间码。",
+            lobbyTitle: "房间大厅",
+            roomCodeLabel: "房间码",
+            copy: "复制",
+            copiedCode: "房间码已复制：",
+            copyFallback: "房间码：",
+            gameMode: "比赛模式",
+            hostBadge: "（你是房主 / 教师 Host）",
+            modePracticeBtn: "练习",
+            modeCompetitiveBtn: "竞赛",
+            modeDescPractice: "练习：密码 20 分钟轮换、部署不限、统计仅练习模式记录。",
+            modeDescCompetitive: "竞赛：密码 12 分钟轮换、每目标 3 次部署、排行榜锁定。",
+            shuffleRandomStates: "Shuffle 时随机分配州属",
+            shuffleTeams: "Shuffle 分队",
+            startGame: "开始游戏",
+            forceStart: "强制开始（试讲 · 允许不足 2 人）",
+            teacherPanel: "教师 Host 面板",
+            hostOnly: "仅房主",
+            kickPlayer: "踢出玩家",
+            kick: "踢出",
+            endGame: "结束比赛",
+            exportCsv: "导出 CSV",
+            exportReport: "导出报告",
+            players: "玩家",
+            spectators: "观战",
+            mapPreview: "地图预览",
+            mapPreviewTag: "Shuffle 后图钉同步更新",
+            joinRoomCard: "加入本房",
+            displayName: "显示名称 / 队名",
+            namePlaceholder: "例如：暗影金库小队",
+            homeStatePlayer: "金库所在州属（Player）",
+            joinAsPlayer: "以玩家加入",
+            joinAsSpectator: "以观战加入",
+            leaveRoom: "离开房间",
+            waitingPlayers: "等待玩家加入…",
+            noSpectators: "暂无观战",
+            spectatorTag: "观战",
+            hostTag: "Host",
+            noKickTarget: "无可踢出玩家",
+            gameEnded: "比赛已结束。可导出 CSV 后返回首页。",
+            modePracticeSet: "已切换为练习模式。",
+            modeCompetitiveSet: "已切换为竞赛模式。",
+            shuffleDone: "Shuffle 完成。",
+            joinedPlayer: "已以玩家加入。",
+            joinedSpectator: "已以观战加入。",
+            selectKick: "请选择要踢出的玩家。",
+            confirmKick: "确定踢出该玩家？",
+            kicked: "已踢出玩家。",
+            confirmEnd: "确定结束本场比赛？",
+            gameEndedNotice: "比赛已结束。",
+            csvDownloaded: "CSV 已下载。",
+            reportDownloaded: "报告已下载。",
+            singlePlayerBtn: "单人练习",
+            singlePlayerTitle: "单人练习 · 对战电脑",
+            singlePlayerDesc: "无需房间码。5 支 AI 金库会出现在地图上，规则与练习模式相同：部署不限、密码 20 分钟轮换。",
+            singlePlayerStart: "开始单人任务",
+            singlePlayerBack: "返回首页",
+            tagSolo: "单人 vs 电脑",
+            registerDescSolo: "设置特工代号、金库州属与密码，生成 5 支电脑对手金库。",
+            registerBtnSolo: "特工入职 · 开始任务",
+            registerTitleSolo: "特工入职",
+            modeSolo: "单人练习",
+            backHome: "返回首页",
+            aiTeam: "电脑队伍",
+            soloStarted: "任务开始！你的金库在 {state}。点击地图上的电脑金库选择目标。",
+            enterAgentName: "请输入特工代号。",
+            aiRotated: "{name} 轮换了密码，已完成关卡的情报已保留。",
+            vaultNotReady: "{name} 尚未设置金库密码，无法攻击。",
+            yourOwnTeam: "{name} 是你的队伍。",
+            matchTime: "剩余时间",
+            leaveMatch: "离开比赛",
+            confirmLeaveMatch: "确定离开比赛？你将离线，可稍后在首页重新加入。",
+            matchDuration: "比赛时长（分钟，自行输入）",
+            matchDurationSet: "已更新比赛时长",
+            balance: "余额",
+            passwordTimer: "密码倒计时",
+            currentTarget: "当前目标",
+            more: "更多",
+            room: "房间",
+            mode: "模式",
+            modePractice: "练习",
+            modeCompetitive: "竞赛",
+            otherPlayers: "其他玩家",
+            backLobby: "返回大厅",
+            briefing: "任务简报",
+            muteOn: "音效：关",
+            muteOff: "音效：开",
+            mapTitle: "马来西亚威胁地图",
+            legendYou: "你",
+            legendTarget: "选中目标",
+            legendOthers: "其他玩家",
+            legendExpired: "密码过期",
+            mapHint: "点击地图上其他玩家的金库开始截获",
+            tabRegister: "确认密码",
+            tabAttack: "截获任务",
+            tabDefend: "金库防线",
+            tabScore: "战绩",
+            registerTitle: "确认金库密码",
+            tagPvp: "真人互攻",
+            registerDesc: "队名与州属已在大厅选定。设置密码与特工等级后即可参战。",
+            agentName: "特工代号",
+            vaultPassword: "金库密码",
+            passwordHint: "(6–9 位大写字母或数字)",
+            agentRank: "特工等级",
+            rankTrainee: "见习特工（推荐）",
+            rankElite: "精英特工",
+            homeState: "金库州属",
+            registerBtn: "确认密码 · 进入战场",
+            safeNote: "请勿使用真实银行密码。课堂模拟。",
+            attackTitle: "截获控制台",
+            tagThreeLevels: "三关 → 解锁金库",
+            attackHintDefault: "先确认密码，然后点击地图上其他玩家金库选择目标。",
+            yourTeam: "你的队伍",
+            targetVault: "目标金库",
+            redeploy: "重新部署",
+            refreshIntel: "刷新情报",
+            flowPick: "① 选目标",
+            flowPlay: "② 闯关",
+            flowBreach: "③ 破解转账",
+            frag1: "密钥片段 1",
+            frag2: "密钥片段 2",
+            frag3: "密钥片段 3",
+            fragLocked: "🔒 未解锁",
+            fragDone: "已获取",
+            puzzleHint: "完成三关小游戏，每关揭示一段密钥。",
+            combinedKey: "组合金库密钥",
+            autofill: "自动填入片段",
+            breachBtn: "破解金库门锁",
+            transferTitle: "金库已破解！可模拟转账。",
+            transferTo: "转入账户",
+            transferAmount: "夺取金额",
+            transferBtn: "确认转账",
+            transferPerfHint: "完成三关后按表现结算夺取金额",
+            transferPerfScore: "表现评分",
+            mapStatMissionReward: "本次夺取",
+            scoreTitle: "本房排名",
+            tagRanking: "Ranking",
+            txTitle: "最近转账",
+            tagRecent: "最近 5 笔",
+            exportReport: "导出报告",
+            resetSim: "重置本机进度",
+            none: "无",
+            awaiting: "等待确认密码",
+            expired: "已过期",
+            active: "防线正常",
+            notRegistered: "未入职",
+            noTarget: "未选择",
+            hudTeamsCount: "名对手",
+            alertExpired: "⚠️ 你的金库密码已过期！请前往「金库防线」更新后再攻击。",
+            alertAttacked: "⚠️ 你的金库遭到转账！请检查余额并更新密码。",
+            alertRotated: "⚠️ 你的金库密码已被迫使轮换！",
+            deployLimit: "部署",
+            practiceUnlimited: "不限",
+            waitingRegister: "请先确认密码。",
+            pickTargetMap: "请点击地图上的敌方金库。",
+            selectTargetFirst: "请选择目标。",
+            langLabel: "界面语言",
+            langZh: "华语",
+            langEn: "English",
+            langLocked: "比赛进行中，语言已锁定",
+            mapRankEmpty: "—",
+            mapMyRankPending: "尚未入职",
+            mapStatTotalMoney: "地图总资金",
+            mapStatTransfers: "成功转账",
+            mapStatTarget: "当前目标",
+            mapStatMissionReward: "本次夺取",
+            dialSlotHint: "拖拽 / 滚轮",
+            dialDesc: "拖动转轮或滚轮调节字母和数字，恢复密钥片段。",
+            dialReset: "恢复初始",
+            dialResetDone: "转轮已恢复初始状态",
+            pageTitleEnded: "Currency Safe · 比赛结束",
+            missionComplete: "任务完成",
+            podiumReveal: "揭晓名次",
+            rankPlace: "第 {n} 名",
+            yourResult: "你的战绩",
+            stopCelebration: "停止庆祝",
+            statSteal: "盗",
+            statRobbed: "被盗",
+            statTimes: "次",
+            lobbyStatusWaiting: "等待中",
+            lobbyStatusLive: "进行中",
+            lobbyStatusEnded: "已结束",
+            lobbyCommand: "作战大厅",
+            hostConsole: "HOST 控制台",
+            viewResults: "查看颁奖",
+        },
+        en: {
+            pageTitleHome: "Currency Safe",
+            pageTitleLobby: "Currency Safe · Lobby",
+            pageTitleGame: "Currency Safe · Vault Ops",
+            gameTitle: "Currency Safe: Vault Ops",
+            reportTitle: "Currency Safe: Vault Ops — Agent Report",
+            homeSubtitle: "Vault ops · PvP or solo practice · Create/join a room",
+            createRoom: "Create Room",
+            joinRoom: "Join Room",
+            roomCode: "Room Code",
+            roomCodePlaceholder: "e.g. AB12",
+            enterRoom: "Enter Room",
+            cancel: "Cancel",
+            syncLocal: "Sync: localStorage demo · Enable js/firebase-config.js for multi-device",
+            syncFirebase: "Sync: Firebase Realtime Database · Multi-device ready",
+            createFailed: "Failed to create room.",
+            enterCode: "Please enter a room code.",
+            lobbyTitle: "Room Lobby",
+            roomCodeLabel: "Room",
+            copy: "Copy",
+            copiedCode: "Room code copied: ",
+            copyFallback: "Room code: ",
+            gameMode: "Game Mode",
+            hostBadge: "(You are host / Teacher)",
+            modePracticeBtn: "Practice",
+            modeCompetitiveBtn: "Competitive",
+            modeDescPractice: "Practice: 20 min password rotation, unlimited deploys, mission stats tracked.",
+            modeDescCompetitive: "Competitive: 12 min rotation, 3 deploys per target, locked leaderboard.",
+            shuffleRandomStates: "Randomize states on Shuffle",
+            shuffleTeams: "Shuffle Teams",
+            startGame: "Start Game",
+            forceStart: "Force start (demo · allow < 2 players)",
+            teacherPanel: "Teacher Host Panel",
+            hostOnly: "Host only",
+            kickPlayer: "Kick player",
+            kick: "Kick",
+            endGame: "End Game",
+            exportCsv: "Export CSV",
+            exportReport: "Export Report",
+            players: "Players",
+            spectators: "Spectators",
+            mapPreview: "Map Preview",
+            mapPreviewTag: "Pins update after Shuffle",
+            joinRoomCard: "Join This Room",
+            displayName: "Display name / Team",
+            namePlaceholder: "e.g. Shadow Vault Squad",
+            homeStatePlayer: "Vault state (Player)",
+            joinAsPlayer: "Join as Player",
+            joinAsSpectator: "Join as Spectator",
+            leaveRoom: "Leave Room",
+            waitingPlayers: "Waiting for players…",
+            noSpectators: "No spectators yet",
+            spectatorTag: "Spectator",
+            hostTag: "Host",
+            noKickTarget: "No players to kick",
+            gameEnded: "Game ended. Export CSV or return home.",
+            modePracticeSet: "Switched to Practice mode.",
+            modeCompetitiveSet: "Switched to Competitive mode.",
+            shuffleDone: "Shuffle complete.",
+            joinedPlayer: "Joined as Player.",
+            joinedSpectator: "Joined as Spectator.",
+            selectKick: "Select a player to kick.",
+            confirmKick: "Kick this player?",
+            kicked: "Player kicked.",
+            confirmEnd: "End this match?",
+            gameEndedNotice: "Match ended.",
+            csvDownloaded: "CSV downloaded.",
+            reportDownloaded: "Report downloaded.",
+            singlePlayerBtn: "Solo Practice",
+            singlePlayerTitle: "Solo · vs Computer",
+            singlePlayerDesc: "No room code needed. 5 AI vaults on the map. Practice rules: unlimited deploys, 20 min password rotation.",
+            singlePlayerStart: "Start Solo Mission",
+            singlePlayerBack: "Back to Home",
+            tagSolo: "Solo vs AI",
+            registerDescSolo: "Set codename, home state and password. Five AI vaults will spawn.",
+            registerBtnSolo: "Register & Start",
+            registerTitleSolo: "Agent Registration",
+            modeSolo: "Solo Practice",
+            backHome: "Home",
+            aiTeam: "AI team",
+            soloStarted: "Mission started! Your vault is in {state}. Click an AI vault on the map.",
+            enterAgentName: "Enter your codename.",
+            aiRotated: "{name} rotated password. Completed level intel kept.",
+            vaultNotReady: "{name} vault not ready yet.",
+            yourOwnTeam: "{name} is your team.",
+            matchTime: "Time Left",
+            leaveMatch: "Leave Match",
+            confirmLeaveMatch: "Leave the match? You will go offline and can rejoin from the home page.",
+            matchDuration: "Match duration (minutes, enter any value)",
+            matchDurationSet: "Match duration updated",
+            balance: "Balance",
+            passwordTimer: "Password Timer",
+            currentTarget: "Target",
+            more: "More",
+            room: "Room",
+            mode: "Mode",
+            modePractice: "Practice",
+            modeCompetitive: "Competitive",
+            otherPlayers: "Others",
+            backLobby: "Lobby",
+            briefing: "Briefing",
+            muteOn: "Sound: Off",
+            muteOff: "Sound: On",
+            mapTitle: "Malaysia Threat Map",
+            legendYou: "You",
+            legendTarget: "Target",
+            legendOthers: "Players",
+            legendExpired: "Expired",
+            mapHint: "Click another player's vault on the map to start",
+            tabRegister: "Set Password",
+            tabAttack: "Mission",
+            tabDefend: "Defense",
+            tabScore: "Scores",
+            registerTitle: "Confirm Vault Password",
+            tagPvp: "PvP",
+            registerDesc: "Name and state were set in the lobby. Set password and rank to play.",
+            agentName: "Codename",
+            vaultPassword: "Vault Password",
+            passwordHint: "(6–9 letters or digits)",
+            agentRank: "Agent Rank",
+            rankTrainee: "Trainee (recommended)",
+            rankElite: "Elite",
+            homeState: "Home State",
+            registerBtn: "Confirm & Enter",
+            safeNote: "Do not use real bank passwords. Classroom simulation.",
+            attackTitle: "Intercept Console",
+            tagThreeLevels: "3 levels → breach",
+            attackHintDefault: "Confirm password, then click a vault on the map.",
+            yourTeam: "Your Team",
+            targetVault: "Target Vault",
+            redeploy: "Deploy Mission",
+            refreshIntel: "Refresh Intel",
+            flowPick: "① Target",
+            flowPlay: "② Levels",
+            flowBreach: "③ Breach",
+            frag1: "Key Part 1",
+            frag2: "Key Part 2",
+            frag3: "Key Part 3",
+            fragLocked: "🔒 Locked",
+            fragDone: "Obtained",
+            puzzleHint: "Complete 3 mini-games to reveal key parts.",
+            combinedKey: "Combined Vault Key",
+            autofill: "Autofill Parts",
+            breachBtn: "Breach Vault",
+            transferTitle: "Vault breached! Transfer authorized.",
+            transferTo: "Transfer To",
+            transferAmount: "Loot Amount",
+            transferBtn: "Confirm Transfer",
+            transferPerfHint: "Loot is calculated from your 3-level performance",
+            transferPerfScore: "Performance",
+            scoreTitle: "Room Ranking",
+            tagRanking: "Ranking",
+            txTitle: "Recent Transfers",
+            tagRecent: "Last 5",
+            exportReport: "Export Report",
+            resetSim: "Reset Local Progress",
+            none: "None",
+            awaiting: "Awaiting password",
+            expired: "Expired",
+            active: "Active",
+            notRegistered: "Not ready",
+            noTarget: "None",
+            hudTeamsCount: "opponents",
+            alertExpired: "⚠️ Your vault password expired! Update under Defense before attacking.",
+            alertAttacked: "⚠️ Your vault was drained! Check balance and rotate password.",
+            alertRotated: "⚠️ Your vault password was forced to rotate!",
+            deployLimit: "Deploys",
+            practiceUnlimited: "∞",
+            waitingRegister: "Please confirm your password first.",
+            pickTargetMap: "Click an enemy vault on the map.",
+            selectTargetFirst: "Select a target.",
+            langLabel: "UI Language",
+            langZh: "华语",
+            langEn: "English",
+            langLocked: "Language locked during match",
+            mapRankEmpty: "—",
+            mapMyRankPending: "Not registered",
+            mapStatTotalMoney: "Total on map",
+            mapStatTransfers: "Successful transfers",
+            mapStatTarget: "当前目标",
+            mapStatMissionReward: "Mission loot",
+            dialSlotHint: "Drag / scroll",
+            dialDesc: "Drag reels or scroll to align letters and digits and recover the fragment.",
+            dialReset: "Reset reels",
+            dialResetDone: "Reels reset to start",
+            pageTitleEnded: "Currency Safe · Match End",
+            missionComplete: "MISSION COMPLETE",
+            podiumReveal: "Final Standings",
+            rankPlace: "#{n}",
+            yourResult: "Your Stats",
+            stopCelebration: "Stop Celebration",
+            statSteal: "Stole",
+            statRobbed: "Lost",
+            statTimes: "×",
+            lobbyStatusWaiting: "WAITING",
+            lobbyStatusLive: "LIVE",
+            lobbyStatusEnded: "ENDED",
+            lobbyCommand: "VAULT LOBBY",
+            hostConsole: "HOST CONSOLE",
+            viewResults: "View Results",
+        }
+    };
+
+    function getLang() {
+        const lang = sessionStorage.getItem(SK.uiLang) || "zh";
+        return lang === "en" ? "en" : "zh";
+    }
+
+    function setLang(lang, force) {
+        if (!force && sessionStorage.getItem(SK.uiLangLocked) === "1") return false;
+        sessionStorage.setItem(SK.uiLang, lang === "en" ? "en" : "zh");
+        syncLangBarButtons();
+        return true;
+    }
+
+    function lockLang() {
+        sessionStorage.setItem(SK.uiLangLocked, "1");
+        const bar = document.getElementById("csLangBar");
+        if (bar) bar.style.display = "none";
+    }
+
+    function unlockLang() {
+        sessionStorage.removeItem(SK.uiLangLocked);
+        const bar = document.getElementById("csLangBar");
+        if (bar) bar.style.display = "";
+        syncLangBarButtons();
+    }
+
+    function isLangLocked() {
+        return sessionStorage.getItem(SK.uiLangLocked) === "1";
+    }
+
+    function t(key) {
+        const lang = getLang();
+        return STR[lang][key] ?? STR.zh[key] ?? key;
+    }
+
+    function applyToDocument() {
+        document.querySelectorAll("[data-i18n]").forEach(el => {
+            const key = el.getAttribute("data-i18n");
+            const val = t(key);
+            if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+                if (el.hasAttribute("data-i18n-placeholder") || el.hasAttribute("placeholder")) {
+                    el.placeholder = t(el.getAttribute("data-i18n-placeholder") || key);
+                } else {
+                    el.textContent = val;
+                }
+            } else if (el.tagName === "OPTION") {
+                el.textContent = val;
+            } else {
+                el.textContent = val;
+            }
+        });
+        document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+            if (!el.hasAttribute("data-i18n")) {
+                el.placeholder = t(el.getAttribute("data-i18n-placeholder"));
+            }
+        });
+        document.querySelectorAll("[data-i18n-title]").forEach(el => {
+            el.title = t(el.getAttribute("data-i18n-title"));
+        });
+        const pageTitleKey = document.body?.getAttribute("data-i18n-page-title");
+        if (pageTitleKey) document.title = t(pageTitleKey);
+        document.documentElement.lang = getLang() === "en" ? "en" : "zh";
+    }
+
+    function syncLangBarButtons() {
+        const bar = document.getElementById("csLangBar");
+        if (!bar) return;
+        const lang = getLang();
+        const locked = isLangLocked();
+        bar.querySelectorAll("[data-lang]").forEach(btn => {
+            const l = btn.getAttribute("data-lang");
+            btn.classList.toggle("active", lang === l);
+            btn.disabled = locked;
+        });
+        bar.classList.toggle("lang-locked", locked);
+        const tip = bar.querySelector(".lang-locked-tip");
+        if (tip) tip.classList.toggle("hidden", !locked);
+    }
+
+    function mountLangBar(opts) {
+        opts = opts || {};
+        if (!document.getElementById("csLangBar")) {
+            const bar = document.createElement("div");
+            bar.id = "csLangBar";
+            bar.className = "lang-bar";
+            bar.innerHTML =
+                `<button type="button" class="lang-btn" data-lang="zh" id="csLangZh">华语</button>` +
+                `<button type="button" class="lang-btn" data-lang="en" id="csLangEn">English</button>` +
+                `<span class="lang-locked-tip hidden" data-i18n="langLocked"></span>`;
+            document.body.appendChild(bar);
+            bar.querySelector('[data-lang="zh"]').addEventListener("click", () => {
+                if (setLang("zh")) {
+                    applyToDocument();
+                    if (opts.onChange) opts.onChange("zh");
+                }
+            });
+            bar.querySelector('[data-lang="en"]').addEventListener("click", () => {
+                if (setLang("en")) {
+                    applyToDocument();
+                    if (opts.onChange) opts.onChange("en");
+                }
+            });
+        }
+        syncLangBarButtons();
+        if (isLangLocked()) {
+            const bar = document.getElementById("csLangBar");
+            if (bar) bar.style.display = "none";
+        }
+        applyToDocument();
+    }
+
+    window.CurrencySafeI18n = {
+        SK, STR, getLang, setLang, lockLang, unlockLang, isLangLocked,
+        t, applyToDocument, mountLangBar, syncLangBarButtons
+    };
+})();
