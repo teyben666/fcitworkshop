@@ -87,6 +87,7 @@
         if (!room) return { ok: false, error: "找不到房间，请检查房间码。" };
         if (room.status === "ended") return { ok: false, error: "房间已结束。" };
         sessionStorage.setItem(SK.roomId, room.id);
+        touchLobbyPresence(room.id);
         return { ok: true, room };
     }
 
@@ -102,9 +103,11 @@
         if (room.status !== "lobby") return { ok: false, error: "游戏已开始，无法以玩家加入。" };
         const trimmed = (name || "").trim().slice(0, 24);
         if (!trimmed) return { ok: false, error: "请输入队名。" };
+        if (!S.isValidParticipantName(trimmed)) return { ok: false, error: "名称不能为 unknown。" };
         const raw = loadRooms()[room.id];
         const clientId = getClientId();
         raw.spectators = (raw.spectators || []).filter(s => s.id !== clientId);
+        if (raw.visitors) delete raw.visitors[clientId];
         const existing = raw.players.find(p => p.id === clientId);
         const coords = S.coordsFromState(stateId);
         if (existing) {
@@ -129,9 +132,12 @@
         const room = getRoom(roomId);
         if (!room) return { ok: false, error: "房间不存在。" };
         const raw = loadRooms()[room.id];
-        const trimmed = (name || "观战者").trim().slice(0, 24);
+        const trimmed = (name || "").trim().slice(0, 24);
+        if (!trimmed) return { ok: false, error: "请输入观战显示名称。" };
+        if (!S.isValidParticipantName(trimmed)) return { ok: false, error: "名称不能为 unknown。" };
         const clientId = getClientId();
         raw.players = raw.players.filter(p => p.id !== clientId);
+        if (raw.visitors) delete raw.visitors[clientId];
         let existing = (raw.spectators || []).find(s => s.id === clientId);
         if (existing) existing.name = trimmed;
         else {
@@ -171,32 +177,32 @@
         return { ok: true, room: getRoom(raw.id) };
     }
 
-    function ensureHostAsPlayer(raw) {
+    function touchLobbyPresence(roomId) {
+        const raw = loadRooms()[(roomId || "").toUpperCase()];
+        if (!raw || raw.status !== "lobby") return { ok: true };
         const clientId = getClientId();
-        if (clientId !== raw.hostId) return;
-        if (raw.players.some(p => p.id === clientId)) {
-            sessionStorage.setItem(SK.roomRole, "player");
-            return;
+        if (raw.players.some(p => p.id === clientId) || (raw.spectators || []).some(s => s.id === clientId)) {
+            if (raw.visitors?.[clientId]) {
+                delete raw.visitors[clientId];
+                saveRoom(raw);
+            }
+            return { ok: true };
         }
-        raw.spectators = (raw.spectators || []).filter(s => s.id !== clientId);
-        const taken = new Set(raw.players.map(p => p.stateId));
-        let stateId = "selangor";
-        for (const st of window.MALAYSIA_STATES || []) {
-            if (!taken.has(st.id)) { stateId = st.id; break; }
-        }
-        const coords = S.coordsFromState(stateId);
-        raw.players.push({
-            id: clientId, name: "房主 Host", ...coords, balance: 1000,
-            passwordUpdatedAt: Date.now(), agentRank: "trainee", icon: "🧑"
-        });
-        sessionStorage.setItem(SK.roomRole, "player");
+        const last = raw.visitors?.[clientId]?.lastSeen || 0;
+        if (Date.now() - last < 4000) return { ok: true };
+        raw.visitors = raw.visitors || {};
+        raw.visitors[clientId] = { id: clientId, lastSeen: Date.now() };
+        saveRoom(raw);
+        return { ok: true };
     }
 
     function startGame(roomId, force) {
         const raw = loadRooms()[(roomId || "").toUpperCase()];
         if (!raw) return { ok: false, error: "房间不存在。" };
         if (getClientId() !== raw.hostId) return { ok: false, error: "仅房主可开始游戏。" };
-        ensureHostAsPlayer(raw);
+        const room = S.normalizeRoom(raw.id, raw);
+        const lobbyCheck = S.validateLobbyForStart(room, getClientId());
+        if (!lobbyCheck.ok) return lobbyCheck;
         if (!force && raw.players.length < 2) {
             return { ok: false, error: "至少需要 2 名玩家才能开始（真人互攻）。" };
         }
@@ -263,6 +269,19 @@
         return { ok: true, room: getRoom(raw.id) };
     }
 
+    function kickSpectator(roomId, spectatorId) {
+        const raw = loadRooms()[(roomId || "").toUpperCase()];
+        if (!raw) return { ok: false, error: "房间不存在。" };
+        if (getClientId() !== raw.hostId) return { ok: false, error: "仅房主可踢人。" };
+        const s = (raw.spectators || []).find(x => x.id === spectatorId);
+        if (!s) return { ok: false, error: "观战者不在房间内。" };
+        pushActivity(raw, "player_leave", `${s.name} 被房主移出观战`);
+        raw.spectators = (raw.spectators || []).filter(x => x.id !== spectatorId);
+        if (raw.visitors) raw.visitors[spectatorId] = { id: spectatorId, lastSeen: 0 };
+        saveRoom(raw);
+        return { ok: true, room: getRoom(raw.id) };
+    }
+
     function leaveRoom(roomId) {
         const raw = loadRooms()[(roomId || "").toUpperCase()];
         if (!raw) return;
@@ -271,6 +290,7 @@
         if (p) pushActivity(raw, "player_leave", `${p.name} 离开房间`);
         raw.players = raw.players.filter(x => x.id !== clientId);
         raw.spectators = (raw.spectators || []).filter(x => x.id !== clientId);
+        if (raw.visitors) delete raw.visitors[clientId];
         if (raw.hostId === clientId && raw.players[0]) raw.hostId = raw.players[0].id;
         saveRoom(raw);
         sessionStorage.removeItem(SK.roomId);
@@ -426,12 +446,12 @@
     window.CurrencySafeRoomLocal = {
         SK, getClientId, createRoom, getRoom, saveRoom, joinRoom, reconnectRoom,
         joinRoomAsPlayer, joinRoomAsSpectator, setRoomMode, shufflePlayers,
-        startGame, endGame, kickPlayer, leaveRoom, getSessionRoom, getSessionRole,
+        startGame, endGame, kickPlayer, kickSpectator, leaveRoom, getSessionRoom, getSessionRole,
         isHost, canWrite, pushActivity: (r, t, m) => pushActivity(r, t, m),
         coordsFromState: S.coordsFromState, updatePlayerInRoom, updatePlayerProgress,
         getRoomSettings, logActivity, applyBreach, applyTransfer, getMaxDeployPerTarget,
         claimTargetDeploy, subscribe, exportRoomCsv, exportRoomReport,
-        setMatchDuration, autoEndGameIfExpired,
+        setMatchDuration, autoEndGameIfExpired, touchLobbyPresence,
         backendName: "local"
     };
 })();

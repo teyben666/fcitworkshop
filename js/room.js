@@ -37,11 +37,11 @@
     const METHODS = [
         "getClientId", "createRoom", "getRoom", "saveRoom", "joinRoom", "reconnectRoom",
         "joinRoomAsPlayer", "joinRoomAsSpectator", "setRoomMode", "shufflePlayers",
-        "startGame", "endGame", "kickPlayer", "leaveRoom", "getSessionRoom", "getSessionRole",
+        "startGame", "endGame", "kickPlayer", "kickSpectator", "leaveRoom", "getSessionRoom", "getSessionRole",
         "isHost", "canWrite", "coordsFromState", "updatePlayerInRoom", "updatePlayerProgress",
         "getRoomSettings", "logActivity", "applyBreach", "applyTransfer", "getMaxDeployPerTarget",
         "claimTargetDeploy", "subscribe", "exportRoomCsv", "exportRoomReport",
-        "setMatchDuration", "autoEndGameIfExpired"
+        "setMatchDuration", "autoEndGameIfExpired", "touchLobbyPresence"
     ];
 
     const api = {

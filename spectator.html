@@ -7,42 +7,41 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,700;14..32,900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/shared.css" />
+    <link rel="stylesheet" href="css/spectator-dashboard.css" />
 </head>
-<body>
-    <main class="portal portal-wide">
-        <div class="portal-logo">👁</div>
-        <h1>观战模式</h1>
-        <p class="subtitle">
-            房间 <span class="room-code" id="roomCodeDisplay">----</span>
-            · <span class="mode-badge practice" id="modeBadge">练习</span>
-            · <span id="matchTimeLabel">—</span>
-        </p>
+<body class="spectator-page">
+    <main class="spectator-dashboard">
+        <header class="spectator-top">
+            <div>
+                <h1>观战模式</h1>
+                <p class="subtitle">
+                    房间 <span class="room-code" id="roomCodeDisplay">----</span>
+                    · <span class="mode-badge practice" id="modeBadge">练习</span>
+                    · 剩余 <span id="matchTimeLabel">—</span>
+                </p>
+            </div>
+            <div class="spectator-top-actions">
+                <a href="lobby.html" class="btn secondary" id="backLobby">返回大厅</a>
+                <a href="index.html" class="btn secondary">首页</a>
+            </div>
+        </header>
 
-        <div class="tabs-row">
-            <button type="button" class="active" data-tab="map">地图</button>
-            <button type="button" data-tab="leaderboard">排行榜</button>
-            <button type="button" data-tab="activity">Activity</button>
-        </div>
+        <div class="spectator-main">
+            <section class="spectator-left">
+                <div class="card spectator-map-card">
+                    <h2>马来西亚威胁地图 <span class="tag">只读 · 州色攻击线</span></h2>
+                    <div class="map-preview-wrap" id="spectatorMap"></div>
+                </div>
+                <div class="card spectator-activity-card">
+                    <h2>Activity 动态 <span class="tag">最新在上</span></h2>
+                    <div class="activity-feed" id="activityFeed"></div>
+                </div>
+            </section>
 
-        <div class="card" id="tab-map">
-            <h2>马来西亚威胁地图 <span class="tag">只读 · 不可部署</span></h2>
-            <div class="map-preview-wrap" id="spectatorMap"></div>
-            <p class="notice" style="margin-bottom:0">图钉与名字按<strong>州属颜色</strong>区分；<strong>州色攻击线</strong>显示谁在攻谁（进攻方州色）。观战不可点击操作。</p>
-        </div>
-
-        <div class="card hidden" id="tab-leaderboard">
-            <h2>排行榜 <span class="tag" id="leaderboardLockTag"></span></h2>
-            <ul class="member-list" id="leaderboardList"></ul>
-        </div>
-
-        <div class="card hidden" id="tab-activity">
-            <h2>Activity 动态 <span class="tag">最新在上</span></h2>
-            <div class="activity-feed" id="activityFeed"></div>
-        </div>
-
-        <div class="btn-row">
-            <a href="lobby.html" class="btn secondary" id="backLobby">返回大厅</a>
-            <a href="index.html" class="btn secondary">首页</a>
+            <aside class="card spectator-right">
+                <h2>排行榜 <span class="tag" id="leaderboardLockTag"></span></h2>
+                <ul class="member-list" id="leaderboardList"></ul>
+            </aside>
         </div>
     </main>
 
@@ -80,17 +79,6 @@
             room_created: "建房"
         };
 
-        document.querySelectorAll(".tabs-row button").forEach(btn => {
-            btn.onclick = () => {
-                document.querySelectorAll(".tabs-row button").forEach(b => b.classList.remove("active"));
-                btn.classList.add("active");
-                const tab = btn.dataset.tab;
-                $("tab-map").classList.toggle("hidden", tab !== "map");
-                $("tab-leaderboard").classList.toggle("hidden", tab !== "leaderboard");
-                $("tab-activity").classList.toggle("hidden", tab !== "activity");
-            };
-        });
-
         $("backLobby").href = "lobby.html?room=" + roomId;
 
         function escapeHtml(t) {
@@ -99,13 +87,9 @@
             return d.innerHTML;
         }
 
-        function formatElapsed(ms) {
+        function formatRemaining(ms) {
             const s = Math.max(0, Math.floor(ms / 1000));
             return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
-        }
-
-        function formatRemaining(ms) {
-            return formatElapsed(ms);
         }
 
         function progressDots(levels) {
@@ -124,18 +108,17 @@
                 location.href = "lobby.html?room=" + roomId;
                 return;
             }
-            $("roomCodeDisplay").textContent = room.id;
-            const isComp = room.mode === "competitive";
             if (room.status === "ended") {
                 location.href = "ended.html?room=" + roomId;
                 return;
             }
-            $("modeBadge").textContent = isComp ? "竞赛 Competitive" : "练习 Practice";
+
+            $("roomCodeDisplay").textContent = room.id;
+            const isComp = room.mode === "competitive";
+            $("modeBadge").textContent = isComp ? "竞赛" : "练习";
             $("modeBadge").className = "mode-badge " + (isComp ? "competitive" : "practice");
             const rem = CurrencySafeRoomShared.getMatchRemainingMs(room);
-            $("matchTimeLabel").textContent = rem != null
-                ? formatRemaining(rem)
-                : "—";
+            $("matchTimeLabel").textContent = rem != null ? formatRemaining(rem) : "—";
 
             if (window.MalaysiaMapPreview) {
                 const mapEl = $("spectatorMap");

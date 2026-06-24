@@ -51,8 +51,9 @@
 
         <div class="hud-panel host-console" id="teacherPanel">
             <h2><span data-i18n="hostConsole">HOST 控制台</span> <span class="tag" data-i18n="hostOnly">仅房主</span></h2>
-            <label for="kickPlayerSelect" data-i18n="kickPlayer">踢出玩家</label>
+            <label for="kickPlayerSelect" data-i18n="kickMember">踢出成员</label>
             <select id="kickPlayerSelect"></select>
+            <p class="notice" id="pendingVisitorsNotice" style="margin:8px 0 0;display:none"></p>
             <div class="btn-row">
                 <button type="button" class="secondary" id="kickPlayerBtn" data-i18n="kick">踢出</button>
                 <button type="button" class="secondary" id="endGameBtn" data-i18n="endGame">结束比赛</button>
@@ -88,6 +89,7 @@
                 <button type="button" class="cyan" id="joinSpectatorBtn" data-i18n="joinAsSpectator">以观战加入</button>
             </div>
             <div id="lobbyNotice" class="notice hidden"></div>
+            <p id="joinReminder" class="notice error hidden" style="margin-top:10px;margin-bottom:0"></p>
         </div>
 
         <div class="btn-row">
@@ -209,10 +211,26 @@
             $("hostPanel").style.display = host ? "block" : "none";
             $("teacherPanel").style.display = host ? "block" : "none";
             $("hostBadge").textContent = host ? t("hostBadge") : "";
-            $("kickPlayerSelect").innerHTML = room.players
-                .filter(p => p.id !== room.hostId)
-                .map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`)
-                .join("") || `<option value="">${escapeHtml(t("noKickTarget"))}</option>`;
+            $("kickPlayerSelect").innerHTML = (() => {
+                const opts = [];
+                room.players.filter(p => p.id !== room.hostId).forEach(p => {
+                    const bad = !S.isValidParticipantName(p.name);
+                    opts.push(`<option value="player:${p.id}">${bad ? "⚠ " : ""}[玩家] ${escapeHtml(p.name)}</option>`);
+                });
+                (room.spectators || []).forEach(s => {
+                    const bad = !S.isValidParticipantName(s.name);
+                    opts.push(`<option value="spectator:${s.id}">${bad ? "⚠ " : ""}[观战] ${escapeHtml(s.name)}</option>`);
+                });
+                return opts.join("") || `<option value="">${escapeHtml(t("noKickTarget"))}</option>`;
+            })();
+            const pending = S.getPendingVisitors(room);
+            const pendingEl = $("pendingVisitorsNotice");
+            if (host && pending.length) {
+                pendingEl.style.display = "block";
+                pendingEl.textContent = t("pendingVisitors").replace("{n}", String(pending.length));
+            } else if (pendingEl) {
+                pendingEl.style.display = "none";
+            }
             $("endGameBtn").style.display = room.status === "playing" ? "inline-block" : "none";
             $("modePractice").classList.toggle("active", room.mode === "practice");
             $("modeCompetitive").classList.toggle("active", room.mode === "competitive");
@@ -243,6 +261,25 @@
                 if (me.stateId) $("joinState").value = me.stateId;
             } else if (spec) {
                 $("joinName").value = spec.name;
+            }
+
+            const reminder = $("joinReminder");
+            if (reminder) {
+                if (!me && !spec && room.status === "lobby") {
+                    reminder.classList.remove("hidden");
+                    reminder.textContent = t("mustJoinFirst");
+                } else {
+                    reminder.classList.add("hidden");
+                }
+            }
+
+            if (room.status === "lobby" && host) {
+                const ready = S.validateLobbyForStart(room, CurrencySafeRoom.getClientId());
+                $("startGameBtn").disabled = !ready.ok;
+                $("startGameBtn").title = ready.ok ? "" : ready.error;
+            } else {
+                $("startGameBtn").disabled = false;
+                $("startGameBtn").title = "";
             }
 
             if (room.status === "ended") {
@@ -281,6 +318,7 @@
             }).then(() => {
                 unsub = CurrencySafeRoom.subscribe(roomId, renderRoom);
                 refreshTimer = setInterval(() => {
+                    CurrencySafeRoom.touchLobbyPresence(roomId);
                     const room = CurrencySafeRoom.getRoom(roomId);
                     if (room) renderRoom(room);
                 }, 1000);
@@ -318,8 +356,15 @@
         $("startGameBtn").onclick = () => {
             runAction(CurrencySafeRoom.startGame(roomId, $("forceStartCheck").checked), res => {
                 if (!res || res.ok === false) return;
-                sessionStorage.setItem(CurrencySafeRoom.SK.roomRole, "player");
-                location.href = "game.html?room=" + roomId;
+                const room = CurrencySafeRoom.getRoom(roomId);
+                const me = room?.players.find(p => p.id === CurrencySafeRoom.getClientId());
+                if (me) {
+                    sessionStorage.setItem(CurrencySafeRoom.SK.roomRole, "player");
+                    location.href = "game.html?room=" + roomId;
+                } else {
+                    sessionStorage.setItem(CurrencySafeRoom.SK.roomRole, "spectator");
+                    location.href = "spectator.html?room=" + roomId;
+                }
             });
         };
 
@@ -336,10 +381,14 @@
         };
 
         $("kickPlayerBtn").onclick = () => {
-            const pid = $("kickPlayerSelect").value;
-            if (!pid) { showNotice(t("selectKick"), true); return; }
+            const val = $("kickPlayerSelect").value;
+            if (!val) { showNotice(t("selectKick"), true); return; }
             if (!confirm(t("confirmKick"))) return;
-            runAction(CurrencySafeRoom.kickPlayer(roomId, pid), () => showNotice(t("kicked"), false));
+            const [type, id] = val.split(":");
+            const action = type === "spectator"
+                ? CurrencySafeRoom.kickSpectator(roomId, id)
+                : CurrencySafeRoom.kickPlayer(roomId, id);
+            runAction(action, () => showNotice(t("kicked"), false));
         };
 
         $("endGameBtn").onclick = () => {

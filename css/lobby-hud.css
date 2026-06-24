@@ -3,6 +3,15 @@ body.lobby-page {
     background:
         radial-gradient(circle at 50% 0%, rgba(90, 255, 154, 0.1), transparent 32%),
         linear-gradient(160deg, #010503 0%, #03120c 50%, #010503 100%);
+    min-height: 100vh;
+}
+
+body.lobby-page .portal.portal-wide {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 16px 20px 32px;
+    box-sizing: border-box;
 }
 
 .lobby-command-bar {

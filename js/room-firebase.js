@@ -114,7 +114,7 @@
             if (raw.status === "ended") return { ok: false, error: "房间已结束。" };
             setCache(id, raw);
             sessionStorage.setItem(SK.roomId, id);
-            return { ok: true, room: getRoom(id) };
+            return touchLobbyPresence(id).then(() => ({ ok: true, room: getRoom(id) }));
         });
     }
 
@@ -132,6 +132,7 @@
             if (room.status !== "lobby") return { ok: false, error: "游戏已开始，无法以玩家加入。" };
             const trimmed = (name || "").trim().slice(0, 24);
             if (!trimmed) return { ok: false, error: "请输入队名。" };
+            if (!S.isValidParticipantName(trimmed)) return { ok: false, error: "名称不能为 unknown。" };
             const clientId = getClientId();
             const coords = S.coordsFromState(stateId);
             const existing = room.players.find(p => p.id === clientId);
@@ -140,6 +141,7 @@
             }
             const updates = {};
             updates[`rooms/${id}/spectators/${clientId}`] = null;
+            updates[`rooms/${id}/visitors/${clientId}`] = null;
             updates[`rooms/${id}/players/${clientId}`] = {
                 ...(existing || {}),
                 id: clientId, name: trimmed, ...coords,
@@ -159,13 +161,16 @@
 
     function joinRoomAsSpectator(roomId, name) {
         const id = (roomId || "").toUpperCase();
-        const trimmed = (name || "观战者").trim().slice(0, 24);
+        const trimmed = (name || "").trim().slice(0, 24);
+        if (!trimmed) return Promise.resolve({ ok: false, error: "请输入观战显示名称。" });
+        if (!S.isValidParticipantName(trimmed)) return Promise.resolve({ ok: false, error: "名称不能为 unknown。" });
         const clientId = getClientId();
         return joinRoom(id).then(res => {
             if (!res.ok) return res;
             const existing = res.room.spectators.find(s => s.id === clientId);
             const updates = {};
             updates[`rooms/${id}/players/${clientId}`] = null;
+            updates[`rooms/${id}/visitors/${clientId}`] = null;
             updates[`rooms/${id}/spectators/${clientId}`] = { id: clientId, name: trimmed };
             return db.ref().update(updates).then(() => {
                 if (!existing) return pushActivityFb(id, "spectator_join", `${trimmed} 以观战身份加入`);
@@ -206,35 +211,35 @@
         ).then(() => ({ ok: true, room: getRoom(id) }));
     }
 
+    function touchLobbyPresence(roomId) {
+        const id = (roomId || "").toUpperCase();
+        const room = getRoom(id);
+        if (!room || room.status !== "lobby") return Promise.resolve({ ok: true });
+        const clientId = getClientId();
+        if (room.players.some(p => p.id === clientId) || room.spectators.some(s => s.id === clientId)) {
+            return roomRef(id).child(`visitors/${clientId}`).remove().then(() => ({ ok: true }));
+        }
+        return roomRef(id).child(`visitors/${clientId}`).transaction(v => {
+            const last = v?.lastSeen || 0;
+            if (Date.now() - last < 4000) return;
+            return { id: clientId, lastSeen: Date.now() };
+        }).then(() => ({ ok: true }));
+    }
+
     function startGame(roomId, force) {
         const id = (roomId || "").toUpperCase();
         const room = getRoom(id);
         if (!room) return Promise.resolve({ ok: false, error: "房间不存在。" });
         if (getClientId() !== room.hostId) return Promise.resolve({ ok: false, error: "仅房主可开始游戏。" });
-        const hostId = getClientId();
+        const lobbyCheck = S.validateLobbyForStart(room, getClientId());
+        if (!lobbyCheck.ok) return Promise.resolve(lobbyCheck);
         const updates = {
             status: "playing",
             matchStartedAt: Date.now(),
             leaderboardLocked: room.settings?.leaderboardLocked ?? (room.mode === "competitive"),
             deployLocks: null
         };
-        let players = [...room.players];
-        if (hostId === room.hostId && !players.some(p => p.id === hostId)) {
-            const taken = new Set(players.map(p => p.stateId));
-            let stateId = "selangor";
-            for (const st of window.MALAYSIA_STATES || []) {
-                if (!taken.has(st.id)) { stateId = st.id; break; }
-            }
-            const coords = S.coordsFromState(stateId);
-            updates[`players/${hostId}`] = {
-                id: hostId, name: "房主 Host", ...coords, balance: 1000,
-                passwordUpdatedAt: Date.now(), agentRank: "trainee", icon: "🧑",
-                missionProgress: S.freshMissionProgress()
-            };
-            updates[`spectators/${hostId}`] = null;
-            sessionStorage.setItem(SK.roomRole, "player");
-            players.push({ id: hostId });
-        }
+        const players = [...room.players];
         players.forEach(p => {
             updates[`players/${p.id}/missionProgress`] = S.freshMissionProgress();
         });
@@ -302,6 +307,21 @@
         ).then(() => ({ ok: true, room: getRoom(id) }));
     }
 
+    function kickSpectator(roomId, spectatorId) {
+        const id = (roomId || "").toUpperCase();
+        const room = getRoom(id);
+        if (!room) return Promise.resolve({ ok: false, error: "房间不存在。" });
+        if (getClientId() !== room.hostId) return Promise.resolve({ ok: false, error: "仅房主可踢人。" });
+        const s = room.spectators.find(x => x.id === spectatorId);
+        if (!s) return Promise.resolve({ ok: false, error: "观战者不在房间内。" });
+        return pushActivityFb(id, "player_leave", `${s.name} 被房主移出观战`).then(() =>
+            roomRef(id).update({
+                [`spectators/${spectatorId}`]: null,
+                [`visitors/${spectatorId}`]: { id: spectatorId, lastSeen: 0 }
+            })
+        ).then(() => ({ ok: true, room: getRoom(id) }));
+    }
+
     function leaveRoom(roomId) {
         const id = (roomId || "").toUpperCase();
         const clientId = getClientId();
@@ -311,6 +331,7 @@
         const updates = {};
         updates[`rooms/${id}/players/${clientId}`] = null;
         updates[`rooms/${id}/spectators/${clientId}`] = null;
+        updates[`rooms/${id}/visitors/${clientId}`] = null;
         return (p ? pushActivityFb(id, "player_leave", `${p.name} 离开房间`) : Promise.resolve())
             .then(() => db.ref().update(updates))
             .then(() => {
@@ -465,13 +486,13 @@
         joinRoom, reconnectRoom,
         joinRoomAsPlayer,
         joinRoomAsSpectator, setRoomMode, shufflePlayers,
-        startGame, endGame, kickPlayer, leaveRoom,
+        startGame, endGame, kickPlayer, kickSpectator, leaveRoom,
         getSessionRoom, getSessionRole, isHost, canWrite,
         coordsFromState: S.coordsFromState,
         updatePlayerInRoom, updatePlayerProgress, getRoomSettings,
         logActivity, applyBreach, applyTransfer, getMaxDeployPerTarget,
         claimTargetDeploy, subscribe, exportRoomCsv, exportRoomReport,
-        setMatchDuration, autoEndGameIfExpired,
+        setMatchDuration, autoEndGameIfExpired, touchLobbyPresence,
         backendName: "firebase"
     };
 })();

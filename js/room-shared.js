@@ -90,6 +90,7 @@ window.CurrencySafeRoomShared = (function () {
             id: raw.id || id,
             players,
             spectators: listFromMap(raw.spectators),
+            visitors: listFromMap(raw.visitors),
             activity,
             transactions,
             deployLocks: raw.deployLocks || {}
@@ -139,6 +140,53 @@ window.CurrencySafeRoomShared = (function () {
         return m;
     }
 
+    function isValidParticipantName(name) {
+        const t = String(name || "").trim();
+        if (!t) return false;
+        if (/^unknown$/i.test(t)) return false;
+        return true;
+    }
+
+    function getPendingVisitors(room, staleMs) {
+        if (!room) return [];
+        const maxAge = staleMs == null ? 120000 : staleMs;
+        const now = Date.now();
+        const visitors = listFromMap(room.visitors);
+        return visitors.filter(v => {
+            if (!v.lastSeen || now - v.lastSeen > maxAge) return false;
+            if (room.players.some(p => p.id === v.id)) return false;
+            if ((room.spectators || []).some(s => s.id === v.id)) return false;
+            return true;
+        });
+    }
+
+    function validateLobbyForStart(room, hostClientId) {
+        if (!room) return { ok: false, error: "房间不存在。" };
+        const hostAsPlayer = room.players.some(p => p.id === hostClientId);
+        const hostAsSpec = (room.spectators || []).some(s => s.id === hostClientId);
+        if (!hostAsPlayer && !hostAsSpec) {
+            return { ok: false, error: "房主请先填写名称，并点击「以玩家加入」或「以观战加入」。" };
+        }
+        for (const p of room.players) {
+            if (!isValidParticipantName(p.name)) {
+                return { ok: false, error: `玩家名称无效（不能为 unknown 或空白）：${p.name || "—"}` };
+            }
+        }
+        for (const s of room.spectators || []) {
+            if (!isValidParticipantName(s.name)) {
+                return { ok: false, error: `观战名称无效：${s.name || "—"}` };
+            }
+        }
+        const pending = getPendingVisitors(room);
+        if (pending.length) {
+            return {
+                ok: false,
+                error: `还有 ${pending.length} 人在大厅未选择加入或观战，请等待对方完成登记。`
+            };
+        }
+        return { ok: true };
+    }
+
     function buildCsv(room) {
         const lines = [];
         const txs = room.transactions || [];
@@ -185,6 +233,7 @@ window.CurrencySafeRoomShared = (function () {
         SK, uid, defaultRoomSettings, fisherYates, assignUniqueStates,
         coordsFromState, randomVaultPassword, normalizeRoom, serializeLists,
         listFromMap, mapFromList, buildCsv, downloadCsv, transferStatsForPlayer,
-        freshMissionProgress, getRoundMs, getMatchRemainingMs, parseMatchMinutes
+        freshMissionProgress, getRoundMs, getMatchRemainingMs, parseMatchMinutes,
+        isValidParticipantName, getPendingVisitors, validateLobbyForStart
     };
 })();

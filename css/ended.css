@@ -7,9 +7,12 @@ body.ended-page {
 .ended-stage {
     position: relative;
     z-index: 2;
-    width: min(920px, 94vw);
-    margin: 0 auto;
-    padding: 40px 16px 80px;
+    width: 100%;
+    max-width: none;
+    min-height: 100vh;
+    margin: 0;
+    padding: 40px 20px 80px;
+    box-sizing: border-box;
     text-align: center;
 }
 
@@ -47,7 +50,8 @@ body.ended-page {
     gap: 14px;
     align-items: end;
     min-height: 280px;
-    margin-bottom: 28px;
+    max-width: 920px;
+    margin: 0 auto 28px;
 }
 
 #podiumFxLayer {

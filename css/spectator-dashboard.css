@@ -1,0 +1,156 @@
+/* Spectator fullscreen dashboard — map + activity | leaderboard */
+body.spectator-page {
+    margin: 0;
+    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
+}
+
+body.spectator-page .spectator-dashboard {
+    width: 100%;
+    max-width: none;
+    height: 100vh;
+    margin: 0;
+    padding: 10px 14px 12px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.spectator-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+    flex-shrink: 0;
+    padding: 10px 14px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(5, 18, 14, 0.92);
+}
+
+.spectator-top h1 {
+    margin: 0;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    color: var(--cyan);
+}
+
+.spectator-top .subtitle {
+    margin: 0;
+    font-size: 0.82rem;
+}
+
+.spectator-top-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.spectator-top-actions .btn {
+    padding: 8px 14px;
+    font-size: 0.78rem;
+}
+
+.spectator-main {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr min(380px, 30vw);
+    gap: 12px;
+}
+
+.spectator-left {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.spectator-map-card {
+    flex: 1;
+    min-height: 0;
+    margin: 0;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+}
+
+.spectator-map-card h2 {
+    margin: 0 0 8px;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.spectator-map-card .map-preview-wrap {
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+    aspect-ratio: auto;
+    height: 100%;
+}
+
+.spectator-activity-card {
+    flex-shrink: 0;
+    height: min(200px, 24vh);
+    margin: 0;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.spectator-activity-card h2 {
+    margin: 0 0 8px;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.spectator-activity-card .activity-feed {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.spectator-right {
+    min-height: 0;
+    margin: 0;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+}
+
+.spectator-right h2 {
+    margin: 0 0 10px;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.spectator-right .member-list {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    margin: 0;
+}
+
+@media (max-width: 900px) {
+    body.spectator-page {
+        height: auto;
+        overflow: auto;
+    }
+
+    body.spectator-page .spectator-dashboard {
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .spectator-main {
+        grid-template-columns: 1fr;
+    }
+
+    .spectator-map-card .map-preview-wrap {
+        min-height: 220px;
+    }
+}
