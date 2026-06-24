@@ -146,6 +146,7 @@
                 ...(existing || {}),
                 id: clientId, name: trimmed, ...coords,
                 balance: existing?.balance ?? 1000,
+                password: existing?.password ?? S.randomVaultPassword(8),
                 passwordUpdatedAt: existing?.passwordUpdatedAt ?? Date.now(),
                 wins: existing?.wins ?? 0, losses: existing?.losses ?? 0,
                 agentRank: existing?.agentRank ?? "trainee", icon: "🧑"
@@ -242,6 +243,10 @@
         const players = [...room.players];
         players.forEach(p => {
             updates[`players/${p.id}/missionProgress`] = S.freshMissionProgress();
+            if (!p.password) {
+                updates[`players/${p.id}/password`] = S.randomVaultPassword(8);
+                updates[`players/${p.id}/passwordUpdatedAt`] = Date.now();
+            }
         });
         if (!force && players.length < 2) {
             return Promise.resolve({ ok: false, error: "至少需要 2 名玩家才能开始（真人互攻）。" });
@@ -260,7 +265,12 @@
         if (room.status !== "lobby") return Promise.resolve({ ok: false, error: "比赛已开始，无法修改时长。" });
         const m = S.parseMatchMinutes(minutes);
         if (m == null) return Promise.resolve({ ok: false, error: "请输入至少 1 分钟的有效数字。" });
-        const settings = { ...(room.settings || S.defaultRoomSettings(room.mode)), roundMs: m * 60 * 1000 };
+        const settings = {
+            ...(room.settings || S.defaultRoomSettings(room.mode)),
+            roundMs: m * 60 * 1000,
+            passwordRotateMs: (room.settings || S.defaultRoomSettings(room.mode)).passwordRotateMs
+                ?? S.defaultRoomSettings(room.mode).passwordRotateMs
+        };
         return roomRef(id).update({ settings }).then(() => ({ ok: true, room: getRoom(id) }));
     }
 

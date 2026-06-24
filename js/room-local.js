@@ -113,12 +113,14 @@
         if (existing) {
             existing.name = trimmed;
             Object.assign(existing, coords);
+            S.ensureVaultCredentials(existing);
         } else {
             if (raw.players.some(p => p.stateId === stateId && p.id !== clientId)) {
                 return { ok: false, error: "该州属已被其他队伍选择。" };
             }
             raw.players.push({
                 id: clientId, name: trimmed, ...coords, balance: 1000,
+                password: S.randomVaultPassword(8),
                 passwordUpdatedAt: Date.now(), wins: 0, losses: 0, agentRank: "trainee", icon: "🧑"
             });
             pushActivity(raw, "player_join", `${trimmed} 加入（${coords.state}）`);
@@ -211,6 +213,7 @@
         raw.matchStartedAt = Date.now();
         raw.leaderboardLocked = raw.settings?.leaderboardLocked ?? (raw.mode === "competitive");
         raw.players.forEach(p => {
+            S.ensureVaultCredentials(p);
             p.missionProgress = S.freshMissionProgress();
         });
         raw.deployLocks = {};
@@ -227,6 +230,9 @@
         const m = S.parseMatchMinutes(minutes);
         if (m == null) return { ok: false, error: "请输入至少 1 分钟的有效数字。" };
         raw.settings = raw.settings || S.defaultRoomSettings(raw.mode);
+        if (!raw.settings.passwordRotateMs) {
+            raw.settings.passwordRotateMs = S.defaultRoomSettings(raw.mode).passwordRotateMs;
+        }
         raw.settings.roundMs = m * 60 * 1000;
         saveRoom(raw);
         return { ok: true, room: getRoom(raw.id) };

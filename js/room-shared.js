@@ -14,8 +14,10 @@ window.CurrencySafeRoomShared = (function () {
 
     function defaultRoomSettings(mode) {
         const practice = mode === "practice";
+        const passwordRotateMs = practice ? 20 * 60 * 1000 : 12 * 60 * 1000;
         return {
-            roundMs: practice ? 20 * 60 * 1000 : 12 * 60 * 1000,
+            roundMs: passwordRotateMs,
+            passwordRotateMs,
             maxDeployPerTarget: practice ? 999 : 3,
             trackMissionStats: practice,
             leaderboardLocked: !practice,
@@ -129,6 +131,21 @@ window.CurrencySafeRoomShared = (function () {
         return room.settings?.roundMs ?? defaultRoomSettings(room.mode).roundMs;
     }
 
+    function getPasswordRotateMs(room) {
+        if (!room) return 20 * 60 * 1000;
+        return room.settings?.passwordRotateMs
+            ?? defaultRoomSettings(room.mode).passwordRotateMs;
+    }
+
+    function ensureVaultCredentials(player) {
+        if (!player) return player;
+        if (!player.password) {
+            player.password = randomVaultPassword(8);
+            player.passwordUpdatedAt = Date.now();
+        }
+        return player;
+    }
+
     function getMatchRemainingMs(room) {
         if (!room || room.status !== "playing" || !room.matchStartedAt) return null;
         return room.matchStartedAt + getRoundMs(room) - Date.now();
@@ -233,7 +250,7 @@ window.CurrencySafeRoomShared = (function () {
         SK, uid, defaultRoomSettings, fisherYates, assignUniqueStates,
         coordsFromState, randomVaultPassword, normalizeRoom, serializeLists,
         listFromMap, mapFromList, buildCsv, downloadCsv, transferStatsForPlayer,
-        freshMissionProgress, getRoundMs, getMatchRemainingMs, parseMatchMinutes,
-        isValidParticipantName, getPendingVisitors, validateLobbyForStart
+        freshMissionProgress, getRoundMs, getPasswordRotateMs, getMatchRemainingMs, parseMatchMinutes,
+        isValidParticipantName, getPendingVisitors, validateLobbyForStart, ensureVaultCredentials
     };
 })();

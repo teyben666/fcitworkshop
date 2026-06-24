@@ -361,6 +361,8 @@
         .hidden { display: none !important; }
         .solo-only { display: none !important; }
         body.mode-single .mp-only { display: none !important; }
+        body.mode-mp .tab[data-tab="register"],
+        body.mode-mp #register { display: none !important; }
         body.mode-single .solo-only { display: block !important; }
         body.mode-single label.solo-only,
         body.mode-single .panel-title .tag.solo-only { display: inline-block !important; }
@@ -1666,14 +1668,6 @@
                         <span class="bl">ATTACK TRAFFIC · ACTIVE</span>
                         <span class="br">CLASSROOM SAFE MODE</span>
                     </div>
-                    <!-- 拦截转账弧线 -->
-                    <div class="intercept-arc" id="interceptArc" style="display:none">
-                        <div class="arc-route-label" id="arcRouteLabel"></div>
-                        <svg viewBox="0 0 643 316" preserveAspectRatio="xMidYMid meet">
-                            <path id="interceptPath" fill="none" stroke="rgba(255,214,90,.7)" stroke-width="3" stroke-dasharray="8 8"/>
-                            <circle id="interceptDot" class="intercept-packet" r="10" fill="#ffd65a"/>
-                        </svg>
-                    </div>
                     <!-- 路线层 (2D SVG) -->
                     <svg class="route-layer" id="routeLayer" viewBox="0 0 643 316" preserveAspectRatio="xMidYMid meet"></svg>
                     <div class="map-rank-bar" id="mapLeaderboard"></div>
@@ -2296,21 +2290,61 @@
         }
 
         function tryRestorePlayerFromRoom() {
-            if (isSinglePlayer || state.player) return;
+            return bootstrapMultiplayerFromRoom();
+        }
+
+        function bootstrapMultiplayerFromRoom() {
+            if (isSinglePlayer) return Promise.resolve();
             const room = CurrencySafeRoom.getRoom(roomId);
             const me = room?.players.find(p => p.id === csClientId);
-            if (!me?.password) return;
-            state.player = teamFromRoomPlayer(me, true);
-            state.player.password = me.password;
-            state.player.isOpponent = false;
-            state.player.icon = "🧑";
-            syncFromRoom();
-            state._syncSnapshot = {
-                balance: state.player.balance,
-                password: state.player.password,
-                passwordUpdatedAt: state.player.passwordUpdatedAt
-            };
-            if (!state.targetId && state.opponents[0]) state.targetId = state.opponents[0].id;
+            if (!me) return Promise.resolve();
+
+            function applyPlayer(playerData) {
+                state.player = teamFromRoomPlayer(playerData, true);
+                state.player.isOpponent = false;
+                state.player.icon = "🧑";
+                state.player.agentRank = playerData.agentRank || "trainee";
+                syncFromRoom();
+                state._syncSnapshot = {
+                    balance: state.player.balance,
+                    password: state.player.password,
+                    passwordUpdatedAt: state.player.passwordUpdatedAt
+                };
+                if (!state.targetId && state.opponents[0]) state.targetId = state.opponents[0].id;
+                if (!state.matchStartedAt) state.matchStartedAt = room.matchStartedAt || Date.now();
+                if (!state.missionStats) state.missionStats = defaultMissionStats();
+            }
+
+            if (me.password) {
+                if (!state.player) applyPlayer(me);
+                else {
+                    state.player.password = me.password;
+                    state.player.passwordUpdatedAt = me.passwordUpdatedAt;
+                    syncFromRoom();
+                }
+                return Promise.resolve();
+            }
+            const pw = randomPassword(8);
+            const patch = { password: pw, passwordUpdatedAt: Date.now() };
+            return Promise.resolve(CurrencySafeRoom.updatePlayerInRoom(roomId, patch)).then(() => {
+                const fresh = CurrencySafeRoom.getRoom(roomId);
+                const updated = fresh?.players.find(p => p.id === csClientId) || { ...me, ...patch };
+                applyPlayer(updated);
+            });
+        }
+
+        function refreshOpponentFromRoom(targetId) {
+            const room = CurrencySafeRoom.getRoom(roomId);
+            const rp = room?.players.find(p => p.id === targetId);
+            if (!rp) return getOpponent(targetId);
+            const local = getOpponent(targetId);
+            if (local) {
+                local.password = rp.password || local.password;
+                local.passwordUpdatedAt = rp.passwordUpdatedAt || local.passwordUpdatedAt;
+                local.vaultReady = !!rp.password;
+                local.balance = rp.balance ?? local.balance;
+            }
+            return local || teamFromRoomPlayer(rp);
         }
 
         function prefillFromRoom() {
@@ -2449,6 +2483,12 @@
             const room = CurrencySafeRoom.getRoom(roomId);
             if (room?.settings?.roundMs) return room.settings.roundMs;
             return getAgentCfg().roundMs;
+        }
+
+        function getPasswordRotateMs() {
+            if (isSinglePlayer) return getRoundMs();
+            const room = CurrencySafeRoom.getRoom(roomId);
+            return CurrencySafeRoomShared.getPasswordRotateMs(room);
         }
 
         function enableAudio() {
@@ -2618,7 +2658,7 @@
             return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
         }
 
-        function isExpired(team) { return Date.now() - team.passwordUpdatedAt >= getRoundMs(); }
+        function isExpired(team) { return Date.now() - team.passwordUpdatedAt >= getPasswordRotateMs(); }
 
         function autoRotateIfExpired(team) {
             if (!team || !isExpired(team)) return false;
@@ -3109,11 +3149,13 @@
         }
 
         function deployTargetIntel(resetAll = true) {
-            const target = getOpponent($("targetTeamSelect").value || state.targetId);
-            if (!state.player) { showToast("请先完成特工入职。"); return false; }
+            syncFromRoom();
+            const tid = $("targetTeamSelect").value || state.targetId;
+            const target = refreshOpponentFromRoom(tid) || getOpponent(tid);
+            if (!state.player) { showToast("请先进入战场。"); return false; }
             if (!target) { showToast("请选择目标金库。"); return false; }
             if (!isSinglePlayer && (!target.vaultReady || !target.password)) {
-                showToast(`${target.name} 尚未设置金库密码，无法攻击。`);
+                showToast(`${target.name} 金库尚未就绪，请稍后重试。`);
                 return false;
             }
             ensurePlayerVaultFresh();
@@ -3315,7 +3357,7 @@
                 showTab(player ? "attack" : "register");
                 return;
             }
-            showTab(player?.password ? "attack" : "register");
+            showTab("attack");
         }
 
         function runSinglePlayerAITick() {
@@ -3352,10 +3394,7 @@
                 const opt = document.createElement("option");
                 opt.value = team.id;
                 const stateTag = team.state ? ` · ${team.state}` : "";
-                const readyTag = team.vaultReady ? "" : " · …";
-                opt.textContent =
-                    `${team.name}${stateTag}${readyTag} · RM ${money(team.balance)}`;
-                if (!team.vaultReady) opt.disabled = true;
+                opt.textContent = `${team.name}${stateTag} · RM ${money(team.balance)}`;
                 $("targetTeamSelect").appendChild(opt);
             });
             if (state.targetId && state.opponents.some(o => o.id === state.targetId)) $("targetTeamSelect").value = state.targetId;
@@ -3370,7 +3409,7 @@
             const notice = $("attackNotice");
             if (!player) {
                 notice.className = "notice warning";
-                notice.textContent = t("waitingRegister");
+                notice.textContent = isSinglePlayer ? t("waitingRegister") : t("pickTargetMap");
             } else if (!target) {
                 notice.className = "notice";
                 notice.textContent = t("pickTargetMap");
@@ -3383,7 +3422,6 @@
                     `<strong>${escapeHtml(player.name)}</strong> → <strong>${escapeHtml(target.name)}</strong>${deployNote}`;
             }
 
-            if (!currentIntel && target) currentIntel = buildIntelForTarget(target);
             renderFragments();
             renderMissionSteps();
             updateMissionFlow();
@@ -4339,7 +4377,8 @@
 
         function attemptUnlock() {
             const player = getPlayer();
-            const target = getOpponent(state.targetId);
+            syncFromRoom();
+            const target = refreshOpponentFromRoom(state.targetId) || getOpponent(state.targetId);
             if (!player || !target) { showToast("请先入职并选择目标。"); return; }
             if (breachUnlocked) { showToast("金库已解锁，请进行转账。"); return; }
             const guess = $("passwordGuess").value.toUpperCase();
@@ -4707,6 +4746,7 @@
         }
 
         function startGameApp() {
+            document.body.classList.add("mode-mp");
             CurrencySafeI18n.mountLangBar({ onChange: () => CurrencySafeI18n.applyToDocument() });
             CurrencySafeI18n.applyToDocument();
             CurrencySafeI18n.lockLang();
@@ -4715,13 +4755,57 @@
             syncFromRoom();
             prefillFromRoom();
             bindLeaveMatchBtn();
-            tryRestorePlayerFromRoom();
-            pickInitialTab();
-            render();
-            if (currentIntel) {
-                startTypingArcIfNeeded();
-                startGridScoutIfNeeded();
-            }
+            bindHostLongPressEnd();
+            Promise.resolve(bootstrapMultiplayerFromRoom()).then(() => {
+                pickInitialTab();
+                render();
+                if (currentIntel) {
+                    startTypingArcIfNeeded();
+                    startGridScoutIfNeeded();
+                }
+            });
+        }
+
+        const HOST_END_HOLD_MS = 10000;
+        let hostEndKeyTimer = null;
+        let hostEndKeyStart = 0;
+        let hostEndToastAt = 0;
+
+        function isZeroKey(e) {
+            return e.key === "0" || e.code === "Digit0" || e.code === "Numpad0";
+        }
+
+        function bindHostLongPressEnd() {
+            if (isSinglePlayer) return;
+            document.addEventListener("keydown", (e) => {
+                if (!isZeroKey(e) || e.repeat) return;
+                const room = CurrencySafeRoom.getRoom(roomId);
+                if (!room || room.status !== "playing" || !CurrencySafeRoom.isHost(room)) return;
+                hostEndKeyStart = Date.now();
+                if (hostEndKeyTimer) clearInterval(hostEndKeyTimer);
+                hostEndKeyTimer = setInterval(() => {
+                    const elapsed = Date.now() - hostEndKeyStart;
+                    if (elapsed >= HOST_END_HOLD_MS) {
+                        clearInterval(hostEndKeyTimer);
+                        hostEndKeyTimer = null;
+                        Promise.resolve(CurrencySafeRoom.endGame(roomId)).then(res => {
+                            if (res?.ok) location.href = "ended.html?room=" + roomId;
+                            else showToast(res?.error || "无法结束比赛");
+                        });
+                    } else if (elapsed >= 2000 && Date.now() - hostEndToastAt > 900) {
+                        hostEndToastAt = Date.now();
+                        const left = Math.ceil((HOST_END_HOLD_MS - elapsed) / 1000);
+                        showToast(`房主按住 0 · ${left}s 后结束比赛`);
+                    }
+                }, 200);
+            });
+            document.addEventListener("keyup", (e) => {
+                if (!isZeroKey(e)) return;
+                if (hostEndKeyTimer) {
+                    clearInterval(hostEndKeyTimer);
+                    hostEndKeyTimer = null;
+                }
+            });
         }
 
         function gameRoomGuard(room) {
@@ -4947,10 +5031,6 @@
                     el.onclick = (e) => {
                         e.stopPropagation();
                         if (team.id !== playerId) {
-                            if (!isSinglePlayer && !team.vaultReady && !team.password) {
-                                showToast(t("vaultNotReady").replace("{name}", team.name));
-                                return;
-                            }
                             $("targetTeamSelect").value = team.id;
                             Promise.resolve(deployTargetIntel(true));
                         } else {

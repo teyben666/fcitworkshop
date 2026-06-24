@@ -169,8 +169,49 @@
                 : `<div class="item">暂无动态</div>`;
         }
 
+        const HOST_END_HOLD_MS = 10000;
+        let hostEndKeyTimer = null;
+        let hostEndKeyStart = 0;
+        let hostEndToastAt = 0;
+
+        function isZeroKey(e) {
+            return e.key === "0" || e.code === "Digit0" || e.code === "Numpad0";
+        }
+
+        function bindHostLongPressEnd() {
+            document.addEventListener("keydown", (e) => {
+                if (!isZeroKey(e) || e.repeat) return;
+                const room = CurrencySafeRoom.getRoom(roomId);
+                if (!room || room.status !== "playing" || !CurrencySafeRoom.isHost(room)) return;
+                hostEndKeyStart = Date.now();
+                if (hostEndKeyTimer) clearInterval(hostEndKeyTimer);
+                hostEndKeyTimer = setInterval(() => {
+                    const elapsed = Date.now() - hostEndKeyStart;
+                    if (elapsed >= HOST_END_HOLD_MS) {
+                        clearInterval(hostEndKeyTimer);
+                        hostEndKeyTimer = null;
+                        Promise.resolve(CurrencySafeRoom.endGame(roomId)).then(res => {
+                            if (res?.ok) location.href = "ended.html?room=" + roomId;
+                        });
+                    } else if (elapsed >= 2000 && Date.now() - hostEndToastAt > 900) {
+                        hostEndToastAt = Date.now();
+                        const left = Math.ceil((HOST_END_HOLD_MS - elapsed) / 1000);
+                        console.log(`房主按住 0 · ${left}s 后结束比赛`);
+                    }
+                }, 200);
+            });
+            document.addEventListener("keyup", (e) => {
+                if (!isZeroKey(e)) return;
+                if (hostEndKeyTimer) {
+                    clearInterval(hostEndKeyTimer);
+                    hostEndKeyTimer = null;
+                }
+            });
+        }
+
         CurrencySafeRoom.ready.then(() => Promise.resolve(CurrencySafeRoom.reconnectRoom(roomId)))
             .then(() => {
+                bindHostLongPressEnd();
                 CurrencySafeRoom.subscribe(roomId, render);
                 setInterval(() => {
                     const room = CurrencySafeRoom.getRoom(roomId);
