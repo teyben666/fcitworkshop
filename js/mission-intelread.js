@@ -4,7 +4,8 @@
  */
 (function (global) {
     const LINE_DECODE_MS = 320;
-    const SCRAMBLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%█▓░▒";
+    const SCRAMBLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
+    const SCRAMBLE_CURSORS = ["░", "▒", "▓", "█"];
 
     const EMBEDDED_BRIEFINGS = [
         {
@@ -84,13 +85,43 @@
         return SCRAMBLE[Math.abs(seed) % SCRAMBLE.length];
     }
 
+    function scrambleCursor(tick) {
+        return SCRAMBLE_CURSORS[Math.abs(tick) % SCRAMBLE_CURSORS.length];
+    }
+
+    /** Plain-text line (legacy / skip) */
     function decodeLine(target, progress, tick) {
+        return decodeLineParts(target, progress, tick)
+            .map(p => p.c)
+            .join("");
+    }
+
+    /**
+     * Scramble with block cursor at the decode frontier (░ → ▒ → ▓ → █).
+     */
+    function decodeLineParts(target, progress, tick) {
         const locked = Math.floor(target.length * Math.min(1, Math.max(0, progress)));
-        return [...target].map((ch, i) => {
-            if (i < locked) return ch;
-            if (ch === " " || ch === "\u3000") return " ";
-            return scrambleChar(tick + i * 31 + target.charCodeAt(i));
-        }).join("");
+        const parts = [];
+        for (let i = 0; i < target.length; i++) {
+            if (i < locked) {
+                parts.push({ t: "plain", c: target[i] });
+            } else if (i === locked) {
+                parts.push({ t: "cursor", c: scrambleCursor(tick) });
+            } else {
+                const ch = target[i];
+                if (ch === " " || ch === "\u3000") parts.push({ t: "plain", c: " " });
+                else parts.push({ t: "plain", c: scrambleChar(tick + i * 31 + target.charCodeAt(i)) });
+            }
+        }
+        return parts;
+    }
+
+    function partsToHtml(parts) {
+        return parts.map(p =>
+            p.t === "cursor"
+                ? `<span class="ir-cursor ir-cursor-block">${escape(p.c)}</span>`
+                : escape(p.c)
+        ).join("");
     }
 
     function createSession(ctx) {
@@ -126,6 +157,7 @@
         const lineProgress = Math.min(1, posInLine / LINE_DECODE_MS);
 
         session.decodeLineIndex = activeLine;
+        session.cursorTick = tick;
 
         if (activeLine >= lineCount) {
             session.step = "quiz";
@@ -178,19 +210,30 @@
         return { ok: true, next: true };
     }
 
+    function lineHtml(full, lineIndex, session) {
+        if (session.step !== "read") return escape(full);
+
+        const tick = session.cursorTick ?? Math.floor(Date.now() / 55);
+        const activeLine = session.decodeLineIndex ?? 0;
+
+        if (lineIndex < activeLine) return escape(full);
+
+        let progress = 0;
+        if (lineIndex === activeLine) {
+            const elapsed = Date.now() - (session.decodeStartedAt || Date.now());
+            const posInLine = elapsed - activeLine * LINE_DECODE_MS;
+            progress = Math.min(1, posInLine / LINE_DECODE_MS);
+        }
+
+        return partsToHtml(decodeLineParts(full, progress, tick + lineIndex * 17));
+    }
+
     function renderReadBody(session) {
         const lines = session.briefing.lines || [];
-        const decrypting = session.step === "read";
         return lines.map((full, i) => {
-            const text = session.displayedLines[i] != null
-                ? session.displayedLines[i]
-                : (decrypting ? decodeLine(full, 0, 0) : full);
             const prefix = i === 0 ? '<span class="ir-prompt">$</span> ' : '<span class="ir-prompt">&gt;</span> ';
             const cls = i === 0 ? "ir-line ir-line-head" : "ir-line";
-            const activeLine = session.decodeLineIndex ?? 0;
-            const cursor = decrypting && i === activeLine
-                ? '<span class="ir-cursor">▌</span>' : "";
-            return `<p class="${cls}">${prefix}${escape(text)}${cursor}</p>`;
+            return `<p class="${cls}">${prefix}${lineHtml(full, i, session)}</p>`;
         }).join("");
     }
 
@@ -289,6 +332,9 @@
         render,
         pickBriefing,
         DECODE_MS: LINE_DECODE_MS,
-        LINE_DECODE_MS
+        LINE_DECODE_MS,
+        SCRAMBLE_CURSORS,
+        scrambleCursor,
+        decodeLineParts
     };
 })(typeof window !== "undefined" ? window : globalThis);
