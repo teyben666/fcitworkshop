@@ -68,6 +68,7 @@
             guesses: [],
             currentPick: [null, null, null, null],
             activeSlot: 0,
+            lastFeedbackAt: 0,
             reveal: fragment || "",
             agentNote: "特工笔记：六色密码中取四色排列上锁。绿点=颜色位置都对，黄点=颜色对但位置错——像真实的热力传感器反馈。"
         };
@@ -85,6 +86,7 @@
         if (typeof game.mistakes !== "number") game.mistakes = 0;
         if (typeof game.activeSlot !== "number") game.activeSlot = 0;
         if (!game.maxGuesses) game.maxGuesses = 10;
+        if (typeof game.lastFeedbackAt !== "number") game.lastFeedbackAt = 0;
     }
 
     function pickColor(game, colorId) {
@@ -107,6 +109,7 @@
         const guess = [...game.currentPick];
         const { greens, yellows } = evaluateGuess(game.secret, guess);
         game.guesses.push({ guess, greens, yellows });
+        game.lastFeedbackAt = Date.now();
         clearPick(game);
 
         if (greens === 4) {
@@ -115,51 +118,84 @@
         if (game.guesses.length >= game.maxGuesses) {
             return { ok: true, win: false, exhausted: true };
         }
-        return { ok: true, win: false, greens, yellows };
+        return { ok: true, win: false, greens, yellows, rowIndex: game.guesses.length - 1 };
     }
 
-    function renderDots(greens, yellows) {
+    function renderDots(greens, yellows, animate) {
         let html = "";
-        for (let i = 0; i < greens; i++) html += '<span class="mm-dot mm-dot-green"></span>';
-        for (let i = 0; i < yellows; i++) html += '<span class="mm-dot mm-dot-yellow"></span>';
-        return html || '<span class="mm-dot mm-dot-empty"></span>';
+        for (let i = 0; i < greens; i++) {
+            html += `<span class="mm-dot mm-dot-green${animate ? " mm-bulb-pop" : ""}" style="animation-delay:${i * 60}ms"></span>`;
+        }
+        for (let i = 0; i < yellows; i++) {
+            html += `<span class="mm-dot mm-dot-yellow${animate ? " mm-bulb-pop" : ""}" style="animation-delay:${(greens + i) * 60}ms"></span>`;
+        }
+        if (!greens && !yellows) {
+            html += '<span class="mm-dot mm-dot-empty" title="无命中"></span>';
+        }
+        return html;
     }
 
     function renderSlot(colorId, slotIdx, active) {
         const c = colorId ? COLOR_BY_ID[colorId] : null;
         const cls = ["mm-slot", active ? "active" : "", c ? "filled" : ""].filter(Boolean).join(" ");
-        const style = c ? `background:${c.hex};box-shadow:0 0 12px ${c.hex}88` : "";
+        const style = c
+            ? `--mm-fill:${c.hex};--mm-glow:0 0 12px ${c.hex}88`
+            : "";
         return `<button type="button" class="${cls}" style="${style}" data-mm-slot="${slotIdx}" aria-label="色槽 ${slotIdx + 1}"></button>`;
+    }
+
+    function renderLegend() {
+        return `<div class="mm-legend">
+            <span><span class="mm-dot mm-dot-green"></span> 绿 = 颜色+位置都对</span>
+            <span><span class="mm-dot mm-dot-yellow"></span> 黄 = 颜色对、位置错</span>
+        </div>`;
+    }
+
+    function renderWarning(guessesLeft) {
+        if (guessesLeft > 2) return "";
+        const urgent = guessesLeft <= 1;
+        return `<p class="mm-warn${urgent ? " mm-warn-urgent" : ""}">${
+            urgent
+                ? "⚠️ 最后一行！用尽将重置密码并计 1 次部署失误。"
+                : `⚠️ 仅剩 ${guessesLeft} 行试探——合理排除颜色，别乱撞。`
+        }</p>`;
     }
 
     function render(game, idx, locked, helpers) {
         migrate(game);
         const { escapeHtml } = helpers;
         const guessesLeft = game.maxGuesses - game.guesses.length;
-        const history = game.guesses.map(row => {
+        const freshRow = game.lastFeedbackAt && (Date.now() - game.lastFeedbackAt < 1200);
+        const history = game.guesses.map((row, ri) => {
+            const isLatest = freshRow && ri === game.guesses.length - 1;
             const chips = row.guess.map(id => {
                 const c = COLOR_BY_ID[id];
                 return `<span class="mm-chip" style="background:${c.hex}" title="${c.label}"></span>`;
             }).join("");
-            return `<div class="mm-history-row"><div class="mm-history-guess">${chips}</div><div class="mm-history-feedback">${renderDots(row.greens, row.yellows)}</div></div>`;
+            return `<div class="mm-history-row${isLatest ? " mm-row-fresh" : ""}">
+                <div class="mm-history-guess">${chips}</div>
+                <div class="mm-history-feedback">${renderDots(row.greens, row.yellows, isLatest)}</div>
+            </div>`;
         }).join("");
 
         const palette = !game.solved && !locked
             ? `<div class="mm-palette">${COLORS.map(c =>
                 `<button type="button" class="mm-color-btn" data-mm-color="${c.id}" data-mm-idx="${idx}" ` +
-                `style="background:${c.hex}" title="${c.label}"></button>`
+                `style="--mm-fill:${c.hex}" title="${c.label}"></button>`
             ).join("")}</div>`
             : "";
 
         const pickRow = !game.solved && !locked
-            ? `<div class="mm-pick-row">${game.currentPick.map((id, si) =>
+            ? `${renderLegend()}
+            ${renderWarning(guessesLeft)}
+            <div class="mm-pick-row">${game.currentPick.map((id, si) =>
                 renderSlot(id, si, game.activeSlot === si)
             ).join("")}</div>
             <div class="mm-actions">
                 <button type="button" class="secondary" data-mm-clear="${idx}">清空</button>
                 <button type="button" class="green" data-mm-submit="${idx}">注入试探</button>
             </div>
-            <p class="muted mm-meta">剩余 ${guessesLeft} 行 · 失误 ${game.mistakes || 0} 次</p>`
+            <p class="muted mm-meta">剩余 <strong>${guessesLeft}</strong> 行 · 部署失误 ${game.mistakes || 0} 次（仅用尽行数时 +1）</p>`
             : "";
 
         return `

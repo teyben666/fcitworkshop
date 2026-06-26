@@ -155,7 +155,7 @@ function createRoomHandlers(store) {
                 if (!raw) return { ok: false, error: "房间不存在。" };
                 if (raw.status !== "lobby") return { ok: false, error: "游戏已开始，无法以玩家加入。" };
                 const trimmed = (name || "").trim().slice(0, 24);
-                if (!trimmed) return { ok: false, error: "请输入队名。" };
+                if (!trimmed) return { ok: false, error: "请输入显示名称。" };
                 if (!S.isValidParticipantName(trimmed)) return { ok: false, error: "名称不能为 unknown。" };
                 S.ensureTeamsAndBank(raw);
                 const clientId = cid();
@@ -202,7 +202,7 @@ function createRoomHandlers(store) {
                         existing.teamId = tid;
                         raw.teams = raw.teams || [];
                         raw.teams.push(S.newTeamRecord({
-                            id: tid, name: trimmed, ...coords, memberIds: [clientId]
+                            id: tid, name: coords.state || trimmed, ...coords, memberIds: [clientId]
                         }));
                         const newTeam = raw.teams[raw.teams.length - 1];
                         S.ensureVaultCredentials(newTeam);
@@ -216,7 +216,7 @@ function createRoomHandlers(store) {
                         });
                         raw.teams = raw.teams || [];
                         raw.teams.push(S.newTeamRecord({
-                            id: tid, name: trimmed, ...coords, memberIds: [clientId]
+                            id: tid, name: coords.state || trimmed, ...coords, memberIds: [clientId]
                         }));
                         const newTeam = raw.teams[raw.teams.length - 1];
                         S.ensureVaultCredentials(newTeam);
@@ -235,6 +235,8 @@ function createRoomHandlers(store) {
                 if (!trimmed) return { ok: false, error: "请输入观战显示名称。" };
                 if (!S.isValidParticipantName(trimmed)) return { ok: false, error: "名称不能为 unknown。" };
                 const clientId = cid();
+                S.removePlayerFromTeamLists(raw, clientId);
+                S.removePlayerFromAllRaids(raw, clientId);
                 raw.players = raw.players.filter(p => p.id !== clientId);
                 if (raw.visitors) delete raw.visitors[clientId];
                 let existing = (raw.spectators || []).find(s => s.id === clientId);
@@ -246,6 +248,47 @@ function createRoomHandlers(store) {
                 }
                 persist(raw);
                 return { ok: true, room: getRoom(raw.id), role: "spectator" };
+            },
+
+            confirmLobbyName(roomId, name) {
+                const raw = getRaw(roomId);
+                if (!raw) return { ok: false, error: "房间不存在。" };
+                if (raw.status !== "lobby") return { ok: false, error: "比赛已开始。" };
+                const trimmed = (name || "").trim().slice(0, 24);
+                if (!trimmed) return { ok: false, error: "请输入显示名称。" };
+                if (!S.isValidParticipantName(trimmed)) return { ok: false, error: "名称不能为 unknown。" };
+                const clientId = cid();
+                const player = raw.players.find(p => p.id === clientId);
+                if (player) {
+                    player.name = trimmed;
+                    persist(raw);
+                    return { ok: true, room: getRoom(raw.id) };
+                }
+                const spec = (raw.spectators || []).find(s => s.id === clientId);
+                if (spec) {
+                    spec.name = trimmed;
+                    persist(raw);
+                    return { ok: true, room: getRoom(raw.id) };
+                }
+                raw.visitors = raw.visitors || {};
+                raw.visitors[clientId] = {
+                    id: clientId,
+                    lastSeen: Date.now(),
+                    name: trimmed
+                };
+                persist(raw);
+                return { ok: true, room: getRoom(raw.id) };
+            },
+
+            leaveTeamToBench(roomId, name) {
+                const raw = getRaw(roomId);
+                if (!raw) return { ok: false, error: "房间不存在。" };
+                const clientId = cid();
+                const player = raw.players.find(p => p.id === clientId);
+                if (!player) return { ok: false, error: "你尚未加入队伍。" };
+                const benchName = (name || player.name || "").trim().slice(0, 24);
+                if (!benchName) return { ok: false, error: "请先确认显示名称。" };
+                return handlers(clientId).joinRoomAsSpectator(roomId, benchName);
             },
 
             setRoomMode(roomId, mode) {
@@ -283,39 +326,32 @@ function createRoomHandlers(store) {
                 if (cid() !== raw.hostId) return { ok: false, error: "仅房主可 Shuffle。" };
                 if (!raw.players.length) return { ok: false, error: "还没有玩家。" };
                 S.ensureTeamsAndBank(raw);
-                const shuffled = S.fisherYates(raw.players);
-                const teams = [];
-                const maxTeam = raw.settings?.maxTeamSize || 4;
-                for (let i = 0; i < shuffled.length; i += maxTeam) {
-                    const chunk = shuffled.slice(i, i + maxTeam);
-                    const tid = S.createTeamId();
-                    const team = S.newTeamRecord({ id: tid, name: chunk[0]?.name || "队伍", memberIds: [] });
-                    chunk.forEach(p => {
-                        p.teamId = tid;
-                        team.memberIds.push(p.id);
-                    });
-                    teams.push(team);
-                }
-                if (randomStates) S.assignStatesToTeams(teams);
-                else {
-                    teams.forEach(team => {
-                        const lead = shuffled.find(p => p.id === team.memberIds[0]);
-                        if (lead?.stateId) {
-                            team.stateId = lead.stateId;
-                            team.state = lead.state;
-                            team.mapX = lead.mapX;
-                            team.mapY = lead.mapY;
-                            team.lat = lead.lat;
-                            team.lon = lead.lon;
-                        }
-                    });
-                }
-                raw.teams = teams;
-                S.syncPlayersFromTeams(raw.players, raw.teams);
-                raw.shuffleRandomStates = !!randomStates;
+                const stats = S.shufflePlayersIntoTeams(raw, randomStates);
                 pushActivity(raw, "shuffle_teams", randomStates
-                    ? `Shuffle：${teams.length} 支队伍已自动分队并分配州属`
-                    : `Shuffle：${teams.length} 支队伍已自动分队（4 人一组，末组可不足 4 人）`, cid());
+                    ? `Shuffle：${stats.teamCount} 支队伍 · 均 ${stats.avgTeamSize} 人/队 · 已分配州属`
+                    : `Shuffle：${stats.teamCount} 支队伍 · 均 ${stats.avgTeamSize} 人/队（上限 ${stats.maxTeamSize} 人）`, cid());
+                persist(raw);
+                return { ok: true, room: getRoom(raw.id), shuffleStats: stats };
+            },
+
+            setRoomMaxTeamSize(roomId, size) {
+                const raw = getRaw(roomId);
+                if (!raw) return { ok: false, error: "房间不存在。" };
+                if (cid() !== raw.hostId) return { ok: false, error: "仅房主可设置。" };
+                if (raw.status !== "lobby") return { ok: false, error: "比赛已开始。" };
+                const max = S.parseMaxTeamSize(size);
+                if (max == null) return { ok: false, error: "每队人数须在 2～6 之间。" };
+                raw.settings = raw.settings || S.defaultRoomSettings(raw.mode);
+                raw.settings.maxTeamSize = max;
+                pushActivity(raw, "settings", `每队人数上限改为 ${max} 人`, cid());
+                persist(raw);
+                return { ok: true, room: getRoom(raw.id), maxTeamSize: max };
+            },
+
+            abandonTargetRaid(roomId) {
+                const raw = getRaw(roomId);
+                if (!raw) return { ok: false, error: "房间不存在。" };
+                S.removePlayerFromAllRaids(raw, cid());
                 persist(raw);
                 return { ok: true, room: getRoom(raw.id) };
             },
@@ -367,7 +403,7 @@ function createRoomHandlers(store) {
                 if (cid() !== raw.hostId) return { ok: false, error: "仅房主可新建队伍。" };
                 if (raw.status !== "lobby") return { ok: false, error: "比赛已开始。" };
                 if (raw.teams?.some(t => t.stateId === stateId)) {
-                    return { ok: false, error: "该州属已被占用。" };
+                    return { ok: false, error: "该州属已被其他队伍选择。" };
                 }
                 const coords = S.coordsFromState(stateId);
                 const tid = S.createTeamId();
@@ -392,8 +428,15 @@ function createRoomHandlers(store) {
                 }
                 const last = raw.visitors?.[clientId]?.lastSeen || 0;
                 if (Date.now() - last < 4000) return { ok: true };
+                const room = S.normalizeRoom(raw.id, raw);
+                const suggested = S.suggestLobbyName(room, clientId);
                 raw.visitors = raw.visitors || {};
-                raw.visitors[clientId] = { id: clientId, lastSeen: Date.now() };
+                const prev = raw.visitors[clientId];
+                raw.visitors[clientId] = {
+                    id: clientId,
+                    lastSeen: Date.now(),
+                    name: prev?.name || suggested
+                };
                 raw.lastActivityAt = Date.now();
                 persist(raw);
                 return { ok: true };
@@ -510,6 +553,8 @@ function createRoomHandlers(store) {
                 if (!p) return { ok: false, error: "玩家不在房间内。" };
                 if (playerId === raw.hostId) return { ok: false, error: "不能踢出房主。" };
                 pushActivity(raw, "player_leave", `${p.name} 被房主移出房间`, cid());
+                S.removePlayerFromTeamLists(raw, playerId);
+                S.removePlayerFromAllRaids(raw, playerId);
                 raw.players = raw.players.filter(x => x.id !== playerId);
                 persist(raw);
                 return { ok: true, room: getRoom(raw.id) };
@@ -533,7 +578,11 @@ function createRoomHandlers(store) {
                 if (!raw) return { ok: true };
                 const clientId = cid();
                 const p = raw.players.find(x => x.id === clientId);
-                if (p) pushActivity(raw, "player_leave", `${p.name} 离开房间`, clientId);
+                if (p) {
+                    pushActivity(raw, "player_leave", `${p.name} 离开房间`, clientId);
+                    S.removePlayerFromTeamLists(raw, clientId);
+                    S.removePlayerFromAllRaids(raw, clientId);
+                }
                 raw.players = raw.players.filter(x => x.id !== clientId);
                 raw.spectators = (raw.spectators || []).filter(x => x.id !== clientId);
                 if (raw.visitors) delete raw.visitors[clientId];
@@ -586,7 +635,10 @@ function createRoomHandlers(store) {
                     }
                 }
                 persist(raw);
-                return { ok: true, room: getRoom(raw.id), deploySeq: seq };
+                const raid = targetPlayer?.teamId
+                    ? S.raidSnapshot(S.getTargetRaid(raw, targetPlayer.teamId))
+                    : null;
+                return { ok: true, room: getRoom(raw.id), deploySeq: seq, raid };
             },
 
             applyBreach(roomId, targetId) {
@@ -740,13 +792,6 @@ function createRoomHandlers(store) {
                     };
                 }
                 const startedAt = Date.now();
-                bonus.attempts[attemptKey] = {
-                    paid: true,
-                    startedAt,
-                    practiceOnly: false,
-                    completed: false,
-                    wrongCount: 0
-                };
                 persist(raw);
                 return {
                     ok: true,
@@ -756,6 +801,31 @@ function createRoomHandlers(store) {
                     briefingSeed: `${raw.id}|${wi}|${attackerId}`,
                     startedAt
                 };
+            },
+
+            confirmBankBonusOpen(roomId, waveIndex) {
+                const raw = getRaw(roomId);
+                if (!raw) return { ok: false, error: "房间不存在。" };
+                if (raw.status !== "playing") return { ok: false, error: "比赛未进行中。" };
+                const wi = Number(waveIndex);
+                if (!Number.isFinite(wi) || wi < 0) return { ok: false, error: "无效波次。" };
+                const attackerId = cid();
+                const bonus = S.ensureBankBonus(raw);
+                const attemptKey = S.bankBonusAttemptKey(wi, attackerId);
+                const existing = bonus.attempts[attemptKey];
+                if (existing?.paid) {
+                    persist(raw);
+                    return { ok: true, already: true };
+                }
+                bonus.attempts[attemptKey] = {
+                    paid: true,
+                    startedAt: Date.now(),
+                    practiceOnly: false,
+                    completed: false,
+                    wrongCount: 0
+                };
+                persist(raw);
+                return { ok: true };
             },
 
             completeBankBonus(roomId, waveIndex, payload) {
@@ -774,7 +844,7 @@ function createRoomHandlers(store) {
                 const bonus = S.ensureBankBonus(raw);
                 const attemptKey = S.bankBonusAttemptKey(wi, attackerId);
                 const attempt = bonus.attempts[attemptKey];
-                if (!attempt || attempt.practiceOnly) {
+                if (!attempt || !attempt.paid || attempt.practiceOnly) {
                     return { ok: false, error: "练习模式无奖金。", practiceOnly: true };
                 }
                 if (attempt.completed) return { ok: false, error: "本波已结算。" };

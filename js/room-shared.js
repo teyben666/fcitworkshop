@@ -621,6 +621,26 @@ window.CurrencySafeRoomShared = (function () {
         return true;
     }
 
+    function suggestLobbyName(room, exceptId) {
+        if (!room) return "Player 1";
+        const used = new Set();
+        const all = [
+            ...(room.players || []),
+            ...(room.spectators || []),
+            ...listFromMap(room.visitors)
+        ];
+        all.forEach(p => {
+            if (!p || p.id === exceptId) return;
+            const n = String(p.name || "").trim();
+            if (n) used.add(n.toLowerCase());
+        });
+        for (let i = 1; i <= 99; i++) {
+            const n = `Player ${i}`;
+            if (!used.has(n.toLowerCase())) return n;
+        }
+        return `Player ${Math.floor(Math.random() * 900) + 100}`;
+    }
+
     function getPendingVisitors(room, staleMs) {
         if (!room) return [];
         const maxAge = staleMs == null ? 120000 : staleMs;
@@ -639,7 +659,7 @@ window.CurrencySafeRoomShared = (function () {
         const hostAsPlayer = room.players.some(p => p.id === hostClientId);
         const hostAsSpec = (room.spectators || []).some(s => s.id === hostClientId);
         if (!hostAsPlayer && !hostAsSpec) {
-            return { ok: false, error: "房主请先填写名称，并点击「以玩家加入」或「以观战加入」。" };
+            return { ok: false, error: "房主请先确认名称，并点击编队空位进队或「保持候场」。" };
         }
         for (const p of room.players) {
             if (!isValidParticipantName(p.name)) {
@@ -893,6 +913,95 @@ window.CurrencySafeRoomShared = (function () {
         };
     }
 
+    function removePlayerFromTeamLists(raw, playerId) {
+        if (!raw || !playerId) return;
+        (raw.teams || []).forEach(t => {
+            t.memberIds = (t.memberIds || []).filter(id => id !== playerId);
+        });
+        const p = raw.players.find(x => x.id === playerId);
+        if (p) p.teamId = null;
+    }
+
+    function removePlayerFromAllRaids(raw, playerId) {
+        if (!raw || !playerId) return;
+        ensureTargetRaids(raw);
+        Object.keys(raw.targetRaids).forEach(victimTeamId => {
+            const raid = normalizeRaidRecord(raw.targetRaids[victimTeamId]);
+            if (!raid) return;
+            raid.activeAttackers = (raid.activeAttackers || []).filter(a => a.playerId !== playerId);
+            raw.targetRaids[victimTeamId] = raid;
+        });
+    }
+
+    function buildEvenTeamChunks(players, maxTeamSize) {
+        const max = Math.max(1, Math.floor(Number(maxTeamSize) || 4));
+        const n = players.length;
+        if (n === 0) return [];
+        const teamCount = Math.ceil(n / max);
+        const base = Math.floor(n / teamCount);
+        const extra = n % teamCount;
+        const chunks = [];
+        let idx = 0;
+        for (let t = 0; t < teamCount; t++) {
+            const size = base + (t < extra ? 1 : 0);
+            chunks.push(players.slice(idx, idx + size));
+            idx += size;
+        }
+        return chunks;
+    }
+
+    function shufflePlayersIntoTeams(raw, randomStates) {
+        const shuffled = fisherYates(raw.players);
+        const maxTeam = raw.settings?.maxTeamSize || 4;
+        const chunks = buildEvenTeamChunks(shuffled, maxTeam);
+        const teams = chunks.map(chunk => {
+            const tid = createTeamId();
+            const team = newTeamRecord({ id: tid, name: chunk[0]?.name || "队伍", memberIds: [] });
+            chunk.forEach(p => {
+                p.teamId = tid;
+                team.memberIds.push(p.id);
+            });
+            return team;
+        });
+        if (randomStates) assignStatesToTeams(teams);
+        else {
+            teams.forEach(team => {
+                const lead = shuffled.find(p => p.id === team.memberIds[0]);
+                if (lead?.stateId) {
+                    team.stateId = lead.stateId;
+                    team.state = lead.state;
+                    team.mapX = lead.mapX;
+                    team.mapY = lead.mapY;
+                    team.lat = lead.lat;
+                    team.lon = lead.lon;
+                }
+            });
+        }
+        raw.teams = teams;
+        syncPlayersFromTeams(raw.players, raw.teams);
+        raw.shuffleRandomStates = !!randomStates;
+        const n = raw.players.length;
+        const avg = teams.length ? Math.round((n / teams.length) * 10) / 10 : 0;
+        return { teams, teamCount: teams.length, avgTeamSize: avg, playerCount: n, maxTeamSize: maxTeam };
+    }
+
+    function parseMaxTeamSize(size) {
+        const m = Math.floor(Number(size));
+        if (!Number.isFinite(m) || m < 2 || m > 6) return null;
+        return m;
+    }
+
+    function raidSnapshot(raid) {
+        const r = normalizeRaidRecord(raid);
+        if (!r) return { poolRemaining: 0, activeCount: 0, percent: 0, lootPotTotal: 0 };
+        return {
+            poolRemaining: Number(r.lootPotRemaining) || 0,
+            activeCount: (r.activeAttackers || []).length,
+            percent: r.percent || 0,
+            lootPotTotal: Number(r.lootPotTotal) || 0
+        };
+    }
+
     return {
         SK, uid, BANK_TARGET_ID, ROOM_SCHEMA_VERSION, DEFAULT_TEAM_VAULT,
         defaultRoomSettings, defaultBank, defaultBankBonus, ensureBankBonus, fisherYates,
@@ -910,11 +1019,13 @@ window.CurrencySafeRoomShared = (function () {
         hashSeed, roundPoolHundreds, ensureTargetRaids, getTargetRaid, rollRaidPercent,
         getOrCreateTargetRaid, joinTargetRaid, computeRaidShare, computeRaidPayout,
         previewRaidPayout, completeTargetRaid, shouldStartNewRaid,
+        removePlayerFromTeamLists, removePlayerFromAllRaids,
+        buildEvenTeamChunks, shufflePlayersIntoTeams, parseMaxTeamSize, raidSnapshot,
         stripJoinSecrets,
         normalizeJoinPassword, needsJoinPassword, verifyJoinPassword,
         BONUS_LOOT, bankBonusAttemptKey, rollBonusPool, computeBonusPayout, ensureBonusWavePool,
         LAUNCH_COUNTDOWN_SEC, getLaunchCountdownRemaining,
         freshMissionProgress, getRoundMs, getPasswordRotateMs, getMatchRemainingMs, parseMatchMinutes,
-        isValidParticipantName, getPendingVisitors, validateLobbyForStart, ensureVaultCredentials
+        isValidParticipantName, suggestLobbyName, getPendingVisitors, validateLobbyForStart, ensureVaultCredentials
     };
 })();

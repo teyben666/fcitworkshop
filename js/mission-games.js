@@ -55,6 +55,22 @@
             modes: ["solo", "mp"],
             weight: 1
         },
+        quantum: {
+            id: "quantum",
+            enabled: true,
+            icon: "⚛️",
+            shortLabel: "量子同步",
+            modes: ["solo", "mp"],
+            weight: 1
+        },
+        cvfilter: {
+            id: "cvfilter",
+            enabled: true,
+            icon: "🛰️",
+            shortLabel: "滤镜显影",
+            modes: ["solo", "mp"],
+            weight: 1
+        },
         phishing: {
             id: "phishing",
             enabled: false,
@@ -168,6 +184,15 @@
             for (const id of pool) {
                 if (picked.length >= SLOT_COUNT) break;
                 if (!picked.includes(id)) picked.push(id);
+            }
+        }
+        const seqMutex = new Set(["typing", "quantum"]);
+        if (picked.filter(id => seqMutex.has(id)).length > 1) {
+            const drop = picked.find(id => id === "quantum");
+            const alt = pool.find(id => !picked.includes(id) && !seqMutex.has(id));
+            if (drop && alt) {
+                const i = picked.indexOf(drop);
+                picked[i] = alt;
             }
         }
         return { ok: true, kinds: picked.slice(0, SLOT_COUNT) };

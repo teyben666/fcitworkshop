@@ -48,14 +48,16 @@
 
     const METHODS = [
         "getClientId", "createRoom", "getRoom", "saveRoom", "joinRoom", "reconnectRoom", "ensureRoom",
-        "joinRoomAsPlayer", "joinRoomAsSpectator", "setRoomMode", "shufflePlayers", "shuffleStatesOnly",
+        "joinRoomAsPlayer", "joinRoomAsSpectator", "confirmLobbyName", "leaveTeamToBench",
+        "setRoomMode", "shufflePlayers", "shuffleStatesOnly",
         "setRoomJoinPassword",
         "startGame", "endGame", "beginLaunchCountdown", "cancelLaunchCountdown",
         "kickPlayer", "kickSpectator", "leaveRoom", "getSessionRoom", "getSessionRole",
         "isHost", "canWrite", "coordsFromState", "updatePlayerInRoom", "updatePlayerProgress",
         "getRoomSettings", "logActivity", "applyBreach", "applyTransfer", "applyBankTransfer",
-        "beginBankBonus", "completeBankBonus", "getMaxDeployPerTarget",
+        "beginBankBonus", "confirmBankBonusOpen", "completeBankBonus", "getMaxDeployPerTarget",
         "claimTargetDeploy", "claimTeamDeploy", "shuffleTeamGroups", "assignPlayerToTeam", "createTeam",
+        "setRoomMaxTeamSize", "abandonTargetRaid",
         "getTeamDeployCountRoom", "subscribe", "exportRoomCsv", "exportRoomReport",
         "setMatchDuration", "autoEndGameIfExpired", "touchLobbyPresence",
         "getConnectionStatus", "onConnectionChange"

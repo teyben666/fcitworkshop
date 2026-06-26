@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,700;14..32,900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/shared.css" />
     <link rel="stylesheet" href="css/fx.css" />
-    <link rel="stylesheet" href="css/lobby-hud.css?v=20260624c" />
+    <link rel="stylesheet" href="css/lobby-hud.css?v=20260626a" />
     <script>
         (function () {
             var p = new URLSearchParams(location.search);
@@ -96,6 +96,14 @@
                         <button type="button" class="lobby-btn shuffle" id="shuffleBtn" data-i18n="shuffleTeams">Shuffle 分队</button>
                         <button type="button" class="lobby-btn shuffle secondary" id="shuffleStatesBtn" data-i18n="shuffleStatesOnly">随机重分州属</button>
                     </div>
+                    <div class="duration-block" id="maxTeamSizeBlock">
+                        <div class="duration-head">
+                            <span data-i18n="maxTeamSize">每队人数上限</span>
+                            <span class="duration-val" id="maxTeamSizeLabel">4</span>
+                        </div>
+                        <input type="range" id="maxTeamSizeRange" min="2" max="6" step="1" value="4" />
+                        <div class="duration-ticks"><span>2</span><span>4</span><span>6</span></div>
+                    </div>
                     <div class="room-password-block" id="roomPasswordBlock">
                         <label class="lobby-check-row">
                             <input type="checkbox" id="roomPasswordEnabled" />
@@ -168,25 +176,17 @@
                     </div>
                     <p class="join-dock-summary hidden" id="joinDockSummary"></p>
                     <div class="join-dock-body" id="joinDockBody">
-                        <div class="join-grid">
+                        <div class="join-grid join-grid--name-only">
                             <div>
-                                <label for="joinName" data-i18n="displayName">显示名称 / 队名</label>
-                                <input id="joinName" maxlength="24" data-i18n-placeholder="namePlaceholder" placeholder="例如：暗影金库小队" />
-                            </div>
-                            <div>
-                                <label for="joinState" data-i18n="homeStatePlayer">金库所在州属（新建队伍时）</label>
-                                <select id="joinState"></select>
-                            </div>
-                            <div>
-                                <label for="joinTeam">加入已有队伍（可选）</label>
-                                <select id="joinTeam">
-                                    <option value="">创建新队伍</option>
-                                </select>
+                                <label for="joinName">显示名称</label>
+                                <input id="joinName" maxlength="24" placeholder="例如：Alex · 默认 Player 1" />
                             </div>
                         </div>
+                        <p class="muted join-hint">进房后先在候场区等待；确认名称后，点击右侧编队地图的 <strong>空位 +</strong> 进驻某州。一队一州，同队多人占不同空位。</p>
                         <div class="join-actions">
-                            <button type="button" class="lobby-btn join-player" id="joinPlayerBtn" data-i18n="joinAsPlayer">以玩家加入</button>
-                            <button type="button" class="lobby-btn join-spec" id="joinSpectatorBtn" data-i18n="joinAsSpectator">以观战加入</button>
+                            <button type="button" class="lobby-btn join-player" id="confirmNameBtn">确认名称</button>
+                            <button type="button" class="lobby-btn join-spec" id="joinSpectatorBtn" data-i18n="joinAsSpectator">保持候场</button>
+                            <button type="button" class="lobby-btn join-spec hidden" id="switchSpectatorBtn">离队 · 回候场</button>
                         </div>
                         <div id="lobbyNotice" class="notice hidden"></div>
                         <p id="joinReminder" class="notice error hidden"></p>
@@ -212,7 +212,7 @@
                             </span>
                             <div>
                                 <h2>队伍编队 <span id="teamCount" class="squad-count-inline">0</span></h2>
-                                <p class="panel-sub">每队最多 4 人 · 一队一州 · 空州可点击加入或换州</p>
+                                <p class="panel-sub" id="squadRosterSub">每队最多 4 人 · 一队一州 · 点空位进驻 / 换位</p>
                             </div>
                         </div>
                         <span class="active-squads-badge" id="activeSquadsBadge">0 Active Squads</span>
@@ -225,9 +225,10 @@
 
                     <div class="spectators-block">
                         <div class="panel-head compact">
-                            <h3 data-i18n="spectators">观战</h3>
+                            <h3>候场区</h3>
                             <span class="count-pill" id="spectatorCount">0</span>
                         </div>
+                        <p class="muted bench-hint">未点空位进队的人在此等候；已进队者将鼠标指到自己名字上可看到「离队候场」，点击即可换位。</p>
                         <div id="spectatorList" class="spectator-grid"></div>
                     </div>
                 </section>
@@ -284,6 +285,8 @@
         let refreshTimer = null;
         let launchTickTimer = null;
         let launchTriggered = false;
+        let joinNameDraftDirty = false;
+        let lastTeamBoardSig = "";
         const tacticalLogs = [];
 
         function addLog(msg) {
@@ -300,11 +303,9 @@
 
         function applyPendingJoinFromHome() {
             const pendingName = sessionStorage.getItem("csPendingJoinName");
-            const pendingState = sessionStorage.getItem("csPendingJoinState");
             if (pendingName && $("joinName")) $("joinName").value = pendingName;
-            if (pendingState && $("joinState")) $("joinState").value = pendingState;
             if (pendingName) sessionStorage.removeItem("csPendingJoinName");
-            if (pendingState) sessionStorage.removeItem("csPendingJoinState");
+            sessionStorage.removeItem("csPendingJoinState");
         }
 
         function hideStartOverlay() {
@@ -411,14 +412,12 @@
 
         function paintLobbyShell() {
             try {
-                if (window.MALAYSIA_STATES?.length) initStateSelect();
                 const shell = makeShellRoom(roomId);
                 setRoomCodeDisplay(roomId);
                 $("statusLabel").textContent = t("lobbyStatusWaiting");
                 $("modeDesc").textContent = t("modeDescPractice");
                 renderTeamBoard(shell);
                 renderLobbyMap(shell);
-                syncJoinStateField();
             } catch (err) {
                 console.error("paintLobbyShell", err);
                 showBootError("界面渲染失败：" + (err.message || err));
@@ -482,8 +481,8 @@
             }
             addLog("LOBBY: 等待战术小队部署…");
 
-            ensureLobbyReady().then(() => {
-                initStateSelect();
+            ensureLobbyReady().then((room) => {
+                initLobbyName(room);
                 syncDurationLabel();
                 applyPendingJoinFromHome();
                 refreshBackendBadge();
@@ -517,14 +516,72 @@
             }
         }
 
+        function initLobbyName(room) {
+            const clientId = getLobbyClientId();
+            const me = room.players.find(p => p.id === clientId)
+                || room.spectators.find(s => s.id === clientId);
+            const visitor = (room.visitors || []).find(v => v.id === clientId);
+            const input = $("joinName");
+            if (!input) return;
+            if (me?.name) {
+                input.value = me.name;
+                return;
+            }
+            const suggested = visitor?.name || S.suggestLobbyName(room, clientId);
+            if (!input.value.trim()) input.value = suggested;
+            CurrencySafeRoom.touchLobbyPresence(roomId);
+        }
+
+        function getLobbyDisplayName() {
+            return ($("joinName")?.value || "").trim();
+        }
+
+        function markJoinNameCommitted() {
+            joinNameDraftDirty = false;
+        }
+
+        function syncJoinNameField(room) {
+            const input = $("joinName");
+            if (!input || joinNameDraftDirty || document.activeElement === input) return;
+            const clientId = CurrencySafeRoom.getClientId();
+            const me = room.players.find(p => p.id === clientId);
+            const spec = (room.spectators || []).find(s => s.id === clientId);
+            const visitor = S.getPendingVisitors(room).find(v => v.id === clientId);
+            if (me) input.value = me.name;
+            else if (spec) input.value = spec.name;
+            else if (visitor?.name && !input.value.trim()) input.value = visitor.name;
+        }
+
+        function confirmLobbyName() {
+            const name = getLobbyDisplayName();
+            if (!name) {
+                showNotice("请先填写显示名称", true);
+                $("joinName")?.focus();
+                return;
+            }
+            if (!S.isValidParticipantName(name)) {
+                showNotice("名称不能为 unknown 或空白", true);
+                return;
+            }
+            runAction(CurrencySafeRoom.confirmLobbyName(roomId, name), () => {
+                markJoinNameCommitted();
+                showNotice("名称已确认，请点击右侧空位进驻", false);
+            });
+        }
+
+        function leaveToBench() {
+            const name = getLobbyDisplayName();
+            runAction(CurrencySafeRoom.leaveTeamToBench(roomId, name), () => {
+                markJoinNameCommitted();
+                showNotice("已回到候场，可点击其他州空位换位", false);
+            });
+        }
+
         function initStateSelect() {
-            const states = window.MALAYSIA_STATES || [];
-            if (!states.length || !$("joinState")) return;
-            const stateOpts = states.map(s =>
-                `<option value="${s.id}">${s.label}</option>`
-            ).join("");
-            $("joinState").innerHTML = stateOpts;
-            $("joinState").value = "selangor";
+            refreshHostStateSelect();
+        }
+
+        function refreshJoinStateSelect() {
             refreshHostStateSelect();
         }
 
@@ -557,18 +614,6 @@
             return Number(n || 0).toLocaleString("en-MY");
         }
 
-        function renderAssignOptions(room, player) {
-            const maxTeam = room.settings?.maxTeamSize || 4;
-            let html = `<option value="">→ 新建队伍</option>`;
-            (room.teams || []).forEach(tm => {
-                const n = (tm.memberIds || []).length;
-                const full = n >= maxTeam && tm.id !== player.teamId;
-                const label = `${stateLabelForTeam(tm)} (${n}/${maxTeam})`;
-                html += `<option value="${tm.id}" ${tm.id === player.teamId ? "selected" : ""} ${full ? "disabled" : ""}>${escapeHtml(label)}</option>`;
-            });
-            return html;
-        }
-
         function stateLabelForTeam(team) {
             const st = (window.MALAYSIA_STATES || []).find(s => s.id === team.stateId);
             return st?.label || team.state || team.name || "未分配州属";
@@ -583,10 +628,14 @@
 
         function tryJoinState(stateId, teamId) {
             if (!stateId && !teamId) return;
-            const name = ($("joinName").value || "").trim();
+            const name = getLobbyDisplayName();
             if (!name) {
-                showNotice("请先在下方填写显示名称", true);
-                $("joinName").focus();
+                showNotice("请先填写并确认显示名称", true);
+                $("joinName")?.focus();
+                return;
+            }
+            if (!S.isValidParticipantName(name)) {
+                showNotice("名称不能为 unknown 或空白", true);
                 return;
             }
             ensureLobbyReady().then((room) => {
@@ -594,20 +643,22 @@
                     showNotice("比赛已开始，无法更换州属。", true);
                     return;
                 }
-                const me = room.players.find(p => p.id === CurrencySafeRoom.getClientId());
+                const clientId = CurrencySafeRoom.getClientId();
+                const me = room.players.find(p => p.id === clientId);
                 if (me && teamId && me.teamId === teamId) return;
                 if (me && !teamId && me.stateId === stateId) return;
-                $("joinState").value = stateId || $("joinState").value;
-                if (teamId) $("joinTeam").value = teamId;
-                else $("joinTeam").value = "";
-                syncJoinStateField();
-                return runAction(
-                    CurrencySafeRoom.joinRoomAsPlayer(roomId, name, stateId || $("joinState").value, teamId || null),
+                const confirmThenJoin = () => runAction(
+                    CurrencySafeRoom.joinRoomAsPlayer(roomId, name, stateId, teamId || null),
                     () => {
+                        markJoinNameCommitted();
                         const st = (MALAYSIA_STATES || []).find(s => s.id === stateId);
                         showNotice(teamId ? "已加入该队" : `已进驻 ${st?.label || stateId}`, false);
                     }
                 );
+                const visitor = (room.visitors || []).find(v => v.id === clientId);
+                const nameOk = me?.name === name || visitor?.name === name;
+                if (nameOk) return confirmThenJoin();
+                return runAction(CurrencySafeRoom.confirmLobbyName(roomId, name), confirmThenJoin);
             }).catch(err => showNotice(err.message || String(err), true));
         }
 
@@ -626,28 +677,33 @@
                 if (p) {
                     const isMe = p.id === clientId;
                     const isHost = p.id === room.hostId;
-                    const assignUi = host && room.status === "lobby"
-                        ? `<select class="team-assign-select" data-player="${p.id}">${renderAssignOptions(room, p)}</select>`
-                        : "";
+                    const selfLeaveUi = isMe && canJoin
+                        ? `<span class="squad-self-hit" data-bench-leave role="button" tabindex="0" title="点击回到候场">
+                               <span class="squad-self-default">
+                                   <span class="squad-self-name">${escapeHtml(p.name)}</span>
+                                   <span class="mini-tag you">YOU</span>
+                               </span>
+                               <span class="squad-self-hover" aria-hidden="true">离队候场</span>
+                           </span>`
+                        : `<span>${escapeHtml(p.name)}</span>${isMe ? '<span class="mini-tag you">YOU</span>' : ""}`;
                     slots.push(`<div class="squad-slot filled${isMe ? " is-me" : ""}">
                         <div class="squad-slot-name">
                             <span class="squad-dot" style="background:${color}"></span>
-                            <span>${escapeHtml(p.name)}</span>
+                            ${selfLeaveUi}
                             ${isHost ? '<span class="mini-tag host">HOST</span>' : ""}
-                            ${isMe ? '<span class="mini-tag you">YOU</span>' : ""}
-                        </div>
-                        <div class="squad-slot-meta">
-                            ${isMe ? '<span class="mini-tag you">YOU</span>' : ""}
-                            ${assignUi}
                         </div>
                     </div>`);
                 } else {
-                    const click = canJoin
+                    const full = team && members.length >= maxTeam;
+                    const click = canJoin && !full
                         ? ` data-join-state="${st.id}"${team ? ` data-join-team="${team.id}"` : ""} tabindex="0" role="button"`
                         : "";
-                    slots.push(`<div class="squad-slot empty joinable${canJoin ? "" : " disabled"}"${click}>
-                        <span class="empty-slot-icon">+</span>
-                        <span>空位</span>
+                    const slotLabel = full
+                        ? "已满"
+                        : (team && members.length > 0 ? "空位" : "进驻");
+                    slots.push(`<div class="squad-slot empty${canJoin && !full ? " joinable" : " disabled"}${full ? " squad-slot-full" : ""}"${click}>
+                        <span class="empty-slot-icon">${full ? "—" : "+"}</span>
+                        <span>${slotLabel}</span>
                     </div>`);
                 }
             }
@@ -741,17 +797,52 @@
             });
         }
 
-        function renderTeamBoard(room) {
+        function teamBoardSignature(room) {
+            const maxTeam = room.settings?.maxTeamSize || 4;
+            const teams = (room.teams || []).map(t => ({
+                id: t.id,
+                stateId: t.stateId,
+                members: [...(t.memberIds || [])].sort(),
+                bal: S.teamBalance(room, t.id)
+            })).sort((a, b) => a.id.localeCompare(b.id));
+            const players = (room.players || []).map(p => ({
+                id: p.id,
+                name: p.name,
+                teamId: p.teamId || ""
+            })).sort((a, b) => a.id.localeCompare(b.id));
+            return JSON.stringify({
+                status: room.status,
+                maxTeam,
+                hostId: room.hostId,
+                teams,
+                players
+            });
+        }
+
+        function renderTeamBoard(room, force) {
             S.ensureTeamsAndBank(room);
+            const sig = teamBoardSignature(room);
             const { entries, orphans } = buildStateRoster(room);
             const maxTeam = room.settings?.maxTeamSize || 4;
-            const host = window.CurrencySafeRoom?.isHost?.(room) || false;
-            const clientId = getLobbyClientId();
             const occupied = entries.filter(e => e.team && (e.team.memberIds || []).length).length;
             const totalStates = (window.MALAYSIA_STATES || []).length;
             $("teamCount").textContent = `${occupied} / ${totalStates}`;
             const badge = $("activeSquadsBadge");
             if (badge) badge.textContent = `${occupied} Active Squads`;
+
+            const rosterSub = $("squadRosterSub");
+            if (rosterSub) {
+                const nTeams = (room.teams || []).length;
+                const nPlayers = (room.players || []).length;
+                const avg = nTeams ? Math.round((nPlayers / nTeams) * 10) / 10 : 0;
+                rosterSub.textContent = `每队最多 ${maxTeam} 人 · ${nTeams} 队 · 均 ${avg} 人/队 · 一队一州`;
+            }
+
+            if (!force && sig === lastTeamBoardSig) return;
+            lastTeamBoardSig = sig;
+
+            const host = window.CurrencySafeRoom?.isHost?.(room) || false;
+            const clientId = getLobbyClientId();
 
             let html = entries.map((entry, i) =>
                 renderStateSquadCard(entry.state, entry.team, room, maxTeam, host, clientId, i)
@@ -781,31 +872,48 @@
                 slot.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } };
             });
 
-            document.querySelectorAll(".team-assign-select").forEach(sel => {
-                sel.onchange = () => {
-                    runAction(CurrencySafeRoom.assignPlayerToTeam(roomId, sel.dataset.player, sel.value || null), () => {
-                        showNotice("分队已更新", false);
-                    });
+            document.querySelectorAll("[data-bench-leave]").forEach(el => {
+                const go = (e) => {
+                    e.stopPropagation();
+                    leaveToBench();
+                };
+                el.onclick = go;
+                el.onkeydown = (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        go(e);
+                    }
                 };
             });
 
             document.querySelectorAll(".squad-join-state-btn").forEach(btn => {
                 btn.onclick = () => tryJoinState(btn.dataset.stateId, null);
             });
+        }
 
-            const joinTeam = $("joinTeam");
-            if (joinTeam) {
-                const opts = [`<option value="">创建新队伍</option>`];
-                (room.teams || []).forEach(tm => {
-                    const n = (tm.memberIds || []).length;
-                    const full = n >= maxTeam;
-                    opts.push(`<option value="${tm.id}" ${full ? "disabled" : ""}>${escapeHtml(stateLabelForTeam(tm))} (${n}/${maxTeam})</option>`);
-                });
-                joinTeam.innerHTML = opts.join("");
-                const me = room.players.find(p => p.id === clientId);
-                if (me?.teamId) joinTeam.value = me.teamId;
+        function renderVisitorChip(v) {
+            const clientId = getLobbyClientId();
+            const isMe = v.id === clientId;
+            return `<div class="spectator-chip visitor-chip${isMe ? " is-me" : ""}">
+                <span class="spectator-dot"></span>
+                <span>${escapeHtml(v.name || "—")}</span>
+                <span class="mini-tag">候场</span>
+                ${isMe ? '<span class="mini-tag you">ME</span>' : ""}
+            </div>`;
+        }
+
+        function renderBenchList(room) {
+            const clientId = getLobbyClientId();
+            const pending = S.getPendingVisitors(room);
+            const specs = room.spectators || [];
+            const chips = [
+                ...pending.map(v => renderVisitorChip(v)),
+                ...specs.map((s, i) => renderSpectatorChip(s, i, room))
+            ];
+            if (!chips.length) {
+                return `<div class="notice empty-squads">暂无候场人员 · 确认名称后点空位进队，或点「保持候场」</div>`;
             }
-            syncJoinStateField();
+            return chips.join("");
         }
 
         function renderSpectatorChip(s, i, room) {
@@ -853,14 +961,14 @@
 
             sessionStorage.setItem(CurrencySafeRoom.SK.roomId, room.id);
             setRoomCodeDisplay(room.id);
-            $("spectatorCount").textContent = "(" + (room.spectators || []).length + ")";
+            $("spectatorCount").textContent = String(
+                S.getPendingVisitors(room).length + (room.spectators || []).length
+            );
             renderTeamBoard(room);
-            syncJoinDock(room);
             refreshHostStateSelect();
+            syncJoinDock(room);
 
-            $("spectatorList").innerHTML = (room.spectators || []).length
-                ? room.spectators.map((s, i) => renderSpectatorChip(s, i, room)).join("")
-                : `<div class="notice empty-squads">${escapeHtml(t("noSpectators"))}</div>`;
+            $("spectatorList").innerHTML = renderBenchList(room);
 
             const host = CurrencySafeRoom.isHost(room);
             $("hostPanel").style.display = host ? "" : "none";
@@ -907,6 +1015,22 @@
                 durRange.value = mins;
                 syncDurationLabel();
             }
+            const maxTeam = room.settings?.maxTeamSize || 4;
+            const maxTeamRange = $("maxTeamSizeRange");
+            if (maxTeamRange && document.activeElement !== maxTeamRange) {
+                maxTeamRange.value = String(maxTeam);
+                syncMaxTeamSizeLabel();
+            }
+            if ($("maxTeamSizeBlock")) {
+                $("maxTeamSizeBlock").style.display = host && room.status === "lobby" ? "" : "none";
+            }
+            const rosterSub = $("squadRosterSub");
+            if (rosterSub) {
+                const nTeams = (room.teams || []).length;
+                const nPlayers = (room.players || []).length;
+                const avg = nTeams ? Math.round((nPlayers / nTeams) * 10) / 10 : 0;
+                rosterSub.textContent = `每队最多 ${maxTeam} 人 · ${nTeams} 队 · 均 ${avg} 人/队 · 一队一州`;
+            }
 
             if (window.MalaysiaMapPreview) {
                 renderLobbyMap(room);
@@ -919,20 +1043,16 @@
                     : t("modeDescCompetitive");
             }
 
+            syncJoinNameField(room);
+
             const me = room.players.find(p => p.id === CurrencySafeRoom.getClientId());
             const spec = (room.spectators || []).find(s => s.id === CurrencySafeRoom.getClientId());
-            if (me) {
-                $("joinName").value = me.name;
-                if (me.stateId) $("joinState").value = me.stateId;
-            } else if (spec) {
-                $("joinName").value = spec.name;
-            }
 
             const reminder = $("joinReminder");
             if (reminder) {
                 if (!me && !spec && room.status === "lobby") {
                     reminder.classList.remove("hidden");
-                    reminder.textContent = t("mustJoinFirst");
+                    reminder.textContent = "请确认名称后点击编队空位进驻，或点「保持候场」。";
                 } else {
                     reminder.classList.add("hidden");
                 }
@@ -1014,17 +1134,6 @@
                 : "本机演示模式：请在本机运行 cd server && npm start，并通过 Tunnel 或局域网访问";
         }
 
-        function syncJoinStateField() {
-            const teamSel = $("joinTeam");
-            const stateSel = $("joinState");
-            if (!teamSel || !stateSel) return;
-            const joiningExisting = !!teamSel.value;
-            stateSel.disabled = joiningExisting;
-            stateSel.closest("div")?.classList.toggle("field-muted", joiningExisting);
-        }
-
-        let joinDockExpanded = false;
-
         function syncJoinDock(room) {
             const dock = $("joinDock");
             const summary = $("joinDockSummary");
@@ -1042,22 +1151,43 @@
             }
             dock.classList.toggle("is-expanded", !registered || joinDockExpanded);
             if (summary) {
-                if (registered) {
-                    if (mePlayer) {
-                        const team = (room.teams || []).find(tm => tm.id === mePlayer.teamId);
-                        const st = team ? stateLabelForTeam(team) : "";
-                        summary.textContent = `✓ 已登记 · ${mePlayer.name}${st ? ` · ${st}` : ""}`;
-                    } else {
-                        summary.textContent = `✓ 观战中 · ${meSpec.name}`;
-                    }
+                if (mePlayer) {
+                    const team = (room.teams || []).find(tm => tm.id === mePlayer.teamId);
+                    const st = team ? stateLabelForTeam(team) : "";
+                    summary.textContent = `✓ 已进队 · ${mePlayer.name}${st ? ` · ${st}` : ""}`;
+                    summary.classList.remove("hidden");
+                } else if (meSpec) {
+                    summary.textContent = `✓ 候场中 · ${meSpec.name}`;
                     summary.classList.remove("hidden");
                 } else {
-                    summary.classList.add("hidden");
+                    const visitor = S.getPendingVisitors(room).find(v => v.id === clientId);
+                    if (visitor?.name) {
+                        summary.textContent = `候场 · ${visitor.name}（待点空位进队）`;
+                        summary.classList.remove("hidden");
+                    } else {
+                        summary.classList.add("hidden");
+                    }
                 }
             }
-            if (mePlayer?.name && $("joinName") && !$("joinName").value.trim()) {
-                $("joinName").value = mePlayer.name;
+            syncJoinNameField(room);
+            const switchSpec = $("switchSpectatorBtn");
+            const joinSpec = $("joinSpectatorBtn");
+            if (switchSpec) {
+                switchSpec.classList.toggle("hidden", !(mePlayer && room.status === "lobby"));
             }
+            if (joinSpec) joinSpec.classList.toggle("hidden", !!(meSpec && room.status === "lobby"));
+        }
+
+        function syncMaxTeamSizeLabel() {
+            const v = $("maxTeamSizeRange")?.value || "4";
+            if ($("maxTeamSizeLabel")) $("maxTeamSizeLabel").textContent = v;
+        }
+
+        function applyMaxTeamSize() {
+            syncMaxTeamSizeLabel();
+            runAction(CurrencySafeRoom.setRoomMaxTeamSize(roomId, $("maxTeamSizeRange").value), () => {
+                showNotice(t("maxTeamSizeSet"), false);
+            });
         }
 
         function escapeHtml(text) {
@@ -1066,13 +1196,19 @@
             return d.innerHTML;
         }
 
+        let joinDockExpanded = false;
+
         if (document.readyState === "loading") {
             document.addEventListener("DOMContentLoaded", bootstrapLobby);
         } else {
             bootstrapLobby();
         }
 
-        $("joinTeam")?.addEventListener("change", syncJoinStateField);
+        $("confirmNameBtn")?.addEventListener("click", () => confirmLobbyName());
+
+        $("joinName")?.addEventListener("input", () => {
+            joinNameDraftDirty = true;
+        });
 
         $("joinDockToggle")?.addEventListener("click", () => {
             joinDockExpanded = !joinDockExpanded;
@@ -1083,6 +1219,37 @@
                 toggle.setAttribute("aria-expanded", joinDockExpanded ? "true" : "false");
                 toggle.textContent = joinDockExpanded ? "▲" : "▼";
             }
+        });
+
+        $("hostCreateTeamBtn")?.addEventListener("click", () => {
+            runAction(CurrencySafeRoom.createTeam(roomId, $("hostNewTeamState").value), () => {
+                showNotice("已创建空队伍", false);
+            });
+        });
+
+        $("joinSpectatorBtn")?.addEventListener("click", () => {
+            const name = getLobbyDisplayName();
+            if (!name) {
+                showNotice("请先填写显示名称", true);
+                return;
+            }
+            runAction(CurrencySafeRoom.confirmLobbyName(roomId, name))
+                .then(() => CurrencySafeRoom.joinRoomAsSpectator(roomId, name))
+                .then(res => {
+                    if (res?.ok === false) showNotice(res.error || "操作失败", true);
+                    else {
+                        markJoinNameCommitted();
+                        showNotice("已保持候场（开赛后以观战身份进入）", false);
+                    }
+                    const room = CurrencySafeRoom.getRoom(roomId);
+                    if (room) renderRoom(room);
+                })
+                .catch(err => showNotice(err?.message || String(err), true));
+        });
+
+        $("switchSpectatorBtn")?.addEventListener("click", () => {
+            if (!confirm("离开当前队伍并回到候场？可再点其他州空位换位。")) return;
+            leaveToBench();
         });
 
         $("copyCodeBtn").onclick = async () => {
@@ -1111,8 +1278,12 @@
         $("shuffleBtn").onclick = () => {
             $("shuffleBtn").classList.add("is-shuffling");
             addLog("SYS: Shuffle 分队协议启动");
-            runAction(CurrencySafeRoom.shufflePlayers(roomId, false), () => {
-                showNotice(t("shuffleDone"), false);
+            runAction(CurrencySafeRoom.shufflePlayers(roomId, false), (res) => {
+                const stats = res?.shuffleStats;
+                const msg = stats
+                    ? `${t("shuffleDone")} ${stats.teamCount} 队 · 均 ${stats.avgTeamSize} 人`
+                    : t("shuffleDone");
+                showNotice(msg, false);
                 addLog("SYS: 分队与坐标同步完成");
                 $("mapPreviewCard").classList.add("shuffle-flash");
                 setTimeout(() => {
@@ -1164,24 +1335,8 @@
             });
         });
 
-        $("joinPlayerBtn").onclick = () => {
-            const teamId = $("joinTeam").value || null;
-            runAction(CurrencySafeRoom.joinRoomAsPlayer(roomId, $("joinName").value, $("joinState").value, teamId), () => {
-                showNotice(t("joinedPlayer"), false);
-            });
-        };
-
-        $("hostCreateTeamBtn")?.addEventListener("click", () => {
-            runAction(CurrencySafeRoom.createTeam(roomId, $("hostNewTeamState").value), () => {
-                showNotice("已创建空队伍", false);
-            });
-        });
-
-        $("joinSpectatorBtn").onclick = () => {
-            runAction(CurrencySafeRoom.joinRoomAsSpectator(roomId, $("joinName").value), () => {
-                showNotice(t("joinedSpectator"), false);
-            });
-        };
+        $("maxTeamSizeRange")?.addEventListener("input", syncMaxTeamSizeLabel);
+        $("maxTeamSizeRange")?.addEventListener("change", applyMaxTeamSize);
 
         $("kickPlayerBtn").onclick = () => {
             const val = $("kickPlayerSelect").value;

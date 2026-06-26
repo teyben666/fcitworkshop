@@ -56,14 +56,16 @@ const CLIENT_RPC = new Set([
     "createRoom", "saveRoom", "joinRoom", "reconnectRoom", "ensureRoom",
     "joinRoomAsPlayer", "joinRoomAsSpectator", "setRoomMode", "shufflePlayers",
     "shuffleStatesOnly", "shuffleTeamGroups", "assignPlayerToTeam", "createTeam",
+    "setRoomMaxTeamSize", "abandonTargetRaid",
     "setRoomJoinPassword",
     "startGame", "endGame", "beginLaunchCountdown", "cancelLaunchCountdown",
     "kickPlayer", "kickSpectator", "leaveRoom",
     "updatePlayerInRoom", "updatePlayerProgress", "logActivity",
     "applyBreach", "applyTransfer", "applyBankTransfer",
-    "beginBankBonus", "completeBankBonus",
+    "beginBankBonus", "confirmBankBonusOpen", "completeBankBonus",
     "claimTargetDeploy", "claimTeamDeploy",
-    "setMatchDuration", "autoEndGameIfExpired", "touchLobbyPresence"
+    "setMatchDuration", "autoEndGameIfExpired", "touchLobbyPresence",
+    "confirmLobbyName", "leaveTeamToBench"
 ]);
 
 wss.on("connection", (ws) => {

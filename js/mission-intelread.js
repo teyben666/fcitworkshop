@@ -65,6 +65,29 @@
             : EMBEDDED_BRIEFINGS);
     });
 
+    const TRAP_LABELS = {
+        ordinal: "序数陷阱",
+        route: "站点陷阱",
+        time: "时间变更",
+        negation: "否定陷阱"
+    };
+
+    const DEFAULT_TRAP_HINTS = {
+        ordinal: "题目问的是第几站/第几个——别看成第一站！",
+        route: "看清每一站的职责，别张冠李戴。",
+        time: "注意「改至」「推迟」——以最新时间为准。",
+        negation: "题目问「不是」——别选成允许项！"
+    };
+
+    function trapTagLabel(trap) {
+        return TRAP_LABELS[trap] || "注意力陷阱";
+    }
+
+    function trapHintFor(q) {
+        if (!q?.trap) return null;
+        return q.trapHint || DEFAULT_TRAP_HINTS[q.trap] || "仔细读题，别被诱饵带走。";
+    }
+
     function hashSeed(str) {
         return global.MissionGames?.hashSeed?.(str)
             ?? global.CurrencySafeRoomShared?.hashSeed?.(str)
@@ -199,9 +222,18 @@
         if (pick !== q.answer) {
             session.wrongCount = (session.wrongCount || 0) + 1;
             session.lastWrongQ = session.currentQ;
-            return { ok: false, wrong: true, wrongCount: session.wrongCount };
+            const trapHint = trapHintFor(q);
+            session.lastTrapHint = trapHint;
+            return {
+                ok: false,
+                wrong: true,
+                wrongCount: session.wrongCount,
+                trap: q.trap || null,
+                trapHint
+            };
         }
         session.lastWrongQ = -1;
+        session.lastTrapHint = null;
         session.currentQ++;
         if (session.currentQ >= session.briefing.questions.length) {
             session.step = "done";
@@ -240,13 +272,16 @@
     function renderQuiz(session) {
         const q = session.briefing.questions[session.currentQ];
         if (!q) return "";
+        const tag = q.trap
+            ? `<p class="ir-quiz-tag ir-quiz-tag-trap">ATTENTION · ${escape(trapTagLabel(q.trap))}</p>`
+            : `<p class="ir-quiz-tag">EXTRACT · 细节验证</p>`;
         const wrongHint = session.lastWrongQ === session.currentQ
-            ? '<p class="ir-wrong">答错了 · 奖金 −RM 200 · 请再选一次</p>' : "";
+            ? `<p class="ir-wrong">${escape(session.lastTrapHint || "答错了 · 奖金 −RM 200 · 请再选一次")}</p>` : "";
         const choices = q.choices.map((c, i) =>
             `<button type="button" class="ir-choice" data-ir-choice="${i}">${escape(c)}</button>`
         ).join("");
         return `
-            <p class="ir-quiz-tag">EXTRACT · 细节验证</p>
+            ${tag}
             <p class="ir-quiz-progress">细节题 ${session.currentQ + 1} / ${session.briefing.questions.length}</p>
             <p class="ir-quiz-prompt">${escape(q.prompt)}</p>
             ${wrongHint}
@@ -330,7 +365,9 @@
         submitAnswer,
         computeRemainder,
         render,
-        pickBriefing,
+        trapTagLabel,
+        trapHintFor,
+        TRAP_LABELS,
         DECODE_MS: LINE_DECODE_MS,
         LINE_DECODE_MS,
         SCRAMBLE_CURSORS,

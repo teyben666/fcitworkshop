@@ -1432,6 +1432,69 @@ body.lobby-page .mode-toggle button.active {
     color: var(--cyan);
 }
 
+.squad-self-hit {
+    position: relative;
+    display: inline-grid;
+    align-items: center;
+    justify-items: start;
+    cursor: pointer;
+    min-width: 0;
+    flex: 1;
+    max-width: 100%;
+    vertical-align: middle;
+}
+
+.squad-self-default,
+.squad-self-hover {
+    grid-area: 1 / 1;
+}
+
+.squad-self-default {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 0;
+    max-width: 100%;
+    transition: opacity 0.12s ease, visibility 0.12s ease;
+}
+
+.squad-self-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.squad-self-hover {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #ffd65a !important;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    transition: opacity 0.12s ease, visibility 0.12s ease;
+}
+
+.squad-self-hit:hover .squad-self-default,
+.squad-self-hit:focus-visible .squad-self-default {
+    visibility: hidden;
+    opacity: 0;
+}
+
+.squad-self-hit:hover .squad-self-hover,
+.squad-self-hit:focus-visible .squad-self-hover {
+    visibility: visible;
+    opacity: 1;
+}
+
+.squad-self-hit:focus-visible {
+    outline: none;
+    border-radius: 0.25rem;
+    box-shadow: 0 0 0 1px rgba(255, 214, 90, 0.45);
+}
+
 .squad-slot-name {
     display: flex;
     align-items: center;
@@ -1440,7 +1503,7 @@ body.lobby-page .mode-toggle button.active {
     flex: 1;
 }
 
-.squad-slot-name span:not(.mini-tag) {
+.squad-slot-name > span:not(.mini-tag):not(.squad-self-hit) {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1462,6 +1525,16 @@ body.lobby-page .mode-toggle button.active {
     color: var(--muted);
 }
 
+.join-hint, .bench-hint {
+    font-size: 0.78rem;
+    margin: 0.35rem 0 0.65rem;
+    line-height: 1.45;
+}
+
+.visitor-chip .mini-tag {
+    opacity: 0.85;
+}
+
 .squad-foot {
     margin-top: 0.65rem;
     padding-top: 0.55rem;
@@ -1469,13 +1542,6 @@ body.lobby-page .mode-toggle button.active {
     font-size: 0.65rem;
     font-family: "JetBrains Mono", ui-monospace, monospace;
     color: var(--muted);
-}
-
-.team-assign-select {
-    max-width: 7rem;
-    font-size: 0.62rem;
-    padding: 0.2rem 0.35rem;
-    border-radius: 0.35rem;
 }
 
 .bank-desc {

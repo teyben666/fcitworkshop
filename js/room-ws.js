@@ -386,14 +386,16 @@
     const RPC_METHODS = [
         "joinRoomAsPlayer", "joinRoomAsSpectator", "setRoomMode", "shufflePlayers",
         "shuffleStatesOnly", "shuffleTeamGroups", "assignPlayerToTeam", "createTeam",
+        "setRoomMaxTeamSize", "abandonTargetRaid",
         "setRoomJoinPassword",
         "startGame", "endGame", "beginLaunchCountdown", "cancelLaunchCountdown",
         "kickPlayer", "kickSpectator",
         "updatePlayerInRoom", "updatePlayerProgress",
         "applyBreach", "applyTransfer", "applyBankTransfer",
-        "beginBankBonus", "completeBankBonus",
+        "beginBankBonus", "confirmBankBonusOpen", "completeBankBonus",
         "claimTargetDeploy", "claimTeamDeploy",
-        "setMatchDuration", "autoEndGameIfExpired", "touchLobbyPresence"
+        "setMatchDuration", "autoEndGameIfExpired", "touchLobbyPresence",
+        "confirmLobbyName", "leaveTeamToBench",
     ];
 
     const api = {

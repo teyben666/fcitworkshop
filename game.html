@@ -818,6 +818,20 @@
             overflow-y: auto;
             overscroll-behavior: contain;
             scrollbar-gutter: stable;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(56, 189, 248, 0.35) rgba(3, 10, 18, 0.6);
+        }
+        .mission-scroll::-webkit-scrollbar { width: 6px; }
+        .mission-scroll::-webkit-scrollbar-track {
+            background: rgba(3, 10, 18, 0.5);
+            border-radius: 999px;
+        }
+        .mission-scroll::-webkit-scrollbar-thumb {
+            background: rgba(56, 189, 248, 0.3);
+            border-radius: 999px;
+        }
+        .mission-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(56, 189, 248, 0.5);
         }
         .tabs {
             flex-shrink: 0;
@@ -1224,6 +1238,11 @@
         }
         .typing-progress span.done { color: var(--green); }
         .typing-progress span.cur { color: var(--amber); font-weight: 900; }
+        .typing-stage.typing-unfocused { outline: 2px dashed rgba(255, 138, 147, 0.55); outline-offset: 6px; border-radius: 12px; }
+        .typing-focus-banner {
+            font-size: .78rem; color: #ff8a93; margin: 6px 0 0;
+            animation: signal-flash .8s ease infinite;
+        }
         .signal-warn {
             animation: signal-flash .45s ease 2;
         }
@@ -1333,6 +1352,48 @@
             border-color: rgba(56, 189, 248, 0.55);
             box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
         }
+        .slot-reel.match-pop .slot-reel-window {
+            animation: slot-match-pop 0.35s cubic-bezier(0.22, 0.85, 0.28, 1);
+        }
+        @keyframes slot-match-pop {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.06); }
+            100% { transform: scale(1); }
+        }
+        .slot-nudge {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin-top: 4px;
+            align-items: center;
+        }
+        .slot-nudge-btn {
+            width: 100%;
+            padding: 2px 0;
+            font-size: 0.65rem;
+            line-height: 1;
+            border-radius: 4px;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            background: rgba(12, 20, 16, 0.85);
+            color: var(--muted);
+            cursor: pointer;
+        }
+        .slot-nudge-btn:hover {
+            color: #9ee7ff;
+            border-color: rgba(158, 231, 255, 0.35);
+            transform: none;
+            filter: none;
+        }
+        .slot-distance {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.15em;
+            color: rgba(158, 231, 255, 0.55);
+            text-align: center;
+            margin-top: 2px;
+        }
+        .dial-coord-mask { letter-spacing: 0.2em; color: var(--muted); }
+        .dial-coord-reveal { color: #ffd65a; }
         .slot-reel.fixed .slot-reel-window {
             border-color: rgba(113, 255, 232, 0.38);
         }
@@ -1538,6 +1599,18 @@
             color: var(--cyan);
             font-weight: 700;
         }
+        .vault-scout-banner.scout-tick { color: #ffd65a; transform: scale(1.02); transition: color .2s, transform .2s; }
+        .vault-grid-wrap.scout-lit { box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25); }
+        .vault-grid-wrap.scout-fade { animation: vault-scout-fade .6s ease forwards; }
+        @keyframes vault-scout-fade {
+            from { opacity: 1; }
+            to { opacity: 0.55; }
+        }
+        .vault-grid-wrap.scan-pulse { animation: scan-pulse 1.5s ease-in-out; }
+        @keyframes scan-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 110, 121, 0); }
+            50% { box-shadow: 0 0 24px rgba(255, 110, 121, 0.35); }
+        }
         .vault-grid-wrap.signal-warn {
             animation: signal-flash .45s ease 2;
         }
@@ -1637,8 +1710,16 @@
         .mm-color-btn {
             width: 36px; height: 36px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.25);
             cursor: pointer; padding: 0; transition: transform .12s ease;
+            background: var(--mm-fill, rgba(4,16,11,.6)) !important;
+            color: transparent !important;
+            box-shadow: none !important;
         }
         .mm-color-btn:hover { transform: scale(1.08); }
+        .mm-slot.filled {
+            background: var(--mm-fill, rgba(4,16,11,.6)) !important;
+            color: transparent !important;
+            box-shadow: var(--mm-glow, none) !important;
+        }
         .mm-actions { display: flex; gap: 10px; justify-content: center; margin: 10px 0; }
         .mm-meta { text-align: center; font-size: .82rem; }
         .mm-history { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
@@ -1650,6 +1731,24 @@
         .mm-dot-green { background: #4ade80; box-shadow: 0 0 8px #4ade8088; }
         .mm-dot-yellow { background: #facc15; box-shadow: 0 0 8px #facc1588; }
         .mm-dot-empty { width: 8px; height: 8px; opacity: .25; background: var(--muted); }
+        .mm-bulb-pop { animation: mm-bulb-pop 0.45s cubic-bezier(0.22, 0.85, 0.28, 1) both; }
+        @keyframes mm-bulb-pop {
+            0% { transform: scale(0.2); opacity: 0; }
+            55% { transform: scale(1.35); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+        .mm-row-fresh { background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.2); }
+        .mm-legend {
+            display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
+            font-size: .75rem; color: var(--muted); margin: 4px 0 8px;
+        }
+        .mm-legend span { display: inline-flex; align-items: center; gap: 5px; }
+        .mm-warn {
+            text-align: center; font-size: .8rem; color: #ffd65a;
+            margin: 0 0 8px; padding: 6px 10px; border-radius: 8px;
+            background: rgba(255, 214, 90, 0.08); border: 1px solid rgba(255, 214, 90, 0.2);
+        }
+        .mm-warn-urgent { color: #ff8a93; border-color: rgba(255, 138, 147, 0.35); background: rgba(255, 80, 90, 0.1); }
         /* Fragment sort */
         .fs-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 14px 0; min-height: 88px; }
         .fs-card {
@@ -1664,6 +1763,122 @@
         }
         .fs-text { font-family: ui-monospace, monospace; font-size: 1.15rem; letter-spacing: .12em; color: var(--cyan); }
         .fs-actions { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; margin-top: 8px; }
+        .stroop-card { min-width: 96px; padding: 12px 10px 10px; text-align: center; }
+        .fs-stroop-word {
+            font-size: 2rem; font-weight: 900; margin-bottom: 4px; line-height: 1.1;
+            text-shadow: 0 0 16px rgba(255,255,255,.1);
+        }
+        .fs-stroop-ink-hint { font-size: .68rem; margin-bottom: 6px; }
+        .fs-stroop-example { font-size: .78rem; margin-top: -4px; }
+        .fs-stroop-target {
+            text-align: center; font-size: 1.15rem; letter-spacing: .08em;
+            margin: 6px 0 10px;
+        }
+        .fs-stroop-target-label {
+            font-weight: 900;
+            text-shadow: 0 0 12px rgba(255,255,255,.12);
+        }
+        .fs-stroop-arrow { color: var(--muted); margin: 0 0.2em; }
+        .stroop-congruent { box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
+        .fs-text.fs-frag { font-size: .9rem; opacity: .85; }
+        .qx-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+            max-width: 280px; margin: 12px auto;
+            padding: 8px;
+            border-radius: 16px;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+        .qx-cell {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            background: #0a0a0a;
+            cursor: default;
+            transition: background 0.08s ease, transform 0.1s ease, border-color 0.1s ease;
+            position: relative;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .qx-cell.qx-input {
+            cursor: pointer;
+        }
+        .qx-cell.qx-input:hover {
+            border-color: rgba(255, 255, 255, 0.28);
+        }
+        .qx-cell.qx-lit {
+            border-color: rgba(255, 255, 255, 0.9);
+            transform: scale(1.08);
+            box-shadow: 0 0 20px 4px rgba(255, 255, 255, 0.15);
+        }
+        .qx-cell:focus-visible {
+            outline: 2px solid rgba(56, 189, 248, 0.65);
+            outline-offset: 2px;
+        }
+        .qx-phase { text-align: center; font-weight: 800; color: #7dd3fc; min-height: 1.4em; }
+        .qx-actions { text-align: center; margin-top: 8px; }
+        .qx-meta { text-align: center; font-size: .78rem; }
+        .cv-viewport {
+            position: relative; border-radius: 12px; overflow: hidden;
+            border: 1px solid rgba(56, 189, 248, .25); margin: 10px 0;
+            background: #0a1218;
+        }
+        .cv-map { width: 100%; display: block; max-height: 160px; object-fit: cover; transition: filter .35s ease; }
+        .cv-viewport.cv-glitch .cv-map { animation: cv-glitch .45s ease; }
+        @keyframes cv-glitch {
+            0%, 100% { transform: translate(0); filter: inherit; }
+            20% { transform: translate(-3px, 1px); }
+            40% { transform: translate(3px, -1px); }
+            60% { transform: translate(-2px, 2px); }
+        }
+        .cv-viewport.cv-step-ok .cv-map { animation: cv-step-ok .35s ease; }
+        @keyframes cv-step-ok {
+            0% { box-shadow: inset 0 0 0 0 rgba(56,189,248,0); }
+            50% { box-shadow: inset 0 0 40px rgba(56,189,248,.25); }
+            100% { box-shadow: none; }
+        }
+        .cv-tutorial {
+            margin: 8px 0 10px; padding: 8px 10px; border-radius: 8px;
+            border: 1px solid rgba(148,163,184,.2); background: rgba(8,16,12,.6);
+            font-size: .78rem;
+        }
+        .cv-tutorial summary { cursor: pointer; color: #9ee7ff; font-weight: 700; }
+        .cv-tutorial-list { margin: 8px 0 4px; padding-left: 18px; line-height: 1.45; }
+        .cv-tutorial-foot { margin: 4px 0 0; font-size: .72rem; }
+        .cv-pipeline {
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            margin: 8px 0; flex-wrap: wrap;
+        }
+        .cv-pipe-step {
+            font-size: .72rem; padding: 4px 8px; border-radius: 6px;
+            border: 1px solid rgba(148,163,184,.25); color: var(--muted);
+        }
+        .cv-pipe-active { border-color: #ffd65a; color: #ffd65a; }
+        .cv-pipe-done { border-color: #4ade80; color: #4ade80; background: rgba(74,222,128,.08); }
+        .cv-pipe-arrow { color: var(--muted); font-size: .7rem; }
+        .cv-filter-btn.cv-hint-glow { box-shadow: 0 0 12px rgba(255,214,90,.35); border-color: #ffd65a; }
+        .cv-hint-live { opacity: 1; transform: none; position: static; margin-top: 8px; text-align: center; }
+        .cv-clue {
+            position: absolute; bottom: 8px; right: 8px; left: 8px;
+            padding: 6px 10px; border-radius: 8px; text-align: center;
+            font-family: ui-monospace, monospace; font-weight: 800; font-size: .85rem;
+            color: #ffd65a; background: rgba(0,0,0,.72); opacity: 0; transform: translateY(6px);
+            transition: opacity .4s, transform .4s;
+        }
+        .cv-clue-show { opacity: 1; transform: translateY(0); }
+        .cv-hint {
+            position: absolute; top: 8px; left: 8px; font-size: .72rem;
+            color: #9ee7ff; background: rgba(0,0,0,.55); padding: 4px 8px; border-radius: 6px;
+        }
+        .cv-filters { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .cv-filter-btn {
+            display: inline-flex; align-items: center; gap: 6px; padding: 10px 12px;
+            border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.04);
+            color: var(--text); font-weight: 800; cursor: pointer;
+        }
+        .cv-filter-btn:hover:not(:disabled) { border-color: var(--cyan); background: rgba(56,189,248,.1); }
+        .cv-filter-btn.cv-used { opacity: .45; cursor: default; }
+        .cv-meta { text-align: center; font-size: .78rem; margin-top: 6px; }
         .mission-step.clickable { cursor: pointer; }
         .mission-step.clickable:hover { filter: brightness(1.15); }
         .mission-step.locked-step { opacity: .5; cursor: default; }
@@ -1834,6 +2049,7 @@
             letter-spacing: 0.12em;
             text-transform: uppercase;
         }
+        .ir-quiz-tag-trap { color: #ffb86b; }
         .ir-quiz-progress { margin: 0 0 6px; font-size: 0.72rem; color: var(--muted); }
         .ir-quiz-prompt { font-weight: 700; margin: 0 0 12px; font-size: 0.92rem; color: #e8f0f8; line-height: 1.45; }
         .ir-choices { display: flex; flex-direction: column; gap: 8px; }
@@ -2243,6 +2459,8 @@
     <script src="js/mission-mastermind.js"></script>
     <script src="js/mission-fragsort.js"></script>
     <script src="js/mission-binary.js"></script>
+    <script src="js/mission-quantum.js"></script>
+    <script src="js/mission-cvfilter.js"></script>
     <script src="js/mission-finale.js"></script>
     <script src="js/bank-bonus-scheduler.js"></script>
     <script src="js/intel-briefings-data.js"></script>
@@ -2288,8 +2506,8 @@
             typingKeywordLen: 6,
             saveDebounceMs: 2000
         };
-        const GRID_SCOUT_SEC = 2;
-        const GRID_SCAN_FLASH_MS = 1000;
+        const GRID_SCOUT_SEC = 3;
+        const GRID_SCAN_FLASH_MS = 1500;
         const MALAYSIA_CITIES = [
             { name: "KUALA_LUMPUR", label: "吉隆坡", mapX: 18.9, mapY: 67, lat: 3.139, lon: 101.686 },
             { name: "GEORGETOWN", label: "槟城", mapX: 8.4, mapY: 29.4, lat: 5.414, lon: 100.329 },
@@ -2867,6 +3085,7 @@
                     if (res.wrong) {
                         host.classList.add("ir-shake");
                         setTimeout(() => host.classList.remove("ir-shake"), 400);
+                        showToast(res.trapHint || "答错了 · 奖金 −RM 200");
                     }
                     renderBankBonusPanel();
                     updateBankBonusPoolDisplay();
@@ -2926,11 +3145,12 @@
 
         function openBankBonusModal(beginRes) {
             closeBankBonusModal();
-            if (!window.MissionIntelread) return;
+            if (!window.MissionIntelread) return false;
             bankBonusSession = MissionIntelread.createSession(beginRes);
             $("bankBonusModal")?.classList.add("show");
             renderBankBonusPanel();
             bankBonusTickTimer = setInterval(tickBankBonus, 90);
+            return true;
         }
 
         function updateBankBonusPin() {
@@ -2995,6 +3215,7 @@
             breachUnlocked = false;
             lastScrolledMissionIdx = -1;
             if (!isSinglePlayer && state.targetId) {
+                Promise.resolve(CurrencySafeRoom.abandonTargetRaid(roomId)).catch(() => {});
                 CurrencySafeRoom.updatePlayerProgress(roomId, {
                     targetId: state.targetId,
                     targetName: target?.name || "",
@@ -3032,7 +3253,19 @@
                     } else if (res.practiceOnly) {
                         showToast("本波已用过有钱尝试，本次为练习模式。");
                     }
-                    openBankBonusModal(res);
+                    const opened = openBankBonusModal(res);
+                    if (!opened) {
+                        showToast("情报面板加载失败，请刷新后重试。未消耗本波有偿次数。");
+                        return;
+                    }
+                    if (!res.practiceOnly) {
+                        Promise.resolve(CurrencySafeRoom.confirmBankBonusOpen(roomId, status.waveIndex))
+                            .then(confirmRes => {
+                                if (confirmRes?.ok === false) {
+                                    showToast(confirmRes.error || "无法锁定本波尝试。");
+                                }
+                            });
+                    }
                 });
         }
 
@@ -3235,7 +3468,9 @@
             grid: "特工笔记：先记住安全走廊，再摸黑潜入——就像真实特工的「开牌记忆」训练。",
             mastermind: "特工笔记：热力传感器用绿/黄点反馈——绿=完全命中，黄=颜色对但位置错。",
             fragsort: "特工笔记：碎片角标是真实序号，按 ①→⑤ 排好才能拼出密钥段。",
-            binary: "特工笔记：亮灯=1，灭灯=0。四位灯泡从左到右读成二进制，就是机器人认识的数字。"
+            binary: "特工笔记：亮灯=1，灭灯=0。四位灯泡从左到右读成二进制，就是机器人认识的数字。",
+            quantum: "特工笔记：量子脉冲按时间顺序传输——闪几下、亮哪格，就得原样复制。读字会分心！",
+            cvfilter: "特工笔记：底片要经反转→色彩→锐化管线才能读出坐标，就像计算机视觉的预处理。"
         };
 
         const cityPool = MALAYSIA_CITIES;
@@ -3257,6 +3492,8 @@
         let gridScoutTimer = null;
         let gridMeltdownTimer = null;
         let gridScanTimeout = null;
+        let gridScanCdTimer = null;
+        let quantumFlashTimer = null;
         let lastScrolledMissionIdx = -1;
         let audioCtx = null;
         let saveDebounceTimer = null;
@@ -3567,12 +3804,18 @@
             if (!intel.finale) {
                 intel.finale = MissionFinale.create(frags, seed);
             } else {
-                MissionFinale.migrate(intel.finale);
-                intel.finale.cards = frags.map((text, id) => ({
-                    id,
-                    badge: MissionFinale.BADGES[id],
-                    text
-                }));
+                MissionFinale.migrate(intel.finale, seed);
+                frags.forEach((text, id) => {
+                    if (intel.finale.cards[id]) intel.finale.cards[id].text = text;
+                    else {
+                        intel.finale.cards[id] = {
+                            id,
+                            badge: MissionFinale.BADGES[id],
+                            text
+                        };
+                    }
+                });
+                MissionFinale.migrate(intel.finale, seed);
             }
         }
 
@@ -3603,19 +3846,21 @@
             });
         }
 
+        function getFinaleSeed(intel, team) {
+            if (!intel || !team) return "finale";
+            return `${team.password}|${team.id}|${intel.deploySeq ?? 0}|finale`;
+        }
+
         function onFinaleLock() {
             const finale = currentIntel?.finale;
             if (!finale || finale.solved || !allMinigamesSolved()) return;
-            const res = MissionFinale.lockOrder(finale);
+            const target = refreshOpponentFromRoom(state.targetId) || getOpponent(state.targetId);
+            if (target) ensureIntelFinale(currentIntel, target);
+            const seed = getFinaleSeed(currentIntel, target);
+            const res = MissionFinale.lockOrder(finale, seed);
             if (res.win) {
                 finale.solved = true;
-                const pwd = res.password || MissionFinale.getCombinedPassword(finale);
-                const target = getOpponent(state.targetId);
-                if (target && pwd !== target.password) {
-                    showToast("组合与目标金库不匹配，请检查片段顺序。");
-                    finale.solved = false;
-                    return;
-                }
+                const pwd = res.password || MissionFinale.getCombinedPassword(finale, seed);
                 applyFinaleUnlock(pwd);
                 saveStateNow();
                 renderMiniGames();
@@ -3623,7 +3868,13 @@
             }
             const card = document.getElementById("miniGameFinale");
             if (card) shake(card);
-            showToast(res.hint ? "顺序不对！已将 ① 提示到最左侧。" : "顺序不对，继续调整片段。");
+            showToast(res.hint
+                ? (finale.mode === "stroop"
+                    ? `颜色顺序不对！已将「${MissionFinale.targetSequenceLabel(finale.targetSequence).split(" → ")[0]}」提示到最左侧。`
+                    : "顺序不对！已将 ① 提示到最左侧。")
+                : (finale.mode === "stroop"
+                    ? `颜色顺序不对！本局要排：${MissionFinale.targetSequenceLabel(finale.targetSequence)}`
+                    : "顺序不对，继续调整片段。"));
             onMissionMistake();
             renderMiniGames();
             saveStateNow();
@@ -3665,6 +3916,7 @@
 
         function goToEndedPage() {
             if (isSinglePlayer) return;
+            window.__allowGameUnload = true;
             location.href = "ended.html?room=" + roomId;
         }
 
@@ -3735,8 +3987,7 @@
             intel.games.forEach(g => {
                 if (typeof g.mistakes === "number") total += g.mistakes;
                 else if (g.kind === "typing") {
-                    const cfg = getAgentCfg();
-                    total += Math.max(0, cfg.mistakes - (g.mistakesLeft ?? cfg.mistakes));
+                    total += Math.max(0, g.mistakes || 0);
                 } else if (g.kind === "grid") {
                     total += Math.max(0, 3 - (g.shields ?? 3));
                 }
@@ -3794,8 +4045,8 @@
             let score = 25;
             const games = intel.games;
             const typing = games.find(g => g.kind === "typing");
-            if (typing && cfg) {
-                score -= Math.max(0, cfg.mistakes - (typing.mistakesLeft ?? cfg.mistakes));
+            if (typing) {
+                score -= Math.min(6, typing.mistakes || 0);
             }
             const grid = games.find(g => g.kind === "grid");
             if (grid) {
@@ -3808,6 +4059,8 @@
                 if (g.kind === "mastermind") score -= Math.min(4, m);
                 else if (g.kind === "fragsort") score -= Math.min(3, m);
                 else if (g.kind === "binary") score -= Math.min(3, m);
+                else if (g.kind === "quantum") score -= Math.min(4, m);
+                else if (g.kind === "cvfilter") score -= Math.min(3, m);
             });
             if (intel.finale?.mistakes) score -= Math.min(3, intel.finale.mistakes);
             return Math.max(10, Math.min(25, Math.round(score)));
@@ -3831,6 +4084,7 @@
                         share: Math.round(preview.share),
                         raidPercent: preview.percent,
                         activeRaiders: preview.activeCount,
+                        poolRemaining: preview.poolRemaining,
                         targetName: target.name
                     };
                 }
@@ -3882,6 +4136,7 @@
                     const factor = Math.max(0, 1 - preview.mistakes / 20);
                     metaEl.textContent =
                         `攻坚池 P=${preview.raidPercent}% · 份额 RM ${money(preview.share)}` +
+                        ` · 池余 RM ${money(preview.poolRemaining ?? 0)}` +
                         ` · 失误 ${preview.mistakes}/20 · 实拿 ×${factor.toFixed(2)}` +
                         (preview.activeRaiders > 1 ? ` · ${preview.activeRaiders} 人同时攻坚` : "");
                 } else {
@@ -4013,7 +4268,7 @@
                 playLevelCompleteSound();
                 const target = getOpponent(state.targetId);
                 if (target) ensureIntelFinale(currentIntel, target);
-                showToast("三关任务完成！请组合密钥片段并解锁金库。");
+                showToast("三关任务完成！请完成最终密钥校验并解锁金库。");
                 renderMiniGames();
             }
             saveStateNow();
@@ -4180,6 +4435,37 @@
             return k === "letter" || k === "digit";
         }
 
+        function dialWheelDistance(w) {
+            const kind = dialWheelKind(w);
+            if (kind === "static") return w.current === w.target ? 0 : -1;
+            const mod = kind === "letter" ? 26 : 10;
+            const cur = kind === "letter"
+                ? w.current.charCodeAt(0) - 65
+                : parseInt(w.current, 10);
+            const tgt = kind === "letter"
+                ? w.target.charCodeAt(0) - 65
+                : parseInt(w.target, 10);
+            const fwd = (tgt - cur + mod) % mod;
+            const bwd = (cur - tgt + mod) % mod;
+            return Math.min(fwd, bwd);
+        }
+
+        function dialDistanceDots(dist) {
+            if (dist < 0) return "—";
+            if (dist === 0) return "";
+            const slots = 4;
+            const mark = Math.min(dist, slots);
+            return "·".repeat(slots - mark) + "○".repeat(mark);
+        }
+
+        function pulseDialMatch(reel) {
+            if (!reel) return;
+            reel.classList.remove("match-pop");
+            void reel.offsetWidth;
+            reel.classList.add("match-pop");
+            setTimeout(() => reel.classList.remove("match-pop"), 380);
+        }
+
         function caesarLettersOnly(text, shift) {
             return [...text].map(ch => {
                 const code = ch.charCodeAt(0);
@@ -4198,6 +4484,7 @@
                 keyword,
                 typedIndex: 0,
                 mistakesLeft: cfg.mistakes,
+                mistakes: 0,
                 interceptEnergy: 0,
                 originLabel: originLabel || "瑞士银行",
                 targetTeam,
@@ -4379,7 +4666,9 @@
             grid: (frag) => generateVaultGrid(frag),
             mastermind: (frag, ctx) => MissionMastermind.generate(frag, ctx),
             fragsort: (frag, ctx) => MissionFragsort.generate(frag, ctx),
-            binary: (frag, ctx) => MissionBinary.generate(frag, ctx)
+            binary: (frag, ctx) => MissionBinary.generate(frag, ctx),
+            quantum: (frag, ctx) => MissionQuantum.generate(frag, ctx),
+            cvfilter: (frag, ctx) => MissionCvfilter.generate(frag, ctx)
         });
 
         if (currentIntel?.games) {
@@ -4388,8 +4677,24 @@
                 if (g.kind === "mastermind") MissionMastermind.migrate(g);
                 if (g.kind === "fragsort") MissionFragsort.migrate(g);
                 if (g.kind === "binary") MissionBinary.migrate(g);
+                if (g.kind === "quantum") MissionQuantum.migrate(g);
+                if (g.kind === "cvfilter") MissionCvfilter.migrate(g);
             });
-            if (currentIntel?.finale) MissionFinale.migrate(currentIntel.finale);
+            if (currentIntel?.finale) {
+                const finTeam = refreshOpponentFromRoom(currentIntel.targetId) || getOpponent(currentIntel.targetId);
+                const finSeed = finTeam
+                    ? `${finTeam.password}|${finTeam.id}|${currentIntel.deploySeq ?? 0}|finale`
+                    : "finale";
+                MissionFinale.migrate(currentIntel.finale, finSeed);
+            }
+        }
+
+        function victimRaidNeedsRefresh(target) {
+            if (isSinglePlayer || !target?.teamId) return false;
+            const room = CurrencySafeRoom.getRoom(roomId);
+            if (!room) return false;
+            const raid = CurrencySafeRoomShared.getTargetRaid(room, target.teamId);
+            return !!raid && CurrencySafeRoomShared.shouldStartNewRaid(raid);
         }
 
         function buildIntelForTarget(team, options = {}) {
@@ -4459,10 +4764,12 @@
                 return false;
             }
             ensurePlayerVaultFresh();
-            const isNewDeploy = resetAll && (!currentIntel || currentIntel.targetId !== target.id);
+            const isNewDeploy = resetAll && (
+                !currentIntel || currentIntel.targetId !== target.id || victimRaidNeedsRefresh(target)
+            );
             const prevTargetId = state.targetId;
 
-            function finishDeploy(deploySeqOverride) {
+            function finishDeploy(deploySeqOverride, raidInfo) {
                 if (isNewDeploy && isSinglePlayer) {
                     const used = getDeployCount(target.id);
                     const max = getMaxDeploy();
@@ -4488,6 +4795,9 @@
                 }
                 if (resetAll || !currentIntel || currentIntel.targetId !== target.id) {
                     const seq = deploySeqOverride ?? (isNewDeploy ? getDeployCount(target.id) : currentIntel?.deploySeq);
+                    if (isNewDeploy) {
+                        delete state._finaleCache;
+                    }
                     currentIntel = buildIntelForTarget(target, { deploySeq: seq });
                     if (!currentIntel) return false;
                     breachUnlocked = false;
@@ -4514,14 +4824,26 @@
                 showToast(resetAll
                     ? `任务已部署：${target.name}${pickLabel ? " · " + pickLabel : ""}`
                     : `继续任务：${target.name}`);
+                if (raidInfo && raidInfo.poolRemaining === 0) {
+                    setTimeout(() => showToast("该州攻坚奖池已抽空，完成关卡也无法再分到队库。可换目标或等待对方开启新池。"), 400);
+                }
                 return true;
             }
 
+            function abandonPrevRaid() {
+                if (isSinglePlayer || !prevTargetId || prevTargetId === target.id) {
+                    return Promise.resolve();
+                }
+                return Promise.resolve(CurrencySafeRoom.abandonTargetRaid(roomId)).catch(() => {});
+            }
+
             if (isNewDeploy && !isSinglePlayer) {
-                return Promise.resolve(CurrencySafeRoom.claimTeamDeploy(roomId, target.id)).then(res => {
+                return abandonPrevRaid().then(() =>
+                    Promise.resolve(CurrencySafeRoom.claimTeamDeploy(roomId, target.id))
+                ).then(res => {
                     if (!res.ok) { showToast(res.error); return false; }
                     state.deployCounts[target.id] = res.deploySeq;
-                    return finishDeploy(res.deploySeq);
+                    return finishDeploy(res.deploySeq, res.raid);
                 });
             }
             return finishDeploy();
@@ -4829,6 +5151,31 @@
             }
         }
 
+        function bindTypingFocusTrap() {
+            const trap = document.getElementById("typingFocusTrap");
+            const stage = document.getElementById("typingGameCard");
+            if (!trap || !stage) return;
+            trap.addEventListener("blur", () => {
+                const game = findMissionGame("typing");
+                if (!game || game.solved) return;
+                stage.classList.add("typing-unfocused");
+                let banner = stage.querySelector(".typing-focus-banner");
+                if (!banner) {
+                    banner = document.createElement("p");
+                    banner.className = "typing-focus-banner";
+                    banner.textContent = "点击此处或按任意键继续拦截";
+                    stage.appendChild(banner);
+                }
+                setTimeout(() => trap.focus(), 80);
+            });
+            trap.addEventListener("focus", () => {
+                const stageEl = document.getElementById("typingGameCard");
+                stageEl?.classList.remove("typing-unfocused");
+                stageEl?.querySelector(".typing-focus-banner")?.remove();
+            });
+            stage.addEventListener("click", () => trap.focus());
+        }
+
         function submitTypingChar(key) {
             const game = findMissionGame("typing");
             const slotIdx = getMissionSlotIndex(game);
@@ -4851,16 +5198,18 @@
                 updateTypingUI();
                 saveState();
             } else {
+                game.mistakes = (game.mistakes || 0) + 1;
+                playTone(180, 0.08, "square", 0.12);
                 if (game.mistakesLeft > 0) {
                     game.mistakesLeft--;
                     const card = document.getElementById("typingGameCard");
                     if (card) { card.classList.add("signal-warn"); setTimeout(() => card.classList.remove("signal-warn"), 500); }
-                    showToast(`信号干扰！还可容错 ${game.mistakesLeft} 次`);
+                    showToast(`敲错了！本关容错剩余 ${game.mistakesLeft} 次（部署失误 +1）`);
                     onMissionMistake();
                 } else {
                     trackMissionStat("typingFails", 1);
                     logLevelFail("typing");
-                    showToast("拦截失败！密钥飘走了，重来！");
+                    showToast("拦截失败！密钥飘走，退回一字重来（部署失误 +1）");
                     game.typedIndex = Math.max(0, game.typedIndex - 1);
                     game.mistakesLeft = getAgentCfg().mistakes;
                     onMissionMistake();
@@ -4906,8 +5255,9 @@
                             <small>拦截能量（满格解锁片段，不再中途刷金币）</small>
                             <div class="intercept-energy-bar"><div class="intercept-energy-fill" id="interceptEnergyFill" style="width:${(game.interceptEnergy*100).toFixed(0)}%"></div></div>
                         </div>
-                        <p class="muted" style="font-size:.82rem">容错剩余：${game.mistakesLeft} 次 · 请用键盘输入</p>
-                        <input id="typingFocusTrap" style="opacity:0;position:absolute;width:1px;height:1px" autocomplete="off" />
+                        <p class="muted" style="font-size:.82rem">本关容错 ${game.mistakesLeft} 次 · 部署失误 ${game.mistakes || 0} 次 · 键盘输入</p>
+                        <input id="typingFocusTrap" type="text" inputmode="none" aria-label="打字拦截输入区"
+                            style="opacity:0;position:absolute;width:1px;height:1px;left:50%;top:50%" autocomplete="off" tabindex="0" />
                     </div>`}
                 </div>`;
         }
@@ -4916,7 +5266,7 @@
         const SLOT_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         const SLOT_DIGITS = "0123456789";
         const SLOT_ITEM_H = 48;
-        const SLOT_DRAG_PX = 40;
+        const SLOT_DRAG_PX = 36;
         const SLOT_CENTER = 52;
         const SLOT_DIGIT_CENTER = 20;
 
@@ -5051,13 +5401,22 @@
                     ? buildSlotDigitStripHtml()
                     : `<span class="slot-cell">${escapeHtml(w.current)}</span>`;
             const stripClass = rotatable ? "slot-reel-strip" : "slot-reel-strip static";
-            const hint = rotatable ? t("dialSlotHint") : (game.solved ? "OK" : "—");
+            const hint = rotatable ? "滚轮/拖动" : (game.solved ? "OK" : "已锁定");
+            const dist = rotatable && !match ? dialDistanceDots(dialWheelDistance(w)) : "";
+            const nudge = rotatable
+                ? `<div class="slot-nudge">
+                    <button type="button" class="slot-nudge-btn" data-dial-nudge="${wi}" data-dial-dir="-1" aria-label="上一格">▲</button>
+                    <button type="button" class="slot-nudge-btn" data-dial-nudge="${wi}" data-dial-dir="1" aria-label="下一格">▼</button>
+                   </div>` : "";
+            const distHtml = dist ? `<div class="slot-distance">${dist}</div>` : "";
             return `<div class="${classes}${rotatable ? " interactive" : ""}" data-wheel="${wi}" data-dial-game="${idx}"${rotatable ? ' tabindex="0"' : ""}>
                 <div class="slot-reel-window">
                     <div class="slot-reel-highlight"></div>
                     <div class="${stripClass}">${stripContent}</div>
                 </div>
                 <div class="slot-hint">${hint}</div>
+                ${distHtml}
+                ${nudge}
             </div>`;
         }
 
@@ -5130,6 +5489,14 @@
                     updateSlotReelVisual(reel, game.wheels[wi], false);
                     bindSlotReel(reel, game, idx, wi);
                 });
+                card.querySelectorAll("[data-dial-nudge]").forEach(btn => {
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        const wi = Number(btn.dataset.dialNudge);
+                        const dir = Number(btn.dataset.dialDir);
+                        dialAdjust(game, wi, dir);
+                    };
+                });
             });
         }
 
@@ -5172,10 +5539,16 @@
             const jumped = normalizeReelOffset(w);
             game.spinCount = (game.spinCount || 0) + Math.abs(delta);
             trackMissionStat("dialSpins", Math.abs(delta));
-            playClickSound();
             const gameIdx = currentIntel.games.indexOf(game);
             const card = document.getElementById("miniGame" + gameIdx);
             const reel = card?.querySelector(`.slot-reel[data-wheel="${wheelIdx}"]`);
+            const matchedWheel = w.current === w.target;
+            playClickSound();
+            if (matchedWheel) {
+                playCoinSound();
+                try { navigator.vibrate?.(30); } catch (_) { /* noop */ }
+                pulseDialMatch(reel);
+            }
             if (checkDialSolved(game)) {
                 completeMissionSlot(game, {
                     beforeOnLevelComplete: () => {
@@ -5193,6 +5566,18 @@
                     if (reel) {
                         reel.classList.toggle("match", w.current === w.target);
                         updateSlotReelVisual(reel, w, !jumped);
+                        let distEl = reel.querySelector(".slot-distance");
+                        const d = dialDistanceDots(dialWheelDistance(w));
+                        if (d) {
+                            if (!distEl) {
+                                distEl = document.createElement("div");
+                                distEl.className = "slot-distance";
+                                const hintEl = reel.querySelector(".slot-hint");
+                                if (hintEl?.nextSibling) reel.insertBefore(distEl, hintEl.nextSibling);
+                                else reel.appendChild(distEl);
+                            }
+                            distEl.textContent = d;
+                        } else if (distEl) distEl.remove();
                     }
                 }
             }
@@ -5217,18 +5602,21 @@
             const locked = !isGameUnlocked(idx);
             repairDialGame(game);
             const wheelsHtml = game.wheels.map((w, wi) => renderSlotWheel(w, wi, game, idx)).join("");
+            const coordLabel = game.solved
+                ? `<strong class="dial-coord-reveal">${escapeHtml(game.city.label)}</strong>`
+                : `<span class="dial-coord-mask">███</span>`;
             return `
                 <div class="mini-game-card ${game.solved ? "solved" : ""} ${locked ? "locked" : ""}" id="miniGame${idx}">
                     <h3>${game.solved ? "✅" : "🗺️"} ${game.title}</h3>
-                    <p class="muted">总部在 <strong>${escapeHtml(game.city.label)}</strong> 截获密电（掩护坐标，不是答案）：</p>
+                    <p class="muted">总部截获密电（掩护坐标：<span id="dialCoord${idx}">${coordLabel}</span>）：</p>
                     <p class="cipher" style="text-align:center">${escapeHtml(game.cipherDisplay)}</p>
                     ${renderDialHint(game)}
-                    <p class="muted" data-i18n="dialDesc">拖动转轮或滚轮调节字母，恢复密钥片段。</p>
+                    <p class="muted">拖动转轮、滚轮或 ▲▼ 调节字母与数字，恢复密钥片段。</p>
                     ${!game.solved && !locked ? `<div class="dial-actions"><button type="button" class="secondary dial-reset-btn" data-dial-reset="${idx}" data-i18n="dialReset">恢复初始</button></div>` : ""}
                     <div class="slot-machine-label">◆ VAULT SLOT ◆</div>
                     <div class="dial-row">${wheelsHtml}</div>
                     ${game.solved ? `<div class="reveal">密钥片段：<strong>${escapeHtml(game.reveal)}</strong></div>
-                    <div class="agent-note">${escapeHtml(game.agentNote || "")}<br/>密电片段已恢复，坐标只是掩护情报。</div>` : ""}
+                    <div class="agent-note">${escapeHtml(game.agentNote || "")}<br/>密电片段已恢复，坐标 ${escapeHtml(game.city.label)} 只是掩护情报。</div>` : ""}
                 </div>`;
         }
 
@@ -5245,6 +5633,209 @@
             stopGridScoutTimer();
             stopGridMeltdownTimer();
             if (gridScanTimeout) { clearTimeout(gridScanTimeout); gridScanTimeout = null; }
+            if (gridScanCdTimer) { clearInterval(gridScanCdTimer); gridScanCdTimer = null; }
+            stopQuantumFlash();
+        }
+
+        function stopQuantumFlash() {
+            if (quantumFlashTimer) { clearTimeout(quantumFlashTimer); quantumFlashTimer = null; }
+        }
+
+        function playQuantumFlashTone(cellIdx) {
+            const freqs = [392, 440, 494, 523, 587, 659, 698, 784, 880];
+            playTone(freqs[Number(cellIdx) % freqs.length] || 440, 0.14, "sine", 0.14);
+        }
+
+        function paintQuantumPanel(game, idx) {
+            const card = document.getElementById("miniGame" + idx);
+            if (!card || !game || game.kind !== "quantum") return false;
+            const gridRoot = card.querySelector(".qx-grid");
+            if (!gridRoot || !MissionQuantum.syncGridElement(gridRoot, game)) return false;
+            const phaseEl = document.getElementById("qxPhase" + idx);
+            if (phaseEl) phaseEl.textContent = MissionQuantum.phaseLabel(game);
+            const startBtn = card.querySelector("[data-qx-start]");
+            if (startBtn) {
+                const showStart = game.phase === "ready" || game.phase === "wrong" || game.phase === "round_done";
+                startBtn.style.display = showStart ? "" : "none";
+            }
+            return true;
+        }
+
+        function bindQuantumEvents(idx) {
+            const grid = $("puzzleGrid");
+            if (!grid) return;
+            grid.querySelectorAll("[data-qx-start]").forEach(btn => {
+                const qi = Number(btn.dataset.qxStart);
+                btn.onclick = () => onQuantumStart(currentIntel.games[qi], qi);
+            });
+            grid.querySelectorAll("[data-qx-cell]").forEach(cell => {
+                const qi = idx;
+                const go = () => {
+                    const g = currentIntel?.games?.[qi];
+                    if (!g || g.kind !== "quantum" || g.phase !== "input") return;
+                    onQuantumCell(g, qi, cell.dataset.qxCell);
+                };
+                cell.onclick = go;
+                cell.onkeydown = (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        go();
+                    }
+                };
+            });
+        }
+
+        function runQuantumFlashSequence(game, idx) {
+            const seq = MissionQuantum.currentSequence(game);
+            const cellMs = [720, 580, 500][game.round] || 560;
+            let i = 0;
+            function flash() {
+                if (!currentIntel?.games?.[idx] || currentIntel.games[idx] !== game || game.solved) return;
+                if (i >= seq.length) {
+                    game.flashIndex = -1;
+                    MissionQuantum.beginInputPhase(game);
+                    if (!paintQuantumPanel(game, idx)) renderMiniGames();
+                    else bindQuantumEvents(idx);
+                    return;
+                }
+                game.flashIndex = seq[i];
+                playQuantumFlashTone(seq[i]);
+                if (!paintQuantumPanel(game, idx)) renderMiniGames();
+                quantumFlashTimer = setTimeout(() => {
+                    game.flashIndex = -1;
+                    paintQuantumPanel(game, idx);
+                    i += 1;
+                    quantumFlashTimer = setTimeout(flash, 280);
+                }, cellMs);
+            }
+            flash();
+        }
+
+        function startQuantumRound(game, idx) {
+            if (!game || game.solved) return;
+            stopQuantumFlash();
+            MissionQuantum.beginShowPhase(game);
+            let cd = 3;
+            game.phase = "countdown";
+            if (!paintQuantumPanel(game, idx)) renderMiniGames();
+            const tick = () => {
+                if (!currentIntel?.games?.[idx] || currentIntel.games[idx] !== game || game.solved) return;
+                const phaseEl = document.getElementById("qxPhase" + idx);
+                if (cd > 0) {
+                    if (phaseEl) phaseEl.textContent = `量子信号传输… ${cd}`;
+                    cd -= 1;
+                    quantumFlashTimer = setTimeout(tick, 650);
+                    return;
+                }
+                if (phaseEl) phaseEl.textContent = MissionQuantum.phaseLabel(game);
+                runQuantumFlashSequence(game, idx);
+            };
+            tick();
+        }
+
+        function onQuantumStart(game, idx) {
+            if (!game || game.kind !== "quantum" || game.solved || !isGameUnlocked(idx)) return;
+            startQuantumRound(game, idx);
+        }
+
+        function onQuantumCell(game, idx, cellIdx) {
+            if (!game || game.kind !== "quantum" || game.solved || !isGameUnlocked(idx)) return;
+            const res = MissionQuantum.tapCell(game, Number(cellIdx));
+            if (!res.ok) return;
+            if (res.win) {
+                stopQuantumFlash();
+                completeMissionSlot(game, {
+                    beforeOnLevelComplete: () => { playLevelCompleteSound(); },
+                    toast: "量子序列同步完成！"
+                });
+                return;
+            }
+            if (res.wrong) {
+                playTone(110, 0.12, "sawtooth", 0.1);
+                onMissionMistake();
+                showToast("序列错误！自动重播一遍，请盯紧亮灯顺序。");
+                game.phase = "wrong";
+                if (!paintQuantumPanel(game, idx)) renderMiniGames();
+                else saveStateNow();
+                quantumFlashTimer = setTimeout(() => startQuantumRound(game, idx), 1000);
+                return;
+            } else if (res.correct) {
+                playClickSound();
+                game._tapFlash = Number(cellIdx);
+                if (!paintQuantumPanel(game, idx)) renderMiniGames();
+                clearTimeout(onQuantumCell._tapTimer);
+                onQuantumCell._tapTimer = setTimeout(() => {
+                    game._tapFlash = -1;
+                    paintQuantumPanel(game, idx);
+                }, 140);
+            } else if (res.roundComplete) {
+                playLevelCompleteSound();
+                showToast(`第 ${game.round} 轮同步成功！`);
+                game.phase = "round_done";
+                quantumFlashTimer = setTimeout(() => startQuantumRound(game, idx), 1000);
+            }
+            if (!paintQuantumPanel(game, idx)) renderMiniGames();
+            saveStateNow();
+        }
+
+        function onCvFilterPick(game, idx, filterId) {
+            if (!game || game.kind !== "cvfilter" || game.solved || !isGameUnlocked(idx)) return;
+            const res = MissionCvfilter.applyFilter(game, filterId);
+            if (!res.ok) return;
+            const vp = document.getElementById("cvViewport" + idx);
+            if (res.win) {
+                if (vp) vp.classList.add("cv-step-ok");
+                completeMissionSlot(game, {
+                    beforeOnLevelComplete: () => { playLevelCompleteSound(); },
+                    toast: "坐标现形！滤镜管线正确。"
+                });
+                return;
+            }
+            if (res.wrong) {
+                if (vp) {
+                    vp.classList.remove("cv-step-ok");
+                    vp.classList.add("cv-glitch");
+                    shake(vp);
+                    setTimeout(() => vp.classList.remove("cv-glitch"), 480);
+                }
+                playTone(120, 0.1, "sawtooth", 0.1);
+                onMissionMistake();
+                const hint = (game.mistakes || 0) >= 2
+                    ? `顺序错误！下一步应是「${res.expectedLabel}」`
+                    : `「${res.pickedLabel}」不是这一步！画面已重置，读管线说明再试。`;
+                showToast(hint);
+                game.applied = [];
+            } else {
+                if (vp) {
+                    vp.classList.add("cv-step-ok");
+                    setTimeout(() => vp.classList.remove("cv-step-ok"), 400);
+                }
+                playClickSound();
+                showToast(`✓ ${res.appliedLabel || "显影"} — 第 ${game.applied.length}/3 步成功`);
+            }
+            renderMiniGames();
+            saveStateNow();
+        }
+
+        function onBinaryPick(game, idx, value) {
+            if (!game || game.kind !== "binary" || game.solved || !isGameUnlocked(idx)) return;
+            const res = MissionBinary.pickAnswer(game, value);
+            if (!res.ok) return;
+            if (res.win) {
+                completeMissionSlot(game, {
+                    beforeOnLevelComplete: () => { playLevelCompleteSound(); },
+                    toast: "机器人密语破解成功！"
+                });
+                return;
+            }
+            const card = document.getElementById("miniGame" + idx);
+            if (card) shake(card);
+            if (res.wrong) onMissionMistake();
+            showToast(res.wrong
+                ? "数字不对，机器人拒绝开门！"
+                : `正确！进度 ${game.round}/${game.roundsNeeded}`);
+            renderMiniGames();
+            saveStateNow();
         }
 
         function playShieldHitSound() {
@@ -5323,19 +5914,27 @@
 
         function updateGridHud(game) {
             const banner = document.getElementById("gridScoutBanner");
+            const wrap = document.getElementById("vaultGridWrap");
+            if (wrap) {
+                wrap.classList.toggle("scout-lit", game.phase === "scout");
+                wrap.classList.toggle("scan-pulse", game.phase === "scan_flash");
+            }
             if (banner) {
+                banner.classList.remove("scout-tick");
                 if (game.phase === "ready") {
                     banner.textContent = "阅读任务说明，准备好了再点「开始潜入」。";
                 } else if (game.phase === "scout") {
-                    banner.textContent = `特工，记住这条安全的脚印！倒计时 ${game.scoutCountdown}...`;
+                    banner.textContent = `开牌记忆！盯住「入」→💎 绿走廊 · ${game.scoutCountdown} 秒`;
+                    if (game.scoutCountdown <= 2) banner.classList.add("scout-tick");
                 } else if (game.phase === "meltdown") {
-                    banner.textContent = `核冷却系统触发自毁倒计时 ${game.meltdownSec} 秒！`;
+                    banner.textContent = `核冷却触发自毁！${game.meltdownSec} 秒内到达宝石，否则整关重置`;
                 } else if (game.phase === "scan_flash") {
-                    banner.textContent = "热感扫描：亮灯 1 秒——只显示换位后的激光！";
+                    const left = game.scanFlashLeft ?? Math.ceil(GRID_SCAN_FLASH_MS / 1000);
+                    banner.textContent = `热感扫描中… ${left}s — 只显示换位后的激光 🚨`;
                 } else if (game.solved) {
                     banner.textContent = "核能宝石已到手，潜入成功！";
                 } else {
-                    banner.textContent = "摸黑潜入：从左上角「入」出发，只能点相邻格子走到右下角宝石。";
+                    banner.textContent = "关灯潜入：从「入」出发，点相邻格走到 💎（护盾 3 次）";
                 }
             }
             const shields = document.getElementById("gridShields");
@@ -5377,7 +5976,8 @@
             if (!game || game.solved || game.phase !== "ready") return;
             game.phase = "scout";
             game.scoutCountdown = GRID_SCOUT_SEC;
-            showToast("开牌！盯住起点到宝石之间的绿色安全走廊！");
+            playTone(520, 0.12, "sine", 0.1);
+            showToast(`开牌 ${GRID_SCOUT_SEC} 秒！记住绿色安全走廊，从「入」到 💎`);
             renderMiniGames();
             startGridScoutIfNeeded();
             saveState();
@@ -5393,12 +5993,19 @@
             gridScoutTimer = setInterval(() => {
                 const g = findMissionGame("grid");
                 if (!g || g.solved || g.phase !== "scout") { stopGridScoutTimer(); return; }
+                if (g.scoutCountdown <= 2) playTone(640 + (3 - g.scoutCountdown) * 80, 0.08, "sine", 0.08);
                 g.scoutCountdown--;
                 updateGridHud(g);
                 if (g.scoutCountdown <= 0) {
                     stopGridScoutTimer();
+                    const wrap = document.getElementById("vaultGridWrap");
+                    if (wrap) {
+                        wrap.classList.add("scout-fade");
+                        setTimeout(() => wrap.classList.remove("scout-fade", "scout-lit"), 650);
+                    }
                     g.phase = "hidden";
-                    showToast("关灯！凭记忆潜入——护盾保护你 3 次失误。");
+                    playTone(220, 0.2, "sawtooth", 0.08);
+                    showToast("关灯！凭记忆潜入——踩雷扣护盾，用尽触发自毁。");
                     renderMiniGames();
                     saveState();
                 }
@@ -5412,15 +6019,32 @@
             reshuffleVaultLasers(game);
             game.revealed = {};
             game.phase = "scan_flash";
-            showToast("激光阵已换位！亮灯 1 秒——只显示新的激光位置。");
+            game.scanFlashLeft = Math.ceil(GRID_SCAN_FLASH_MS / 1000);
+            playTone(880, 0.1, "square", 0.08);
+            showToast("激光阵已换位！热感扫描 1.5 秒——看清新激光位置。");
             renderMiniGames();
             saveState();
             if (gridScanTimeout) clearTimeout(gridScanTimeout);
+            if (gridScanCdTimer) clearInterval(gridScanCdTimer);
+            game.scanFlashLeft = Math.ceil(GRID_SCAN_FLASH_MS / 1000);
+            updateGridHud(game);
+            gridScanCdTimer = setInterval(() => {
+                const g = findMissionGame("grid");
+                if (!g || g.phase !== "scan_flash") {
+                    clearInterval(gridScanCdTimer);
+                    gridScanCdTimer = null;
+                    return;
+                }
+                g.scanFlashLeft = Math.max(0, (g.scanFlashLeft || 0) - 1);
+                updateGridHud(g);
+            }, 1000);
             gridScanTimeout = setTimeout(() => {
                 gridScanTimeout = null;
+                if (gridScanCdTimer) { clearInterval(gridScanCdTimer); gridScanCdTimer = null; }
                 const g = findMissionGame("grid");
                 if (!g || g.solved) return;
                 g.phase = "hidden";
+                g.scanFlashLeft = 0;
                 showToast("扫描结束！继续摸黑前进。");
                 renderMiniGames();
                 saveState();
@@ -5563,12 +6187,14 @@
             const scanDisabled = game.scansLeft <= 0 || game.solved ||
                 game.phase === "ready" || game.phase === "scout" || game.phase === "scan_flash" || game.phase === "meltdown";
             const phaseHint = game.phase === "ready"
-                ? "准备阶段：先看懂规则，心理准备好再开始。开始后全场亮灯 3 秒供记忆。"
+                ? `准备阶段：点「开始潜入」后全场亮灯 ${GRID_SCOUT_SEC} 秒，记住绿色走廊。`
                 : game.phase === "scout"
-                ? "阶段一·开牌：记住绿色安全走廊，从左上角「入」走到右下角 💎。"
+                ? `阶段一·开牌（${game.scoutCountdown ?? GRID_SCOUT_SEC}s）：记住从「入」到 💎 的安全路线。`
                 : game.phase === "scan_flash"
-                    ? "热感扫描：亮灯 1 秒，只显示换位后的激光位置（🚨）。"
-                    : "阶段二·关灯：摸黑点击相邻格子；踩雷扣护盾，不重置整关。";
+                    ? `热感扫描（${game.scanFlashLeft ?? 2}s）：只显示换位后的激光 🚨，抓紧记忆。`
+                    : game.phase === "meltdown"
+                        ? `自毁倒计时 ${game.meltdownSec}s：必须赶到 💎，否则整关重置（前两关情报保留）。`
+                    : "阶段二·关灯：点相邻格前进；踩雷扣护盾，护盾用尽再踩雷触发自毁。";
             const startBlock = !locked && !game.solved && game.phase === "ready"
                 ? `<div class="vault-start-wrap">
                     <p>🟢 绿色 = 安全地板　🔴 红色 = 激光阵　💎 右下角 = 核能宝石<br/>
@@ -5634,7 +6260,8 @@
                     kind: "mastermind",
                     mistakes: nextMistakes
                 });
-                showToast("试探次数用尽，密码已重置——再试一次！");
+                playTone(140, 0.15, "sawtooth", 0.1);
+                showToast("试探行数用尽！密码已重置（部署失误 +1）——绿/黄灯泡帮你缩小范围。");
                 onMissionMistake();
                 renderMiniGames();
                 saveStateNow();
@@ -5642,7 +6269,9 @@
             }
             const card = document.getElementById("miniGame" + idx);
             if (card) shake(card);
-            showToast(`反馈：${res.greens} 绿 · ${res.yellows} 黄`);
+            if (res.greens) playTone(520 + res.greens * 60, 0.1, "sine", 0.1);
+            if (res.yellows) setTimeout(() => playTone(420, 0.08, "sine", 0.08), 80);
+            showToast(`传感器反馈：${res.greens} 绿 · ${res.yellows} 黄`);
             renderMiniGames();
             saveStateNow();
         }
@@ -5724,27 +6353,6 @@
             });
         }
 
-        function onBinaryPick(game, idx, value) {
-            if (!game || game.kind !== "binary" || game.solved || !isGameUnlocked(idx)) return;
-            const res = MissionBinary.pickAnswer(game, value);
-            if (!res.ok) return;
-            if (res.win) {
-                completeMissionSlot(game, {
-                    beforeOnLevelComplete: () => { playLevelCompleteSound(); },
-                    toast: "机器人密语破解成功！"
-                });
-                return;
-            }
-            const card = document.getElementById("miniGame" + idx);
-            if (card) shake(card);
-            if (res.wrong) onMissionMistake();
-            showToast(res.wrong
-                ? "数字不对，机器人拒绝开门！"
-                : `正确！进度 ${game.round}/${game.roundsNeeded}`);
-            renderMiniGames();
-            saveStateNow();
-        }
-
         function bindFinaleEvents() {
             const grid = $("puzzleGrid");
             if (!grid) return;
@@ -5781,12 +6389,13 @@
                 return;
             }
 
-            const target = getOpponent(state.targetId);
+            const target = refreshOpponentFromRoom(state.targetId) || getOpponent(state.targetId);
             if (target) ensureIntelFinale(currentIntel, target);
 
             if (allMinigamesSolved()) {
                 if (currentIntel.finale && !currentIntel.finale.solved) {
-                    grid.innerHTML = MissionFinale.render(currentIntel.finale, getMiniGameRenderHelpers());
+                    const finSeed = getFinaleSeed(currentIntel, target);
+                    grid.innerHTML = MissionFinale.render(currentIntel.finale, getMiniGameRenderHelpers(), finSeed);
                     bindFinaleEvents();
                     return;
                 }
@@ -5810,6 +6419,8 @@
             else if (game.kind === "mastermind") html = MissionMastermind.render(game, activeIdx, false, miniHelpers);
             else if (game.kind === "fragsort") html = MissionFragsort.render(game, activeIdx, false, miniHelpers);
             else if (game.kind === "binary") html = MissionBinary.render(game, activeIdx, false, miniHelpers);
+            else if (game.kind === "quantum") html = MissionQuantum.render(game, activeIdx, false, miniHelpers);
+            else if (game.kind === "cvfilter") html = MissionCvfilter.render(game, activeIdx, false, miniHelpers);
             const wrap = document.createElement("div");
             wrap.innerHTML = html;
             grid.appendChild(wrap.firstElementChild);
@@ -5841,6 +6452,7 @@
             const trap = document.getElementById("typingFocusTrap");
             const typingActive = game.kind === "typing" ? game : null;
             if (trap && typingActive && !typingActive.solved) {
+                bindTypingFocusTrap();
                 trap.focus();
                 updateTypingUI();
             }
@@ -5859,6 +6471,19 @@
                     currentIntel.games[Number(btn.dataset.binaryPick)],
                     Number(btn.dataset.binaryPick),
                     btn.dataset.binaryVal
+                );
+            });
+            grid.querySelectorAll("[data-qx-start]").forEach(btn => {
+                const qi = Number(btn.dataset.qxStart);
+                btn.onclick = () => onQuantumStart(currentIntel.games[qi], qi);
+            });
+            bindQuantumEvents(activeIdx);
+            grid.querySelectorAll("[data-cv-filter]").forEach(btn => {
+                const ci = Number(btn.dataset.cvFilter);
+                btn.onclick = () => onCvFilterPick(
+                    currentIntel.games[ci],
+                    ci,
+                    btn.dataset.cvId
                 );
             });
         }
@@ -5986,16 +6611,36 @@
                 };
                 stopTypingArc();
                 stopGridPhaseTimers();
-                currentIntel = buildIntelForTarget(target);
-                breachUnlocked = false;
-                $("passwordGuess").value = "";
-                drawRoute(target, player);
-                syncFromRoom();
-                syncProgressToRoom();
-                saveState();
-                startGridScoutIfNeeded();
-                finishTransferFx(oldBal, player.balance,
-                    `RM ${res.amount ?? amount} 已从 ${target.name} 转入队库。目标密码已轮换。`);
+                const afterTransfer = (claimRes) => {
+                    if (claimRes && claimRes.ok === false) {
+                        showToast(claimRes.error);
+                        return;
+                    }
+                    if (claimRes?.deploySeq != null) {
+                        state.deployCounts[target.id] = claimRes.deploySeq;
+                    }
+                    currentIntel = buildIntelForTarget(target, {
+                        deploySeq: claimRes?.deploySeq ?? getDeployCount(target.id)
+                    });
+                    breachUnlocked = false;
+                    $("passwordGuess").value = "";
+                    drawRoute(target, player);
+                    syncFromRoom();
+                    syncProgressToRoom();
+                    saveState();
+                    startGridScoutIfNeeded();
+                    finishTransferFx(oldBal, player.balance,
+                        `RM ${res.amount ?? amount} 已从 ${target.name} 转入队库。目标密码已轮换。`);
+                    if (claimRes?.raid?.poolRemaining === 0) {
+                        setTimeout(() => showToast("该州攻坚奖池已抽空；同目标再攻将自动开启新池。"), 400);
+                    }
+                };
+                if (isSinglePlayer) {
+                    afterTransfer({ ok: true });
+                } else {
+                    Promise.resolve(CurrencySafeRoom.claimTeamDeploy(roomId, target.id))
+                        .then(afterTransfer);
+                }
             });
         }
 
@@ -6294,6 +6939,7 @@
         };
         $("targetTeamSelect").onchange = () => { Promise.resolve(deployTargetIntel(true)); };
         window.addEventListener("beforeunload", (e) => {
+            if (window.__allowGameUnload) return;
             if (isMissionActive()) {
                 saveStateNow();
                 e.preventDefault();

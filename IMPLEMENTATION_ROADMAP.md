@@ -50,6 +50,7 @@ flowchart TB
 | **6** | 分队榜 + 个人榜 | 2–4 天 | P1 | 📋 |
 | **7** | Firebase + QA | 4–6 天 | P1 | 📋 |
 | **8** | UI/动效打磨 | 2–3 天 | P2 | 📋 |
+| **9** | 品质打磨（逐关精修） | 持续 | P1 | ✅ 首批完成 |
 
 **合计**：约 **4–7 周**（单人）；两人并行约 **3–4 周**。
 
@@ -304,6 +305,27 @@ const BONUS_LOOT = {
 - 呼吸光晕 1.5–2s 周期
 - 阅读：打字机 + 咖啡渍纸
 - 扣款数字动画；全对金光（`fx.js`）
+
+---
+
+## Phase 9 — 品质打磨（逐关精修）🔄
+
+> 原则：**不求快，求品质**；每关单独验收后再进下一项。
+
+| # | 模块 | 文件 | 内容 | 状态 |
+|---|------|------|------|------|
+| 9.1 | quantum | `js/mission-quantum.js`, `game.html` | 闪烁可见性、逐格音效、错题自动重播、节奏放慢 | ✅ |
+| 9.2 | finale 熔炉 | `js/mission-finale.js` | 种子随机目标颜色序、逐字上色、ink 按种子重建 | ✅ |
+| 9.3 | Bonus 陷阱 | `data/intel-briefings.json`, `mission-intelread.js` | 4 套陷阱简报、ATTENTION 标签、答错 Toast | ✅ |
+| 9.4 | dial | `game.html` | 匹配震动/弹动、距离点、▲▼、坐标遮蔽 | ✅ |
+| 9.5 | cvfilter | `js/mission-cvfilter.js` | 滤镜反馈与教学提示加强 | ✅ |
+| 9.6 | typing | `game.html` | 焦点陷阱与错题统计口径复核 | ✅ |
+| 9.7 | grid | `game.html` | 侦察/扫描节奏与口播对齐 | ✅ |
+| 9.8 | mastermind | `js/mission-mastermind.js`, `game.html` | 六色可见、行数用尽提示与灯泡动效 | ✅ |
+| 9.9 | 文档 | `ROOM_RULES.md` | 规则与实现同步 | ✅ |
+| 9.10 | 大厅 UX | `lobby.html`, `room-*.js` | 只填名称、候场、点空位进州、离队换位 | ✅ |
+| 9.11 | 央行 Bonus | `game.html`, `room-*.js` | 面板打开后才占有偿次数；加载失败 Toast | ✅ |
+| 9.12 | 攻坚池 | `game.html`, `room-shared.js` | 转账后/同目标再攻奖池抽空时 `claimTeamDeploy` 开新池 | ✅ |
 
 ---
 
