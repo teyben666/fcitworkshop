@@ -58,7 +58,7 @@ body.spectator-page .spectator-dashboard {
     flex: 1;
     min-height: 0;
     display: grid;
-    grid-template-columns: 1fr min(380px, 30vw);
+    grid-template-columns: 1fr min(520px, 38vw);
     gap: 12px;
 }
 
@@ -90,6 +90,85 @@ body.spectator-page .spectator-dashboard {
     max-height: none;
     aspect-ratio: auto;
     height: 100%;
+}
+
+.spectator-map-outer {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+}
+
+.spectator-map-outer .bank-bonus-pin {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.spectator-map-outer .bank-bonus-pin.hidden { display: none; }
+
+.spectator-map-outer .bank-bonus-ring {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    margin: -18px 0 0;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 214, 90, 0.9);
+    background: radial-gradient(circle, rgba(255, 214, 90, 0.35) 0%, rgba(255, 214, 90, 0.05) 70%);
+    box-shadow: 0 0 16px rgba(255, 214, 90, 0.55);
+}
+
+.spectator-map-outer .bank-bonus-pin.phase-arrive .bank-bonus-ring {
+    animation: spec-bank-arrive 0.9s ease-out infinite;
+}
+
+.spectator-map-outer .bank-bonus-pin.phase-breathe .bank-bonus-ring {
+    animation: spec-bank-breathe 1.5s ease-in-out infinite;
+}
+
+.spectator-map-outer .bank-bonus-pin.phase-depart {
+    animation: spec-bank-depart 3s ease-in forwards;
+}
+
+@keyframes spec-bank-arrive {
+    0% { transform: scale(0.25); opacity: 0.2; }
+    70% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.85; }
+}
+
+@keyframes spec-bank-breathe {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 14px rgba(255, 214, 90, 0.6); }
+    50% { transform: scale(1.15); box-shadow: 0 0 28px rgba(255, 214, 90, 1); }
+}
+
+@keyframes spec-bank-depart {
+    to { opacity: 0; transform: scale(0.4); }
+}
+
+.spectator-map-outer .bank-bonus-dot {
+    position: relative;
+    z-index: 1;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.spectator-map-outer .bank-bonus-label {
+    margin-top: 20px;
+    font-size: 9px;
+    font-weight: 700;
+    color: #ffd65a;
+    white-space: nowrap;
+}
+
+.spectator-map-outer .bank-bonus-phase {
+    font-size: 8px;
+    color: #9ee7ff;
+    white-space: nowrap;
 }
 
 .spectator-activity-card {
@@ -133,6 +212,76 @@ body.spectator-page .spectator-dashboard {
     overflow-y: auto;
     min-height: 0;
     margin: 0;
+}
+
+.spec-leaderboard-wrap {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+}
+
+.spec-leaderboard {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+}
+
+.spec-leaderboard th,
+.spec-leaderboard td {
+    padding: 8px 6px;
+    border-bottom: 1px solid rgba(56, 189, 248, 0.1);
+    text-align: left;
+    vertical-align: top;
+    line-height: 1.35;
+}
+
+.spec-leaderboard th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: rgba(7, 24, 15, 0.98);
+    color: var(--muted);
+    font-weight: 700;
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.spec-leaderboard tbody tr:hover {
+    background: rgba(56, 189, 248, 0.04);
+}
+
+.spec-leaderboard .col-rank {
+    font-weight: 800;
+    color: var(--cyan);
+    white-space: nowrap;
+}
+
+.spec-leaderboard .col-name strong {
+    font-weight: 800;
+}
+
+.spec-leaderboard .col-bal {
+    font-weight: 800;
+    color: var(--amber);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.spec-leaderboard .col-stat {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.spec-leaderboard .stat-amt {
+    color: var(--muted);
+    font-size: 0.72rem;
+}
+
+.spec-leaderboard .empty-row {
+    text-align: center;
+    color: var(--muted);
+    padding: 20px;
 }
 
 @media (max-width: 900px) {

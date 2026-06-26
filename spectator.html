@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Currency Safe · Spectator</title>
+    <link rel="icon" href="fcitlogo.png" type="image/png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,700;14..32,900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/shared.css" />
@@ -21,7 +22,6 @@
                 </p>
             </div>
             <div class="spectator-top-actions">
-                <a href="lobby.html" class="btn secondary" id="backLobby">返回大厅</a>
                 <a href="index.html" class="btn secondary">首页</a>
             </div>
         </header>
@@ -30,7 +30,15 @@
             <section class="spectator-left">
                 <div class="card spectator-map-card">
                     <h2>马来西亚威胁地图 <span class="tag">只读 · 州色攻击线</span></h2>
-                    <div class="map-preview-wrap" id="spectatorMap"></div>
+                    <div class="spectator-map-outer" id="spectatorMapOuter">
+                        <div class="map-preview-wrap" id="spectatorMap"></div>
+                        <div class="bank-bonus-pin spectator-pin hidden" id="spectatorBankBonus" data-phase="hidden">
+                            <span class="bank-bonus-ring"></span>
+                            <span class="bank-bonus-dot">🏦</span>
+                            <span class="bank-bonus-label">央行 Bonus</span>
+                            <span class="bank-bonus-phase"></span>
+                        </div>
+                    </div>
                 </div>
                 <div class="card spectator-activity-card">
                     <h2>Activity 动态 <span class="tag">最新在上</span></h2>
@@ -40,7 +48,24 @@
 
             <aside class="card spectator-right">
                 <h2>排行榜 <span class="tag" id="leaderboardLockTag"></span></h2>
-                <ul class="member-list" id="leaderboardList"></ul>
+                <div class="spec-leaderboard-wrap">
+                    <table class="spec-leaderboard">
+                        <thead>
+                            <tr>
+                                <th>排名</th>
+                                <th>名字</th>
+                                <th>队伍</th>
+                                <th>州</th>
+                                <th>目标</th>
+                                <th>三关</th>
+                                <th>余额</th>
+                                <th>盗</th>
+                                <th>被盗</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardBody"></tbody>
+                    </table>
+                </div>
             </aside>
         </div>
     </main>
@@ -48,11 +73,12 @@
     <script src="js/malaysia-states.js"></script>
     <script src="js/map-attack-lines.js"></script>
     <script src="js/malaysia-map.js"></script>
-    <script src="js/firebase-config.js"></script>
+    <script src="js/server-config.js?v=20260626"></script>
     <script src="js/room-shared.js"></script>
     <script src="js/room-local.js"></script>
-    <script src="js/room-firebase.js"></script>
-    <script src="js/room.js"></script>
+    <script src="js/room-ws.js?v=20260626"></script>
+    <script src="js/room.js?v=20260626"></script>
+    <script src="js/bank-bonus-scheduler.js"></script>
     <script>
         const $ = (id) => document.getElementById(id);
         const roomId = (new URLSearchParams(location.search).get("room")
@@ -75,11 +101,12 @@
             password_expired: "过期",
             vault_breach: "破解",
             transfer: "转账",
+            bank_transfer: "央行",
+            bank_bonus: "央行闪灯",
+            bank_bonus_complete: "阅读Bonus",
             game_end: "结束",
             room_created: "建房"
         };
-
-        $("backLobby").href = "lobby.html?room=" + roomId;
 
         function escapeHtml(t) {
             const d = document.createElement("div");
@@ -98,6 +125,60 @@
             return `${done}/3`;
         }
 
+        const SPECTATOR_MAP = { w: 643, h: 316 };
+
+        function spectatorMapLayout(wrapW, wrapH) {
+            const scale = Math.min(wrapW / SPECTATOR_MAP.w, wrapH / SPECTATOR_MAP.h);
+            const drawW = SPECTATOR_MAP.w * scale;
+            const drawH = SPECTATOR_MAP.h * scale;
+            return {
+                wrapW, wrapH,
+                offsetX: (wrapW - drawW) / 2,
+                offsetY: (wrapH - drawH) / 2,
+                drawW, drawH, scale
+            };
+        }
+
+        function spectatorPinPercent(mapX, mapY, layout) {
+            const px = (mapX / 100) * SPECTATOR_MAP.w;
+            const py = (mapY / 100) * SPECTATOR_MAP.h;
+            const x = layout.offsetX + (px / SPECTATOR_MAP.w) * layout.drawW;
+            const y = layout.offsetY + (py / SPECTATOR_MAP.h) * layout.drawH;
+            return {
+                x: Math.max(1, Math.min(99, (x / layout.wrapW) * 100)),
+                y: Math.max(1, Math.min(99, (y / layout.wrapH) * 100))
+            };
+        }
+
+        function updateSpectatorBankBonus(room) {
+            const pin = $("spectatorBankBonus");
+            if (!pin || !window.BankBonusScheduler) return;
+            const status = BankBonusScheduler.computePhase(room, Date.now());
+            pin.classList.remove("hidden", "phase-arrive", "phase-breathe", "phase-depart");
+            pin.dataset.phase = status.phase;
+            if (status.phase === "hidden") {
+                pin.classList.add("hidden");
+                return;
+            }
+            pin.classList.add("phase-" + status.phase);
+            const mapEl = $("spectatorMap");
+            const inner = mapEl?.querySelector(".map-preview-inner");
+            if (!inner) return;
+            const rect = inner.getBoundingClientRect();
+            const layout = spectatorMapLayout(rect.width, rect.height);
+            const pinCoords = BankBonusScheduler.BANK_BONUS_PIN;
+            const pos = spectatorPinPercent(pinCoords.mapX, pinCoords.mapY, layout);
+            pin.style.left = pos.x + "%";
+            pin.style.top = pos.y + "%";
+            const phaseEl = pin.querySelector(".bank-bonus-phase");
+            if (phaseEl) {
+                const left = status.phaseEndsAt
+                    ? BankBonusScheduler.formatCountdown(status.phaseEndsAt - Date.now())
+                    : "";
+                phaseEl.textContent = BankBonusScheduler.phaseLabel(status) + (left ? " · " + left : "");
+            }
+        }
+
         function render(room) {
             if (!room) room = CurrencySafeRoom.getRoom(roomId);
             if (!room) {
@@ -113,48 +194,60 @@
                 return;
             }
 
+            const S = CurrencySafeRoomShared;
             $("roomCodeDisplay").textContent = room.id;
             const isComp = room.mode === "competitive";
             $("modeBadge").textContent = isComp ? "竞赛" : "练习";
             $("modeBadge").className = "mode-badge " + (isComp ? "competitive" : "practice");
-            const rem = CurrencySafeRoomShared.getMatchRemainingMs(room);
+            const rem = S.getMatchRemainingMs(room);
             $("matchTimeLabel").textContent = rem != null ? formatRemaining(rem) : "—";
 
+            const mapPlayers = room.players.map(p => ({
+                ...p,
+                balance: S.playerVaultBalance(room, p.id)
+            }));
             if (window.MalaysiaMapPreview) {
                 const mapEl = $("spectatorMap");
-                if (mapEl._mapSetPlayers) mapEl._mapSetPlayers(room.players);
-                else MalaysiaMapPreview.render(mapEl, room.players, { showAttackLines: true });
+                if (mapEl._mapSetPlayers) mapEl._mapSetPlayers(mapPlayers);
+                else MalaysiaMapPreview.render(mapEl, mapPlayers, { showAttackLines: true });
             }
+            updateSpectatorBankBonus(room);
 
-            $("leaderboardLockTag").textContent = room.leaderboardLocked ? "余额排序已锁定" : "";
+            $("leaderboardLockTag").textContent = room.leaderboardLocked ? "队库排序已锁定" : "";
 
             const txs = room.transactions || [];
-            function fmtStats(p) {
-                const st = CurrencySafeRoomShared.transferStatsForPlayer(p, txs);
-                return `盗${st.stealCount}次 RM${st.stealTotal.toLocaleString()} · 被盗${st.robbedCount}次 RM${st.robbedTotal.toLocaleString()}`;
-            }
 
             const sorted = [...room.players].sort((a, b) => {
-                const bal = (b.balance || 0) - (a.balance || 0);
+                const bal = S.playerVaultBalance(room, b.id) - S.playerVaultBalance(room, a.id);
                 if (bal !== 0) return bal;
-                const sa = CurrencySafeRoomShared.transferStatsForPlayer(a, txs);
-                const sb = CurrencySafeRoomShared.transferStatsForPlayer(b, txs);
+                const sa = S.transferStatsForPlayer(a, txs);
+                const sb = S.transferStatsForPlayer(b, txs);
                 return sb.stealTotal - sa.stealTotal;
             });
 
-            $("leaderboardList").innerHTML = sorted.length
+            $("leaderboardBody").innerHTML = sorted.length
                 ? sorted.map((p, i) => {
                     const prog = p.missionProgress;
                     const dots = progressDots(prog?.levels);
-                    const target = prog?.targetName ? ` · 攻 ${escapeHtml(prog.targetName)}` : "";
-                    const nameColor = window.getStateColor?.(p.stateId) || "#5aff9a";
-                    return `<li>
-                        <span><strong style="color:${nameColor}">#${i + 1} ${escapeHtml(p.name)}</strong> · <span style="color:${nameColor}">${escapeHtml(p.state || "")}</span>${target}
-                        <br/><span class="progress-dots">三关 ${dots}</span></span>
-                        <span class="tag">RM ${(p.balance || 0).toLocaleString()} · ${escapeHtml(fmtStats(p))}</span>
-                    </li>`;
+                    const target = prog?.targetName ? escapeHtml(prog.targetName) : "—";
+                    const nameColor = window.getStateColor?.(p.stateId) || "#38bdf8";
+                    const st = CurrencySafeRoomShared.transferStatsForPlayer(p, txs);
+                    return `<tr>
+                        <td class="col-rank">#${i + 1}</td>
+                        <td class="col-name"><strong style="color:${nameColor}">${escapeHtml(p.name)}</strong></td>
+                        <td>${(() => {
+                            const team = (room.teams || []).find(t => t.id === p.teamId);
+                            return escapeHtml(team?.state || team?.name || "—");
+                        })()}</td>
+                        <td style="color:${nameColor}">${escapeHtml(p.state || "—")}</td>
+                        <td>${target}</td>
+                        <td>${dots}</td>
+                        <td class="col-bal">RM ${S.playerVaultBalance(room, p.id).toLocaleString()}</td>
+                        <td class="col-stat">${st.stealCount}次<br/><span class="stat-amt">RM ${st.stealTotal.toLocaleString()}</span></td>
+                        <td class="col-stat">${st.robbedCount}次<br/><span class="stat-amt">RM ${st.robbedTotal.toLocaleString()}</span></td>
+                    </tr>`;
                 }).join("")
-                : `<li><span class="tag">暂无玩家</span></li>`;
+                : `<tr><td colspan="9" class="empty-row">暂无玩家</td></tr>`;
 
             const feed = room.activity || [];
             $("activityFeed").innerHTML = feed.length

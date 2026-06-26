@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=1280" />
     <title>Currency Safe · 金库行动</title>
+    <link rel="icon" href="fcitlogo.png" type="image/png" />
     <!-- ===== 字体 ===== -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,20 +15,20 @@
            CSS — 2D Live Cyber Threat Map
            ============================================================ */
         :root {
-            --bg: #020805;
-            --bg2: #04130d;
-            --panel: rgba(7, 24, 15, 0.82);
-            --panel2: rgba(7, 18, 14, 0.92);
-            --line: rgba(77, 255, 166, 0.18);
-            --line-2: rgba(77, 255, 166, 0.09);
-            --text: #ecfff5;
-            --muted: #96cdb3;
-            --green: #5aff9a;
-            --green-2: #27db74;
-            --cyan: #71ffe8;
+            --bg: #020810;
+            --bg2: #031018;
+            --panel: rgba(8, 16, 28, 0.88);
+            --panel2: rgba(7, 14, 22, 0.92);
+            --line: rgba(56, 189, 248, 0.22);
+            --line-2: rgba(56, 189, 248, 0.1);
+            --text: #e8f4ff;
+            --muted: #8ba4be;
+            --green: #38bdf8;
+            --green-2: #22d3ee;
+            --cyan: #67e8f9;
             --amber: #ffd65a;
             --red: #ff6e79;
-            --glow: 0 0 0 1px rgba(90, 255, 154, 0.08), 0 0 24px rgba(77, 255, 166, 0.12), inset 0 0 30px rgba(77, 255, 166, 0.05);
+            --glow: 0 0 0 1px rgba(56, 189, 248, 0.08), 0 0 24px rgba(34, 211, 238, 0.12), inset 0 0 30px rgba(34, 211, 238, 0.05);
             --shadow: 0 24px 80px rgba(0, 0, 0, 0.58);
             --radius: 22px;
             --game-gap: 16px;
@@ -49,10 +50,10 @@
             font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             color: var(--text);
             background:
-                radial-gradient(circle at 50% 0%, rgba(90, 255, 154, 0.12), transparent 28%),
+                radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.12), transparent 28%),
                 radial-gradient(circle at 100% 10%, rgba(113, 255, 232, 0.08), transparent 22%),
-                radial-gradient(circle at 0% 100%, rgba(90, 255, 154, 0.08), transparent 20%),
-                linear-gradient(155deg, #010503 0%, #03100b 52%, #010503 100%);
+                radial-gradient(circle at 0% 100%, rgba(56, 189, 248, 0.08), transparent 20%),
+                linear-gradient(155deg, #010508 0%, #031018 52%, #010508 100%);
         }
         body::before {
             content: "";
@@ -73,7 +74,7 @@
             inset: 0;
             pointer-events: none;
             z-index: 0;
-            background: linear-gradient(to bottom, transparent 0 48%, rgba(90, 255, 154, 0.035) 50%, transparent 52%);
+            background: linear-gradient(to bottom, transparent 0 48%, rgba(56, 189, 248, 0.035) 50%, transparent 52%);
             background-size: 100% 5px;
             opacity: .55;
             mix-blend-mode: screen;
@@ -85,7 +86,7 @@
             width: 320px;
             height: 320px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(90, 255, 154, 0.16), transparent 68%);
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.16), transparent 68%);
             filter: blur(14px);
             transform: translate(-50%, -50%);
         }
@@ -113,7 +114,7 @@
             background: linear-gradient(180deg, rgba(2, 8, 5, 0.96) 72%, rgba(2, 8, 5, 0.88) 100%);
             backdrop-filter: blur(16px) saturate(1.15);
             -webkit-backdrop-filter: blur(16px) saturate(1.15);
-            border-bottom: 1px solid rgba(77, 255, 166, 0.14);
+            border-bottom: 1px solid rgba(34, 211, 238, 0.14);
             box-shadow: 0 10px 36px rgba(0, 0, 0, 0.38);
         }
         .brand {
@@ -142,9 +143,9 @@
             display: grid;
             place-items: center;
             font-size: 30px;
-            background: linear-gradient(145deg, rgba(90, 255, 154, 0.16), rgba(113, 255, 232, 0.08));
+            background: linear-gradient(145deg, rgba(56, 189, 248, 0.16), rgba(113, 255, 232, 0.08));
             border: 1px solid var(--line);
-            box-shadow: var(--shadow), inset 0 0 30px rgba(90, 255, 154, 0.1);
+            box-shadow: var(--shadow), inset 0 0 30px rgba(56, 189, 248, 0.1);
             position: relative;
             overflow: hidden;
         }
@@ -425,7 +426,7 @@
             border-radius: var(--radius);
             overflow: hidden;
             background: linear-gradient(180deg, rgba(7, 20, 15, 0.9), rgba(4, 14, 10, 0.82));
-            box-shadow: var(--shadow), inset 0 0 35px rgba(90, 255, 154, 0.03);
+            box-shadow: var(--shadow), inset 0 0 35px rgba(56, 189, 248, 0.03);
             backdrop-filter: blur(14px);
         }
         .map-card {
@@ -569,6 +570,81 @@
             0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
             50% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.5; }
         }
+        .city-flash-marker.victim-flash {
+            background: rgba(255, 110, 121, 0.95);
+            box-shadow: 0 0 28px rgba(255, 110, 121, 0.95);
+            animation: victim-flash-pulse 0.8s ease-in-out infinite;
+        }
+        @keyframes victim-flash-pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.6); opacity: 0.55; }
+        }
+        .bank-bonus-pin {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            z-index: 9;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+        .bank-bonus-pin.hidden { display: none; }
+        .bank-bonus-pin.phase-breathe { pointer-events: auto; cursor: pointer; }
+        .bank-bonus-ring {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            margin: -20px 0 0;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 214, 90, 0.9);
+            background: radial-gradient(circle, rgba(255, 214, 90, 0.35) 0%, rgba(255, 214, 90, 0.05) 70%);
+            box-shadow: 0 0 18px rgba(255, 214, 90, 0.55);
+        }
+        .bank-bonus-pin.phase-arrive .bank-bonus-ring {
+            animation: bank-bonus-arrive 0.9s ease-out infinite;
+        }
+        .bank-bonus-pin.phase-breathe .bank-bonus-ring {
+            animation: bank-bonus-breathe 1.5s ease-in-out infinite;
+        }
+        .bank-bonus-pin.phase-depart {
+            animation: bank-bonus-depart 3s ease-in forwards;
+        }
+        @keyframes bank-bonus-arrive {
+            0% { transform: scale(0.25); opacity: 0.2; }
+            70% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.85; }
+        }
+        @keyframes bank-bonus-breathe {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 16px rgba(255, 214, 90, 0.6); }
+            50% { transform: scale(1.18); box-shadow: 0 0 32px rgba(255, 214, 90, 1); }
+        }
+        @keyframes bank-bonus-depart {
+            to { opacity: 0; transform: scale(0.4); }
+        }
+        .bank-bonus-dot {
+            position: relative;
+            z-index: 1;
+            font-size: 20px;
+            line-height: 1;
+            filter: drop-shadow(0 0 6px rgba(255, 214, 90, 0.9));
+        }
+        .bank-bonus-label {
+            margin-top: 22px;
+            font-size: 10px;
+            font-weight: 700;
+            color: #ffd65a;
+            white-space: nowrap;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.95);
+            letter-spacing: 0.04em;
+        }
+        .bank-bonus-phase {
+            font-size: 9px;
+            color: #9ee7ff;
+            white-space: nowrap;
+            text-shadow: 0 0 6px rgba(0, 0, 0, 0.9);
+        }
+        #bankBonusCountdown.bonus-cd-live { color: #ffd65a; animation: bank-bonus-breathe 1.5s ease-in-out infinite; }
         .threat-scanline {
             position: absolute;
             left: 0;
@@ -603,9 +679,9 @@
             width: 62%;
             aspect-ratio: 1;
             transform: translate(-50%, -50%);
-            border: 1px solid rgba(90, 255, 154, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.12);
             border-radius: 50%;
-            box-shadow: 0 0 0 70px rgba(90, 255, 154, 0.03), 0 0 0 140px rgba(90, 255, 154, 0.02);
+            box-shadow: 0 0 0 70px rgba(56, 189, 248, 0.03), 0 0 0 140px rgba(56, 189, 248, 0.02);
             pointer-events: none;
             z-index: 3;
         }
@@ -615,7 +691,7 @@
             position: absolute;
             inset: 18%;
             border-radius: 50%;
-            border: 1px solid rgba(90, 255, 154, 0.11);
+            border: 1px solid rgba(56, 189, 248, 0.11);
         }
         .sweep-ring::after {
             inset: 36%;
@@ -746,6 +822,8 @@
         .tabs {
             flex-shrink: 0;
             display: flex;
+            flex-wrap: wrap;
+            align-items: center;
             gap: 8px;
             padding: 10px;
             border-bottom: 1px solid var(--line);
@@ -797,11 +875,11 @@
         .tag {
             padding: 6px 9px;
             border-radius: 999px;
-            background: rgba(90, 255, 154, 0.14);
+            background: rgba(56, 189, 248, 0.14);
             color: var(--green);
             font-size: .76rem;
             font-weight: 950;
-            border: 1px solid rgba(90, 255, 154, 0.18);
+            border: 1px solid rgba(56, 189, 248, 0.18);
         }
         .muted {
             color: var(--muted);
@@ -810,8 +888,8 @@
         .notice {
             padding: 12px 13px;
             border-radius: 16px;
-            border: 1px solid rgba(90, 255, 154, 0.18);
-            background: rgba(90, 255, 154, 0.06);
+            border: 1px solid rgba(56, 189, 248, 0.18);
+            background: rgba(56, 189, 248, 0.06);
             color: #ddffe9;
             line-height: 1.55;
             font-size: .92rem;
@@ -822,8 +900,8 @@
             color: #ffe5e8;
         }
         .success {
-            border-color: rgba(90, 255, 154, 0.24);
-            background: rgba(90, 255, 154, 0.09);
+            border-color: rgba(56, 189, 248, 0.24);
+            background: rgba(56, 189, 248, 0.09);
             color: #e4fff0;
         }
         label {
@@ -938,7 +1016,7 @@
             padding: 11px;
             border-radius: 12px;
             background: #010705;
-            border: 1px solid rgba(90, 255, 154, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.15);
             font-family: SFMono-Regular, Consolas, monospace;
             color: #e5fff0;
             margin: 8px 0;
@@ -963,7 +1041,7 @@
             margin-top: 10px;
             padding: 10px 12px;
             border-radius: 12px;
-            border: 1px dashed rgba(255, 214, 90, 0.35);
+            border: none;
             background: rgba(255, 214, 90, 0.06);
             color: #fff6d0;
             font-weight: 900;
@@ -1018,7 +1096,7 @@
             border-radius: 10px;
             display: grid;
             place-items: center;
-            background: rgba(90, 255, 154, 0.08);
+            background: rgba(56, 189, 248, 0.08);
             color: var(--green);
             font-weight: 950;
         }
@@ -1107,8 +1185,8 @@
             pointer-events: none;
         }
         .mini-game-card.solved {
-            border-color: rgba(90, 255, 154, 0.35);
-            background: rgba(90, 255, 154, 0.05);
+            border-color: rgba(56, 189, 248, 0.35);
+            background: rgba(56, 189, 248, 0.05);
         }
         .mini-game-card h3 {
             margin: 0 0 8px;
@@ -1146,23 +1224,6 @@
         }
         .typing-progress span.done { color: var(--green); }
         .typing-progress span.cur { color: var(--amber); font-weight: 900; }
-        .arc-bar-wrap {
-            height: 10px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--line);
-            overflow: hidden;
-            margin: 10px 0;
-        }
-        .arc-bar-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--red), var(--amber));
-            transition: width .12s linear;
-        }
-        .arc-bar-fill.safe {
-            background: linear-gradient(90deg, var(--green-2), var(--cyan));
-        }
         .signal-warn {
             animation: signal-flash .45s ease 2;
         }
@@ -1211,7 +1272,7 @@
             border-radius: 16px;
             border: 2px solid rgba(255, 214, 90, 0.32);
             background: linear-gradient(180deg, #0c1a14 0%, #050f0b 42%, #050f0b 58%, #0c1a14 100%);
-            box-shadow: inset 0 10px 18px rgba(0, 0, 0, 0.55), inset 0 -10px 18px rgba(0, 0, 0, 0.55), 0 0 22px rgba(90, 255, 154, 0.06);
+            box-shadow: inset 0 10px 18px rgba(0, 0, 0, 0.55), inset 0 -10px 18px rgba(0, 0, 0, 0.55), 0 0 22px rgba(56, 189, 248, 0.06);
             position: relative;
         }
         .slot-reel-window::before,
@@ -1265,12 +1326,12 @@
             letter-spacing: 0.04em;
         }
         .slot-reel.match .slot-reel-window {
-            border-color: rgba(90, 255, 154, 0.55);
-            box-shadow: inset 0 0 20px rgba(90, 255, 154, 0.08), 0 0 20px rgba(90, 255, 154, 0.12);
+            border-color: rgba(56, 189, 248, 0.55);
+            box-shadow: inset 0 0 20px rgba(56, 189, 248, 0.08), 0 0 20px rgba(56, 189, 248, 0.12);
         }
         .slot-reel.match .slot-reel-highlight {
-            border-color: rgba(90, 255, 154, 0.55);
-            box-shadow: 0 0 20px rgba(90, 255, 154, 0.2);
+            border-color: rgba(56, 189, 248, 0.55);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
         }
         .slot-reel.fixed .slot-reel-window {
             border-color: rgba(113, 255, 232, 0.38);
@@ -1288,6 +1349,59 @@
             font-size: 0.8rem;
             color: var(--muted);
             margin: 0 0 10px;
+        }
+        .raid-live-panel {
+            margin: 10px 0 14px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 200, 80, 0.28);
+            background: linear-gradient(135deg, rgba(40, 28, 8, 0.85), rgba(24, 20, 12, 0.9));
+        }
+        .raid-live-panel.raid-live-inline {
+            flex: 1 1 11rem;
+            min-width: 0;
+            margin: 0;
+            padding: 8px 10px;
+            border-radius: 12px;
+        }
+        .raid-live-inline .raid-live-head {
+            font-size: 0.68rem;
+            margin-bottom: 2px;
+        }
+        .raid-live-inline .raid-live-amount {
+            font-size: 1.08rem;
+            line-height: 1.15;
+        }
+        .raid-live-inline .raid-live-meta {
+            font-size: 0.65rem;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .raid-live-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+        .raid-live-amount {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--amber);
+            transition: color 0.15s, transform 0.15s;
+        }
+        .raid-live-amount.raid-live-tick-down {
+            color: var(--red);
+            transform: scale(0.96);
+        }
+        .raid-live-meta {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-top: 6px;
+            line-height: 1.4;
         }
         .slot-reel.solved .slot-cell {
             color: var(--green);
@@ -1361,8 +1475,8 @@
             border-color: rgba(255, 214, 90, 0.5);
         }
         .vault-cell.path {
-            background: rgba(90, 255, 154, 0.18);
-            border-color: rgba(90, 255, 154, 0.4);
+            background: rgba(56, 189, 248, 0.18);
+            border-color: rgba(56, 189, 248, 0.4);
             position: relative;
         }
         .vault-cell.path::after {
@@ -1375,8 +1489,8 @@
         }
         .vault-cell.start { color: var(--cyan); font-weight: 900; }
         .vault-cell.safe {
-            background: rgba(90, 255, 154, 0.22);
-            border-color: rgba(90, 255, 154, 0.45);
+            background: rgba(56, 189, 248, 0.22);
+            border-color: rgba(56, 189, 248, 0.45);
         }
         .vault-cell.goal { color: var(--amber); font-weight: 900; }
         .vault-cell.goal-pulse {
@@ -1397,12 +1511,12 @@
                 #071a14 3px,
                 #071a14 6px
             );
-            border-color: rgba(77, 255, 166, 0.12);
+            border-color: rgba(34, 211, 238, 0.12);
             color: rgba(144, 255, 196, 0.25);
         }
         .vault-cell.revealed-safe {
-            background: rgba(90, 255, 154, 0.14);
-            border-color: rgba(90, 255, 154, 0.35);
+            background: rgba(56, 189, 248, 0.14);
+            border-color: rgba(56, 189, 248, 0.35);
         }
         .vault-hud {
             display: flex;
@@ -1437,10 +1551,10 @@
         }
         .vault-scan-btn:disabled { opacity: .4; }
         .vault-start-btn {
-            background: linear-gradient(135deg, rgba(77, 255, 166, 0.35), rgba(45, 200, 120, 0.25)) !important;
+            background: linear-gradient(135deg, rgba(34, 211, 238, 0.35), rgba(14, 165, 233, 0.25)) !important;
             color: #e8fff3 !important;
-            border: 1px solid rgba(77, 255, 166, 0.55) !important;
-            box-shadow: 0 0 18px rgba(77, 255, 166, 0.2) !important;
+            border: 1px solid rgba(34, 211, 238, 0.55) !important;
+            box-shadow: 0 0 18px rgba(34, 211, 238, 0.2) !important;
             width: 100%;
             margin-top: 10px;
             font-size: 1rem;
@@ -1451,7 +1565,7 @@
             margin-top: 10px;
             padding: 14px;
             border-radius: 14px;
-            border: 1px dashed rgba(77, 255, 166, 0.35);
+            border: none;
             background: rgba(4, 20, 14, 0.6);
             text-align: center;
         }
@@ -1468,7 +1582,7 @@
             margin-top: 10px;
             padding: 10px;
             border-radius: 12px;
-            border: 1px dashed rgba(113, 255, 232, 0.35);
+            border: none;
             background: rgba(113, 255, 232, 0.06);
             font-family: SFMono-Regular, Consolas, monospace;
             font-size: 1.2rem;
@@ -1513,9 +1627,82 @@
             background: rgba(113, 255, 232, 0.06); color: #c8fff5;
             font-size: .86rem; line-height: 1.5;
         }
+        /* Mastermind */
+        .mm-pick-row, .mm-palette { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 12px 0; }
+        .mm-slot {
+            width: 44px; height: 44px; border-radius: 50%; border: 2px solid rgba(56, 189, 248, 0.45);
+            background: rgba(4, 16, 11, 0.6); cursor: pointer; padding: 0;
+        }
+        .mm-slot.active { border-color: var(--amber); box-shadow: 0 0 0 2px rgba(255, 214, 90, 0.35); }
+        .mm-color-btn {
+            width: 36px; height: 36px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.25);
+            cursor: pointer; padding: 0; transition: transform .12s ease;
+        }
+        .mm-color-btn:hover { transform: scale(1.08); }
+        .mm-actions { display: flex; gap: 10px; justify-content: center; margin: 10px 0; }
+        .mm-meta { text-align: center; font-size: .82rem; }
+        .mm-history { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+        .mm-history-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 10px; border-radius: 10px; background: rgba(4,16,11,.55); }
+        .mm-history-guess { display: flex; gap: 6px; }
+        .mm-chip { width: 22px; height: 22px; border-radius: 50%; display: inline-block; border: 1px solid rgba(255,255,255,.2); }
+        .mm-history-feedback { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; min-width: 72px; }
+        .mm-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+        .mm-dot-green { background: #4ade80; box-shadow: 0 0 8px #4ade8088; }
+        .mm-dot-yellow { background: #facc15; box-shadow: 0 0 8px #facc1588; }
+        .mm-dot-empty { width: 8px; height: 8px; opacity: .25; background: var(--muted); }
+        /* Fragment sort */
+        .fs-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 14px 0; min-height: 88px; }
+        .fs-card {
+            position: relative; min-width: 72px; padding: 22px 12px 12px; border-radius: 14px;
+            border: 1px solid var(--line); background: rgba(8, 24, 16, 0.92); cursor: grab;
+            text-align: center; user-select: none; touch-action: none;
+        }
+        .fs-card.fs-hint { border-color: var(--amber); box-shadow: 0 0 0 1px rgba(255,214,90,.35); }
+        .fs-card:active { cursor: grabbing; }
+        .fs-badge {
+            position: absolute; top: 6px; left: 8px; font-size: 1.1rem; font-weight: 900; color: var(--amber);
+        }
+        .fs-text { font-family: ui-monospace, monospace; font-size: 1.15rem; letter-spacing: .12em; color: var(--cyan); }
+        .fs-actions { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; margin-top: 8px; }
         .mission-step.clickable { cursor: pointer; }
         .mission-step.clickable:hover { filter: brightness(1.15); }
-        .mission-step.locked-step { opacity: .5; cursor: not-allowed; }
+        .mission-step.locked-step { opacity: .5; cursor: default; }
+
+        .binary-bulb-row {
+            display: flex;
+            justify-content: center;
+            gap: 0.65rem;
+            margin: 1rem 0 0.5rem;
+        }
+        .binary-bulb {
+            font-size: 1.75rem;
+            line-height: 1;
+            filter: drop-shadow(0 0 8px rgba(255, 214, 90, 0.15));
+        }
+        .binary-bulb.on { filter: drop-shadow(0 0 10px rgba(255, 214, 90, 0.45)); }
+        .binary-choices {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        .binary-choice-btn {
+            padding: 0.65rem;
+            border-radius: 0.65rem;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            background: rgba(8, 18, 28, 0.9);
+            color: var(--cyan);
+            font-family: "JetBrains Mono", ui-monospace, monospace;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .binary-choice-btn:hover {
+            border-color: var(--cyan);
+            background: rgba(56, 189, 248, 0.12);
+        }
+        .finale-card { border-color: rgba(255, 214, 90, 0.28); }
+        .breach-manual-ui.hidden { display: none !important; }
         .arc-route-label {
             position: absolute; left: 16px; top: 52px; z-index: 7;
             padding: 6px 10px; border-radius: 10px;
@@ -1527,6 +1714,152 @@
             place-items: center; background: rgba(0,0,0,.82); padding: 20px;
         }
         .overlay-modal.show { display: grid; }
+        .bank-bonus-box {
+            text-align: left;
+            max-width: min(96vw, 560px);
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .bank-bonus-modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .bank-bonus-modal-head h2 { margin: 0; font-size: 1.15rem; }
+        .intel-read-panel { font-family: "JetBrains Mono", "Courier New", Courier, monospace; }
+        .ir-pool-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 8px 12px;
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 214, 90, 0.45);
+            background: rgba(255, 214, 90, 0.08);
+            font-family: Inter, system-ui, sans-serif;
+        }
+        .ir-pool-bar.practice { border-color: rgba(148, 163, 184, 0.4); background: rgba(148, 163, 184, 0.06); }
+        .ir-pool-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+        .ir-pool-amount {
+            font-size: 1.65rem;
+            font-weight: 900;
+            color: #ffd65a;
+            font-family: Inter, system-ui, sans-serif;
+            transition: color 0.2s, transform 0.15s;
+        }
+        .ir-pool-amount.tick-down { color: #ff8a93; transform: scale(0.97); }
+        .ir-pool-meta { font-size: 0.72rem; color: #9ee7ff; }
+        .ir-terminal {
+            border-radius: 6px;
+            border: 1px solid rgba(51, 255, 153, 0.25);
+            background: #050807;
+            box-shadow: inset 0 0 32px rgba(0, 0, 0, 0.85), 0 0 20px rgba(51, 255, 153, 0.06);
+            overflow: hidden;
+        }
+        .ir-terminal-dim { opacity: 0.72; }
+        .ir-terminal-chrome {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 12px;
+            padding: 6px 10px;
+            font-size: 0.62rem;
+            color: #5a7a6a;
+            border-bottom: 1px solid rgba(51, 255, 153, 0.12);
+            background: rgba(0, 0, 0, 0.45);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .ir-terminal-host { color: #33ff99; }
+        .ir-terminal-file {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #6b8f7a;
+        }
+        .ir-terminal-status {
+            color: #33ff99;
+            animation: ir-status-blink 1s step-end infinite;
+        }
+        .ir-terminal.ir-terminal-dim .ir-terminal-status {
+            animation: none;
+            color: #5a7a6a;
+        }
+        @keyframes ir-status-blink { 50% { opacity: 0.35; } }
+        .ir-terminal-body {
+            padding: 12px 12px 14px;
+            min-height: 100px;
+            max-height: 168px;
+            overflow-y: auto;
+            color: #c8f5dc;
+            font-size: 0.78rem;
+            line-height: 1.55;
+        }
+        .ir-prompt { color: #33ff99; user-select: none; }
+        .ir-line { margin: 0 0 6px; word-break: break-word; }
+        .ir-line-head { color: #9ee7ff; }
+        .ir-cursor { color: #33ff99; animation: ir-blink 0.7s step-end infinite; }
+        @keyframes ir-blink { 50% { opacity: 0; } }
+        .ir-hint {
+            margin: 10px 0 8px;
+            font-size: 0.72rem;
+            font-family: Inter, system-ui, sans-serif;
+            text-align: center;
+        }
+        .ir-quiz-panel {
+            margin-top: 1.25rem;
+            padding: 14px 14px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            background: linear-gradient(180deg, #0f1419 0%, #0a0e12 100%);
+            font-family: Inter, system-ui, sans-serif;
+        }
+        .ir-quiz-tag {
+            margin: 0 0 10px;
+            font-size: 0.65rem;
+            font-family: "JetBrains Mono", monospace;
+            color: #9ee7ff;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+        .ir-quiz-progress { margin: 0 0 6px; font-size: 0.72rem; color: var(--muted); }
+        .ir-quiz-prompt { font-weight: 700; margin: 0 0 12px; font-size: 0.92rem; color: #e8f0f8; line-height: 1.45; }
+        .ir-choices { display: flex; flex-direction: column; gap: 8px; }
+        .ir-choice {
+            text-align: left;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            background: rgba(15, 22, 28, 0.9);
+            color: #dce8f2;
+            font-family: Inter, system-ui, sans-serif;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .ir-choice:hover {
+            background: rgba(30, 42, 52, 0.95);
+            border-color: rgba(158, 231, 255, 0.45);
+            transform: none;
+            filter: none;
+        }
+        .ir-wrong { color: #ff8a93; font-size: 0.8rem; margin: 0 0 10px; font-weight: 700; }
+        .ir-done-panel { text-align: center; }
+        .ir-done-title { font-size: 1.15rem; font-weight: 900; margin: 0 0 6px; color: #33ff99; }
+        .ir-done-sub { margin: 0; font-size: 1rem; color: #ffd65a; font-weight: 800; }
+        .ir-done-meta { margin: 8px 0 0; font-size: 0.8rem; color: var(--muted); }
+        .ir-shake { animation: ir-shake 0.35s ease; }
+        @keyframes ir-shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
         .overlay-box {
             text-align: center; padding: 28px; border-radius: 24px;
             border: 1px solid var(--line);
@@ -1650,6 +1983,7 @@
                         <span>🟡 <span data-i18n="legendYou">你</span></span>
                         <span>🔴 <span data-i18n="legendTarget">选中目标</span></span>
                         <span>🟢 <span data-i18n="legendOthers">其他玩家</span></span>
+                        <span class="mp-only">🏦 <span>央行 Bonus</span></span>
                     </div>
                 </div>
                 <div class="map-wrap" id="mapWrap">
@@ -1658,6 +1992,12 @@
                         <canvas id="threatMapCanvas"></canvas>
                         <div class="threat-map-markers" id="threatMapMarkers"></div>
                         <div class="city-flash-marker" id="cityFlashMarker"></div>
+                        <div class="bank-bonus-pin hidden" id="bankBonusPin" data-phase="hidden">
+                            <span class="bank-bonus-ring"></span>
+                            <span class="bank-bonus-dot">🏦</span>
+                            <span class="bank-bonus-label">央行 Bonus</span>
+                            <span class="bank-bonus-phase"></span>
+                        </div>
                     </div>
                     <div class="threat-scanline"></div>
 
@@ -1677,6 +2017,7 @@
                         <div class="stat-mini"><b id="totalTransfers">0</b><span data-i18n="mapStatTransfers">成功转账</span></div>
                         <div class="stat-mini"><b id="currentTarget">—</b><span data-i18n="mapStatTarget">当前目标</span></div>
                         <div class="stat-mini"><b id="missionReward">—</b><span data-i18n="mapStatMissionReward">本次夺取</span></div>
+                        <div class="stat-mini mp-only" id="bankBonusStatWrap"><b id="bankBonusCountdown" class="bonus-cd">—</b><span>央行 Bonus</span></div>
                     </div>
                 </div>
             </section>
@@ -1686,10 +2027,19 @@
                 <section class="card mission-panel">
                     <div id="missionFxLayer"></div>
                     <div id="sidebarAlertBar" class="alert-bar hidden"></div>
+                    <div id="raidActivityFeed" class="raid-activity-feed mp-only hidden"></div>
                     <div class="tabs">
                         <button class="tab" data-tab="register" data-i18n="tabRegister">确认密码</button>
                         <button class="tab active" data-tab="attack" data-i18n="tabAttack">截获任务</button>
                         <button class="tab" data-tab="score" data-i18n="tabScore">战绩</button>
+                        <div id="raidLivePanel" class="raid-live-panel raid-live-inline hidden">
+                            <div class="raid-live-head">
+                                <strong>实拿预估</strong>
+                                <span id="raidLiveTarget">—</span>
+                            </div>
+                            <div class="raid-live-amount" id="raidLiveAmount">RM —</div>
+                            <div class="raid-live-meta" id="raidLiveMeta"></div>
+                        </div>
                     </div>
 
                     <div class="mission-scroll">
@@ -1758,14 +2108,16 @@
                                 <div class="frag-box"><b id="frag2" class="frag-locked">🔒</b><span data-i18n="frag2">密钥片段 2</span></div>
                                 <div class="frag-box"><b id="frag3" class="frag-locked">🔒</b><span data-i18n="frag3">密钥片段 3</span></div>
                             </div>
-                            <div class="notice" data-i18n="puzzleHint">完成三关小游戏，每关揭示一段密钥。</div>
+                            <div class="notice" data-i18n="puzzleHint">完成三关特工任务，每关揭示一段密钥；三关后组合密钥并转账。</div>
                         </div>
                         <div class="puzzle-grid" id="puzzleGrid"></div>
+                        <div class="breach-manual-ui hidden" id="breachManualUi">
                         <label data-i18n="combinedKey">组合金库密钥</label>
                         <input id="passwordGuess" maxlength="9" placeholder="" />
                         <div class="buttons">
                             <button class="green" id="autofillBtn" data-i18n="autofill">自动填入片段</button>
                             <button class="green" id="breachBtn" data-i18n="breachBtn">破解金库门锁</button>
+                        </div>
                         </div>
                         <div id="transferPanel" class="notice success" style="display:none; margin-top:12px">
                             <strong data-i18n="transferTitle">金库已破解！可模拟转账。</strong>
@@ -1786,9 +2138,15 @@
 
                     <!-- Scoreboard -->
                     <div class="section" id="score">
-                        <div class="panel-title"><h2 data-i18n="scoreTitle">本房排名</h2><span class="tag" data-i18n="tagRanking">Ranking</span></div>
+                        <div class="panel-title"><h2 data-i18n="scoreTitle">分队榜</h2><span class="tag" data-i18n="tagTeamRanking">Team</span></div>
                         <div class="scoreboard" id="scoreboard"></div>
                         <hr />
+                        <div class="panel-title"><h2 data-i18n="playerScoreTitle">个人贡献榜</h2><span class="tag" data-i18n="tagPlayerRanking">Player</span></div>
+                        <div class="scoreboard" id="playerScoreboard"></div>
+                        <hr />
+                        <div class="panel-title mp-only"><h2 data-i18n="activityTitle">战报动态</h2><span class="tag">Raid</span></div>
+                        <div class="activity-feed-game mp-only" id="scoreActivityFeed"></div>
+                        <hr class="mp-only" />
                         <div class="panel-title"><h2 data-i18n="txTitle">最近转账</h2><span class="tag" data-i18n="tagRecent">最近 5 笔</span></div>
                         <div class="transactions" id="transactions"></div>
                         <div class="buttons">
@@ -1813,7 +2171,7 @@
                 <li>5 支敌方金库出现在威胁地图上，点击标记选择目标。</li>
                 <li><strong>游戏1 拦截转账码：</strong>在密钥飘到终点前，按屏幕提示逐字敲出转账密钥。允许错 2 次。</li>
                 <li><strong>游戏2 破译坐标：</strong>拖动老虎机转轮或滚轮破解密电，找出能量核心所在城市。</li>
-                <li><strong>游戏3 潜入网格：</strong>先「开牌」记住 5×5 安全走廊（3 秒），再从左上角摸黑走到右下角宝石。3 次护盾容错；热感扫描亮灯 2 秒，只显示换位后的激光。</li>
+                <li><strong>游戏3 潜入网格：</strong>先「开牌」记住 5×5 安全走廊（2 秒），再从左上角摸黑走到右下角宝石。3 次护盾容错；热感扫描亮灯 1 秒，只显示换位后的激光。</li>
                 <li>三段密钥组合后破解金库，把模拟资金转入你的账户。</li>
                 <li>见习特工敌方密码 <strong>12 分钟</strong>轮换；闯关进行中会自动暂停轮换。</li>
                 <li>刷新页面会<strong>保留</strong>当前三关进度（已自动存档）。</li>
@@ -1842,19 +2200,47 @@
             </div>
         </div>
     </div>
+    <div class="overlay-modal" id="soloEndModal">
+        <div class="overlay-box">
+            <h2>⏱️ 练习结束</h2>
+            <p id="soloEndMessage">本次单人练习已结束。</p>
+            <div class="buttons" style="justify-content:center;margin-top:16px;gap:10px">
+                <button type="button" class="secondary" id="soloEndExportBtn">导出报告</button>
+                <button type="button" class="primary" id="soloReplayBtn">再玩一次</button>
+                <button type="button" class="secondary" id="soloEndHomeBtn">返回首页</button>
+            </div>
+        </div>
+    </div>
+    <div class="overlay-modal" id="bankBonusModal">
+        <div class="overlay-box bank-bonus-box">
+            <div class="bank-bonus-modal-head">
+                <h2>🏦 阅读情报 Bonus</h2>
+                <button type="button" class="secondary" id="closeBankBonusBtn">关闭</button>
+            </div>
+            <div id="bankBonusBody"></div>
+        </div>
+    </div>
 
     <!-- ============================================================
     JavaScript — 2D Live Cyber Threat Map
     ============================================================ -->
     <script src="js/malaysia-states.js"></script>
     <script src="js/map-attack-lines.js"></script>
-    <script src="js/firebase-config.js"></script>
+    <script src="js/server-config.js?v=20260626"></script>
     <script src="js/room-shared.js"></script>
     <script src="js/room-local.js"></script>
-    <script src="js/room-firebase.js"></script>
-    <script src="js/room.js"></script>
+    <script src="js/room-ws.js?v=20260626"></script>
+    <script src="js/room.js?v=20260626"></script>
     <script src="js/fx.js"></script>
     <script src="js/i18n.js"></script>
+    <script src="js/mission-games.js"></script>
+    <script src="js/mission-mastermind.js"></script>
+    <script src="js/mission-fragsort.js"></script>
+    <script src="js/mission-binary.js"></script>
+    <script src="js/mission-finale.js"></script>
+    <script src="js/bank-bonus-scheduler.js"></script>
+    <script src="js/intel-briefings-data.js"></script>
+    <script src="js/mission-intelread.js"></script>
     <script src="js/singleplayer-ai.js"></script>
     <script>
         // ==========================================================
@@ -1894,11 +2280,10 @@
         window.__mapLayout = { wrapW: 0, wrapH: 0, offsetX: 0, offsetY: 0, drawW: 0, drawH: 0, scale: 1 };
         const GAME_CONFIG = {
             typingKeywordLen: 6,
-            arcRetreatPerChar: 0.055,
-            arcFailBackoffChars: 2,
-            arcGraceMs: 3000,
             saveDebounceMs: 2000
         };
+        const GRID_SCOUT_SEC = 2;
+        const GRID_SCAN_FLASH_MS = 1000;
         const MALAYSIA_CITIES = [
             { name: "KUALA_LUMPUR", label: "吉隆坡", mapX: 18.9, mapY: 67, lat: 3.139, lon: 101.686 },
             { name: "GEORGETOWN", label: "槟城", mapX: 8.4, mapY: 29.4, lat: 5.414, lon: 100.329 },
@@ -2098,12 +2483,78 @@
             return window.getMalaysiaStateById(id);
         }
 
-        function teamFromRoomPlayer(p, isSelf) {
-            const pct = malaysiaImagePercentToWrapPercent(p.mapX, p.mapY);
+        const ROOM_SHARED = window.CurrencySafeRoomShared;
+        const BANK_TARGET_ID = ROOM_SHARED.BANK_TARGET_ID;
+
+        function getMyTeamId() {
+            const room = CurrencySafeRoom.getRoom(roomId);
+            const me = room?.players.find(p => p.id === csClientId);
+            return me?.teamId || state.player?.teamId || null;
+        }
+
+        function isBankTarget(id) {
+            return id === BANK_TARGET_ID;
+        }
+
+        function applyTeamVaultToDisplay(room, entity, playerId) {
+            if (!entity || !room) return entity;
+            entity.balance = ROOM_SHARED.playerVaultBalance(room, playerId);
+            const team = ROOM_SHARED.getTeamForTargetPlayer(room, playerId);
+            if (team) {
+                entity.teamId = team.id;
+                if (team.password) {
+                    entity.password = team.password;
+                    entity.passwordUpdatedAt = team.passwordUpdatedAt;
+                }
+            }
+            entity.vaultReady = !!entity.password;
+            return entity;
+        }
+
+        function bankFromRoom(room) {
+            if (!room?.bank) return null;
+            const b = room.bank;
+            const pct = malaysiaImagePercentToWrapPercent(b.mapX, b.mapY);
             return {
+                id: b.id,
+                name: b.name,
+                balance: b.balance ?? 0,
+                isBank: true,
+                mapX: b.mapX,
+                mapY: b.mapY,
+                x: pct.x,
+                y: pct.y,
+                lat: b.lat,
+                lon: b.lon,
+                state: b.state || "央行",
+                stateId: b.stateId || "bank",
+                city: b.state || "央行",
+                password: b.password || "",
+                passwordUpdatedAt: b.passwordUpdatedAt || Date.now(),
+                vaultReady: !!b.password,
+                icon: "🏦",
+                isOpponent: true
+            };
+        }
+
+        function getBankTarget() {
+            const room = CurrencySafeRoom.getRoom(roomId);
+            return bankFromRoom(room);
+        }
+
+        function getAttackTarget(id) {
+            if (!id) return null;
+            if (isBankTarget(id)) return getBankTarget();
+            return refreshOpponentFromRoom(id) || getOpponent(id);
+        }
+
+        function teamFromRoomPlayer(p, isSelf) {
+            const room = CurrencySafeRoom.getRoom(roomId);
+            const pct = malaysiaImagePercentToWrapPercent(p.mapX, p.mapY);
+            const t = {
                 id: p.id,
                 name: p.name,
-                balance: p.balance ?? 1000,
+                balance: 0,
                 mapX: p.mapX,
                 mapY: p.mapY,
                 x: pct.x,
@@ -2119,28 +2570,76 @@
                 wins: p.wins || 0,
                 losses: p.losses || 0,
                 agentRank: p.agentRank || "trainee",
+                teamId: p.teamId || null,
                 isOpponent: !isSelf
             };
+            return applyTeamVaultToDisplay(room, t, p.id);
         }
 
         function syncOpponentsFromRoom() {
             const room = CurrencySafeRoom.getRoom(roomId);
             if (!room) return;
+            state.bankTarget = bankFromRoom(room);
+            const myTeamId = getMyTeamId();
             const localMap = Object.fromEntries((state.opponents || []).map(o => [o.id, o]));
             state.opponents = room.players
-                .filter(p => p.id !== csClientId)
+                .filter(p => p.id !== csClientId && p.teamId !== myTeamId)
                 .map(p => {
                     const local = localMap[p.id];
                     const t = teamFromRoomPlayer(p);
-                    t.vaultReady = !!p.password;
-                    t.password = p.password || "";
-                    t.passwordUpdatedAt = p.passwordUpdatedAt || t.passwordUpdatedAt;
-                    t.balance = p.balance ?? t.balance;
-                    t.wins = p.wins ?? t.wins;
-                    t.losses = p.losses ?? t.losses;
                     t._syncedPasswordAt = p.passwordUpdatedAt || local?._syncedPasswordAt || 0;
                     return t;
                 });
+        }
+
+        function teamMapPercentFromTeam(tm) {
+            if (!tm) return null;
+            const pct = malaysiaImagePercentToWrapPercent(tm.mapX, tm.mapY);
+            return { x: pct.x, y: pct.y, name: tm.name, state: tm.state };
+        }
+
+        function findLatestRobberyTx(room, myTeamId) {
+            if (!room || !myTeamId) return null;
+            const txs = room.transactions || [];
+            return txs.find(tx =>
+                tx.fromTeamId === myTeamId && (tx.kind === "pvp" || tx.kind == null)
+            ) || null;
+        }
+
+        function flashVictimHomeState(room) {
+            const el = document.getElementById("cityFlashMarker");
+            const myTeamId = getMyTeamId();
+            const tm = (room?.teams || []).find(t => t.id === myTeamId);
+            if (!el || !tm) return;
+            const pos = malaysiaImagePercentToWrapPercent(tm.mapX, tm.mapY);
+            el.classList.add("victim-flash");
+            el.style.left = pos.x + "%";
+            el.style.top = pos.y + "%";
+            el.style.display = "block";
+            clearTimeout(el._victimTimer);
+            el._victimTimer = setTimeout(() => {
+                el.style.display = "none";
+                el.classList.remove("victim-flash");
+            }, 4000);
+        }
+
+        function drawVictimRaidRoute(tx, room) {
+            if (!tx || !room) return;
+            const atkTeam = (room.teams || []).find(t => t.id === tx.toTeamId);
+            const vicTeam = (room.teams || []).find(t => t.id === tx.fromTeamId);
+            const from = teamMapPercentFromTeam(atkTeam);
+            const to = teamMapPercentFromTeam(vicTeam);
+            if (from && to) drawRoute(from, to);
+        }
+
+        function showVictimRaidFx(oldBal, newBal, tx, room) {
+            hudBalanceAnimSkip = true;
+            const finishAnim = () => { hudBalanceAnimSkip = false; };
+            if (window.CurrencySafeFx) {
+                CurrencySafeFx.animateHudBalance(oldBal, newBal, { shake: true }).then(finishAnim);
+            } else finishAnim();
+            if (tx && room) drawVictimRaidRoute(tx, room);
+            flashVictimHomeState(room);
         }
 
         function syncSelfFromRoom() {
@@ -2153,10 +2652,23 @@
             const snap = state._syncSnapshot || {};
             let notify = false;
 
-            if (typeof snap.balance === "number" && typeof me.balance === "number" && me.balance < snap.balance) {
-                showToast(t("alertAttacked"));
+            const myTeam = ROOM_SHARED.getTeamForPlayer(room, csClientId);
+            const vaultBal = myTeam ? ROOM_SHARED.teamBalance(room, myTeam.id) : 0;
+
+            if (typeof snap.balance === "number" && vaultBal < snap.balance) {
+                const lost = snap.balance - vaultBal;
+                const myTeamId = myTeam?.id;
+                const raidTx = findLatestRobberyTx(room, myTeamId);
+                const attacker = raidTx?.to || t("noTarget");
+                const amt = raidTx?.amount ?? lost;
+                const toastMsg = t("alertAttackedDetail")
+                    .replace("{name}", attacker)
+                    .replace("{amount}", money(amt));
+                showToast(toastMsg);
                 state._wasAttacked = true;
+                state._lastRobbery = { amount: amt, attacker, at: raidTx?.at || Date.now() };
                 playAlarmSound();
+                showVictimRaidFx(snap.balance, vaultBal, raidTx, room);
                 breachUnlocked = false;
                 notify = true;
             }
@@ -2170,11 +2682,10 @@
                 notify = true;
             }
 
-            player.balance = me.balance ?? player.balance;
+            applyTeamVaultToDisplay(room, player, csClientId);
             player.wins = me.wins ?? player.wins;
             player.losses = me.losses ?? player.losses;
-            if (me.password) player.password = me.password;
-            if (me.passwordUpdatedAt) player.passwordUpdatedAt = me.passwordUpdatedAt;
+            if (me.teamId) player.teamId = me.teamId;
 
             state._syncSnapshot = {
                 balance: player.balance,
@@ -2186,36 +2697,60 @@
 
         function detectOpponentPasswordChange() {
             if (isSinglePlayer) return;
+            if (isBankTarget(state.targetId)) {
+                const room = CurrencySafeRoom.getRoom(roomId);
+                const bank = room?.bank;
+                const local = state.bankTarget || getBankTarget();
+                if (!bank?.password || !local) return;
+                const prevAt = local._syncedPasswordAt || 0;
+                if (bank.passwordUpdatedAt > prevAt && bank.password !== local.password) {
+                    local.password = bank.password;
+                    local.passwordUpdatedAt = bank.passwordUpdatedAt;
+                    local._syncedPasswordAt = bank.passwordUpdatedAt;
+                    if (isMissionActive() || breachUnlocked) rebuildIntelAfterTargetPasswordChange(local);
+                }
+                return;
+            }
             const target = getOpponent(state.targetId);
             if (!target || !currentIntel) return;
             const room = CurrencySafeRoom.getRoom(roomId);
             const rp = room?.players.find(p => p.id === target.id);
-            if (!rp?.password) return;
+            const vicTeam = rp ? ROOM_SHARED.getTeamForTargetPlayer(room, rp.id) : null;
+            const pwdAt = vicTeam?.passwordUpdatedAt || rp?.passwordUpdatedAt;
+            const pwd = vicTeam?.password || rp?.password;
+            if (!pwd) return;
             const prevAt = target._syncedPasswordAt || 0;
-            if (rp.passwordUpdatedAt > prevAt && rp.password !== target.password) {
-                target.password = rp.password;
-                target.passwordUpdatedAt = rp.passwordUpdatedAt;
-                target._syncedPasswordAt = rp.passwordUpdatedAt;
-                if (isMissionActive() || breachUnlocked) {
-                    const kept = currentIntel ? [...currentIntel.fragments] : [null, null, null];
-                    stopTypingArc();
-                    stopGridPhaseTimers();
-                    currentIntel = buildIntelForTarget(target);
-                    kept.forEach((f, i) => {
-                        if (f && currentIntel.games[i]) {
-                            currentIntel.fragments[i] = f;
-                            currentIntel.games[i].solved = true;
-                        }
-                    });
-                    breachUnlocked = false;
-                    $("passwordGuess").value = "";
-                    showToast(`${target.name} 轮换了密码，已完成关卡的情报已保留。`);
-                    saveStateNow();
-                    render();
-                }
+            if (pwdAt > prevAt && pwd !== target.password) {
+                target.password = pwd;
+                target.passwordUpdatedAt = pwdAt;
+                target._syncedPasswordAt = pwdAt;
+                if (isMissionActive() || breachUnlocked) rebuildIntelAfterTargetPasswordChange(target);
             } else {
-                target._syncedPasswordAt = rp.passwordUpdatedAt;
+                target._syncedPasswordAt = pwdAt;
             }
+        }
+
+        function rebuildIntelAfterTargetPasswordChange(target) {
+            const kept = currentIntel ? [...currentIntel.fragments] : [null, null, null];
+            const keptKinds = currentIntel?.pickedKinds;
+            const keptSeq = currentIntel?.deploySeq;
+            stopTypingArc();
+            stopGridPhaseTimers();
+            currentIntel = buildIntelForTarget(target, {
+                pickedKinds: keptKinds,
+                deploySeq: keptSeq
+            });
+            kept.forEach((f, i) => {
+                if (f && currentIntel.games[i]) {
+                    currentIntel.fragments[i] = f;
+                    currentIntel.games[i].solved = true;
+                }
+            });
+            breachUnlocked = false;
+            $("passwordGuess").value = "";
+            showToast(`${target.name} 轮换了密码，已完成关卡的情报已保留。`);
+            saveStateNow();
+            render();
         }
 
         function syncFromRoom() {
@@ -2245,6 +2780,10 @@
         }
 
         function getDeployCount(targetId) {
+            if (isSinglePlayer) return state.deployCounts?.[targetId] || 0;
+            const room = CurrencySafeRoom.getRoom(roomId);
+            const teamId = getMyTeamId();
+            if (teamId && room) return ROOM_SHARED.getTeamDeployCount(room, teamId, targetId);
             return state.deployCounts?.[targetId] || 0;
         }
 
@@ -2269,6 +2808,228 @@
             CurrencySafeRoom.logActivity(roomId, type, message);
         }
 
+        let lastBankBonusWaveLogged = -1;
+        let bankBonusSession = null;
+        let bankBonusTickTimer = null;
+        let lastIrPoolShown = null;
+
+        function closeBankBonusModal() {
+            if (bankBonusTickTimer) {
+                clearInterval(bankBonusTickTimer);
+                bankBonusTickTimer = null;
+            }
+            bankBonusSession = null;
+            lastIrPoolShown = null;
+            $("bankBonusModal")?.classList.remove("show");
+        }
+
+        function updateBankBonusPoolDisplay() {
+            if (!bankBonusSession || !window.MissionIntelread) return;
+            const remain = MissionIntelread.computeRemainder(bankBonusSession);
+            const host = $("bankBonusBody");
+            const amtEl = host?.querySelector("#irPoolAmount");
+            if (amtEl) {
+                amtEl.textContent = "RM " + money(remain);
+                if (lastIrPoolShown != null && remain < lastIrPoolShown) {
+                    amtEl.classList.add("tick-down");
+                    setTimeout(() => amtEl.classList.remove("tick-down"), 300);
+                }
+            }
+            const graceLeft = Math.max(0,
+                (CurrencySafeRoomShared.BONUS_LOOT?.graceMs || 20000)
+                - (Date.now() - bankBonusSession.startedAt));
+            const graceLabel = graceLeft > 0
+                ? `宽限 ${Math.ceil(graceLeft / 1000)}s`
+                : "计时扣款中";
+            const metaEl = host?.querySelector(".ir-pool-meta");
+            if (metaEl) {
+                const wrongs = bankBonusSession.wrongCount || 0;
+                metaEl.textContent = graceLabel + (wrongs ? ` · 答错 −${wrongs}×200` : "");
+            }
+            lastIrPoolShown = remain;
+        }
+
+        function bindBankBonusPanelEvents(host) {
+            host.querySelector(".ir-skip-read")?.addEventListener("click", () => {
+                MissionIntelread.skipToQuiz(bankBonusSession);
+                renderBankBonusPanel();
+            });
+            host.querySelectorAll("[data-ir-choice]").forEach(btn => {
+                btn.onclick = () => {
+                    const res = MissionIntelread.submitAnswer(
+                        bankBonusSession, Number(btn.dataset.irChoice));
+                    if (res.wrong) {
+                        host.classList.add("ir-shake");
+                        setTimeout(() => host.classList.remove("ir-shake"), 400);
+                    }
+                    renderBankBonusPanel();
+                    updateBankBonusPoolDisplay();
+                    if (res.complete) settleBankBonus();
+                };
+            });
+        }
+
+        function renderBankBonusPanel() {
+            const host = $("bankBonusBody");
+            if (!host || !bankBonusSession || !window.MissionIntelread) return;
+            host.innerHTML = MissionIntelread.render(bankBonusSession, { money });
+            updateBankBonusPoolDisplay();
+            bindBankBonusPanelEvents(host);
+        }
+
+        function tickBankBonus() {
+            if (!bankBonusSession) return;
+            if (bankBonusSession.step === "read") {
+                MissionIntelread.tickDecode(bankBonusSession, Date.now());
+                renderBankBonusPanel();
+            } else {
+                updateBankBonusPoolDisplay();
+            }
+        }
+
+        function settleBankBonus() {
+            const session = bankBonusSession;
+            if (!session || session._settled) return;
+            session._settled = true;
+            if (session.practiceOnly) {
+                showToast("练习完成 · 无奖金入账");
+                setTimeout(closeBankBonusModal, 2200);
+                return;
+            }
+            const player = getPlayer();
+            const oldBal = player?.balance ?? 0;
+            Promise.resolve(CurrencySafeRoom.completeBankBonus(roomId, session.waveIndex, {
+                wrongCount: session.wrongCount,
+                startedAt: session.startedAt
+            })).then(res => {
+                if (!res.ok) {
+                    showToast(res.error);
+                    setTimeout(closeBankBonusModal, 1500);
+                    return;
+                }
+                syncFromRoom();
+                if (player) {
+                    applyTeamVaultToDisplay(CurrencySafeRoom.getRoom(roomId), player, csClientId);
+                }
+                render();
+                applyMoneyGainFx(oldBal, player?.balance ?? oldBal,
+                    `央行 Bonus +RM ${money(res.amount)} 已入队库！`, { confetti: true });
+                setTimeout(closeBankBonusModal, 2800);
+            });
+        }
+
+        function openBankBonusModal(beginRes) {
+            closeBankBonusModal();
+            if (!window.MissionIntelread) return;
+            bankBonusSession = MissionIntelread.createSession(beginRes);
+            $("bankBonusModal")?.classList.add("show");
+            renderBankBonusPanel();
+            bankBonusTickTimer = setInterval(tickBankBonus, 90);
+        }
+
+        function updateBankBonusPin() {
+            if (isSinglePlayer) return;
+            const pin = document.getElementById("bankBonusPin");
+            if (!pin || !window.BankBonusScheduler) return;
+            const room = CurrencySafeRoom.getRoom(roomId);
+            const status = BankBonusScheduler.computePhase(room, Date.now());
+            const pct = getTeamMapPercent(BankBonusScheduler.BANK_BONUS_PIN);
+            pin.style.left = pct.x + "%";
+            pin.style.top = pct.y + "%";
+            pin.classList.remove("hidden", "phase-arrive", "phase-breathe", "phase-depart");
+            pin.dataset.phase = status.phase;
+            if (status.phase === "hidden") {
+                pin.classList.add("hidden");
+            } else {
+                pin.classList.add("phase-" + status.phase);
+            }
+            const phaseEl = pin.querySelector(".bank-bonus-phase");
+            if (phaseEl) {
+                const left = status.phaseEndsAt
+                    ? BankBonusScheduler.formatCountdown(status.phaseEndsAt - Date.now())
+                    : "";
+                phaseEl.textContent = status.phase === "hidden"
+                    ? ""
+                    : BankBonusScheduler.phaseLabel(status) + (left ? " · " + left : "");
+            }
+            const cdEl = document.getElementById("bankBonusCountdown");
+            if (cdEl) {
+                cdEl.classList.remove("bonus-cd-live");
+                if (!room || room.status !== "playing") {
+                    cdEl.textContent = "—";
+                } else if (status.phase === "breathe") {
+                    cdEl.textContent = "可点击";
+                    cdEl.classList.add("bonus-cd-live");
+                } else if (status.phase === "arrive" || status.phase === "depart") {
+                    cdEl.textContent = BankBonusScheduler.phaseLabel(status);
+                    cdEl.classList.add("bonus-cd-live");
+                } else {
+                    const nextAt = status.nextFlashAt || status.phaseEndsAt;
+                    cdEl.textContent = nextAt
+                        ? BankBonusScheduler.formatCountdown(nextAt - Date.now())
+                        : "—";
+                }
+            }
+            if (status.phase === "arrive" && status.waveIndex >= 0
+                && status.waveIndex !== lastBankBonusWaveLogged
+                && room && CurrencySafeRoom.isHost(room)) {
+                lastBankBonusWaveLogged = status.waveIndex;
+                logGameActivity("bank_bonus", `央行 Bonus 闪灯 · 第 ${status.waveIndex + 1} 波`);
+            }
+        }
+
+        function abandonMissionForBonus() {
+            const hadProgress = !!(currentIntel || breachUnlocked);
+            if (!hadProgress) return false;
+            const target = getOpponent(state.targetId);
+            stopTypingArc();
+            stopGridPhaseTimers();
+            $("passwordGuess").value = "";
+            currentIntel = null;
+            breachUnlocked = false;
+            lastScrolledMissionIdx = -1;
+            if (!isSinglePlayer && state.targetId) {
+                CurrencySafeRoom.updatePlayerProgress(roomId, {
+                    targetId: state.targetId,
+                    targetName: target?.name || "",
+                    levels: [false, false, false],
+                    pickedKinds: [],
+                    mistakes: 0
+                });
+            }
+            saveStateNow();
+            renderAttack();
+            return true;
+        }
+
+        function onBankBonusPinClick(e) {
+            e.stopPropagation();
+            if (isSinglePlayer) return;
+            const room = CurrencySafeRoom.getRoom(roomId);
+            const status = BankBonusScheduler.computePhase(room, Date.now());
+            if (status.phase !== "breathe") {
+                showToast(status.phase === "hidden"
+                    ? "央行 Bonus 尚未闪灯，请等待海域图钉出现。"
+                    : "请在「可点击参与」阶段点击进入。");
+                return;
+            }
+            const abandoned = abandonMissionForBonus();
+            Promise.resolve(window.MissionIntelread?.ready)
+                .then(() => CurrencySafeRoom.beginBankBonus(roomId, status.waveIndex))
+                .then(res => {
+                    if (!res?.ok) {
+                        showToast(res?.error || "无法开始 Bonus。");
+                        return;
+                    }
+                    if (abandoned) {
+                        showToast("有舍有得：当前攻坚进度已放弃，转攻央行 Bonus。");
+                    } else if (res.practiceOnly) {
+                        showToast("本波已用过有钱尝试，本次为练习模式。");
+                    }
+                    openBankBonusModal(res);
+                });
+        }
+
         function syncProgressToRoom() {
             if (isSinglePlayer || !state.targetId) return;
             const target = getOpponent(state.targetId);
@@ -2278,19 +3039,55 @@
             CurrencySafeRoom.updatePlayerProgress(roomId, {
                 targetId: state.targetId,
                 targetName: target?.name || "",
-                levels
+                levels,
+                pickedKinds: currentIntel?.pickedKinds || [],
+                mistakes: sumIntelMistakes(currentIntel)
             });
         }
 
         function logLevelFail(gameName) {
             const player = getPlayer();
             const target = getOpponent(state.targetId);
-            const label = gameName === "grid" ? "网格" : gameName === "dial" ? "转轮" : "拦截";
-            logGameActivity("level_fail", `${player?.name} 在${label}关失误（目标：${target?.name || "—"}）`);
+            const label = missionKindLabel(gameName);
+            logGameActivity("level_fail", `${player?.name} 在【${label}】失误（目标：${target?.name || "—"}）`);
         }
 
         function tryRestorePlayerFromRoom() {
             return bootstrapMultiplayerFromRoom();
+        }
+
+        function syncMatchSessionFromRoom() {
+            if (isSinglePlayer) return false;
+            const room = CurrencySafeRoom.getRoom(roomId);
+            const roomStart = room?.matchStartedAt;
+            if (!roomStart) return false;
+            if (state.matchStartedAt === roomStart) return false;
+            state.matchStartedAt = roomStart;
+            currentIntel = null;
+            breachUnlocked = false;
+            state.deployCounts = {};
+            lastScrolledMissionIdx = -1;
+            return true;
+        }
+
+        function autoDeployMissionIfNeeded(attempt = 0) {
+            if (isSinglePlayer) return Promise.resolve(false);
+            if (!state.player || !state.opponents.length) return Promise.resolve(false);
+            if (currentIntel) return Promise.resolve(true);
+
+            const tid = $("targetTeamSelect")?.value || state.targetId || state.opponents[0]?.id;
+            if (!tid) return Promise.resolve(false);
+            state.targetId = tid;
+            if ($("targetTeamSelect")) $("targetTeamSelect").value = tid;
+
+            const target = refreshOpponentFromRoom(tid) || getOpponent(tid);
+            if (!target?.vaultReady || !target?.password) {
+                if (attempt < 8) {
+                    return new Promise(r => setTimeout(r, 300)).then(() => autoDeployMissionIfNeeded(attempt + 1));
+                }
+                return Promise.resolve(false);
+            }
+            return Promise.resolve(deployTargetIntel(true));
         }
 
         function bootstrapMultiplayerFromRoom() {
@@ -2305,13 +3102,14 @@
                 state.player.icon = "🧑";
                 state.player.agentRank = playerData.agentRank || "trainee";
                 syncFromRoom();
+                syncMatchSessionFromRoom();
                 state._syncSnapshot = {
                     balance: state.player.balance,
                     password: state.player.password,
                     passwordUpdatedAt: state.player.passwordUpdatedAt
                 };
                 if (!state.targetId && state.opponents[0]) state.targetId = state.opponents[0].id;
-                if (!state.matchStartedAt) state.matchStartedAt = room.matchStartedAt || Date.now();
+                state.matchStartedAt = room.matchStartedAt || state.matchStartedAt || Date.now();
                 if (!state.missionStats) state.missionStats = defaultMissionStats();
             }
 
@@ -2321,6 +3119,9 @@
                     state.player.password = me.password;
                     state.player.passwordUpdatedAt = me.passwordUpdatedAt;
                     syncFromRoom();
+                    syncMatchSessionFromRoom();
+                    if (!state.targetId && state.opponents[0]) state.targetId = state.opponents[0].id;
+                    state.matchStartedAt = room.matchStartedAt || state.matchStartedAt || Date.now();
                 }
                 return Promise.resolve();
             }
@@ -2334,16 +3135,16 @@
         }
 
         function refreshOpponentFromRoom(targetId) {
+            if (isBankTarget(targetId)) {
+                const bank = getBankTarget();
+                if (bank) state.bankTarget = bank;
+                return bank;
+            }
             const room = CurrencySafeRoom.getRoom(roomId);
             const rp = room?.players.find(p => p.id === targetId);
             if (!rp) return getOpponent(targetId);
             const local = getOpponent(targetId);
-            if (local) {
-                local.password = rp.password || local.password;
-                local.passwordUpdatedAt = rp.passwordUpdatedAt || local.passwordUpdatedAt;
-                local.vaultReady = !!rp.password;
-                local.balance = rp.balance ?? local.balance;
-            }
+            if (local) applyTeamVaultToDisplay(room, local, targetId);
             return local || teamFromRoomPlayer(rp);
         }
 
@@ -2426,16 +3227,19 @@
             typing: "特工笔记：转账验证码有效期很短，所以要快准狠——就像真正的 2FA 拦截。",
             dial: "特工笔记：凯撒密码把字母整体移位。坐标城市只是掩护，真正的情报是密电片段。",
             grid: "特工笔记：先记住安全走廊，再摸黑潜入——就像真实特工的「开牌记忆」训练。",
+            mastermind: "特工笔记：热力传感器用绿/黄点反馈——绿=完全命中，黄=颜色对但位置错。",
+            fragsort: "特工笔记：碎片角标是真实序号，按 ①→⑤ 排好才能拼出密钥段。",
+            binary: "特工笔记：亮灯=1，灭灯=0。四位灯泡从左到右读成二进制，就是机器人认识的数字。"
         };
 
         const cityPool = MALAYSIA_CITIES;
 
         const TRAINEE_CFG = {
-            arcDurationMs: 22000, mistakes: 2, dialHint: "lesson",
+            mistakes: 2, dialHint: "lesson",
             laserMoveMs: 0, roundMs: 12 * 60 * 1000, showWholeWord: false
         };
         const ELITE_CFG = {
-            arcDurationMs: 14000, mistakes: 0, dialHint: false,
+            mistakes: 0, dialHint: false,
             laserMoveMs: 2500, roundMs: 5 * 60 * 1000, showWholeWord: true
         };
 
@@ -2444,8 +3248,6 @@
         const mapWrap = $("mapWrap");
         const routeLayer = $("routeLayer");
         let routeTimer = null;
-        let typingArcTimer = null;
-        let typingArcStart = 0;
         let gridScoutTimer = null;
         let gridMeltdownTimer = null;
         let gridScanTimeout = null;
@@ -2457,7 +3259,9 @@
 
         let state = loadState();
         let currentIntel = state.currentIntel || null;
+        if (currentIntel) MissionGames.migrateIntelMeta(currentIntel);
         let breachUnlocked = !!state.breachUnlocked;
+        let lastRaidLiveAmount = null;
 
         if (state.player && state.player.id !== csClientId) {
             state.player = null;
@@ -2518,6 +3322,10 @@
 
         function playClickSound() { playTone(180 + Math.random() * 40, 0.06); }
         function playSuccessSound() { playTone(520, 0.12, "sine", 0.1); playTone(780, 0.15, "sine", 0.07); }
+        function playLevelCompleteSound() {
+            playTone(440, 0.07, "sine", 0.055);
+            setTimeout(() => playTone(554, 0.09, "sine", 0.045), 65);
+        }
         function playCoinSound() { playTone(880, 0.08, "triangle", 0.09); }
         function playAlarmSound() { playTone(120, 0.2, "sawtooth", 0.06); }
 
@@ -2555,7 +3363,7 @@
             }
         }
 
-        if (state.player && !state.matchStartedAt) {
+        if (state.player && !state.matchStartedAt && !isSinglePlayer) {
             state.matchStartedAt = state.player.passwordUpdatedAt || Date.now();
         }
 
@@ -2596,7 +3404,12 @@
         }
 
         function transferStats(team) {
-            return CurrencySafeRoomShared.transferStatsForPlayer(team, getRoomTxs());
+            const txs = getRoomTxs();
+            const teamId = team.teamId || team.id;
+            if (!isSinglePlayer && teamId && CurrencySafeRoomShared.transferStatsForTeam) {
+                return CurrencySafeRoomShared.transferStatsForTeam(teamId, txs);
+            }
+            return CurrencySafeRoomShared.transferStatsForPlayer(team, txs);
         }
 
         function formatTransferStatsLine(team) {
@@ -2642,11 +3455,246 @@
             return out;
         }
 
-        function getAllTeams() { return state.player ? [state.player, ...state.opponents] : [...state.opponents]; }
+        function getAllTeams() {
+            return state.player ? [state.player, ...state.opponents] : [...state.opponents];
+        }
+
+        function getLeaderboardTeams() {
+            if (isSinglePlayer) return getAllTeams();
+            const room = CurrencySafeRoom.getRoom(roomId);
+            const entries = (room?.teams || []).map(tm => ({
+                id: tm.id,
+                name: tm.name || tm.state || "队伍",
+                state: tm.state,
+                stateId: tm.stateId,
+                balance: ROOM_SHARED.teamBalance(room, tm.id),
+                teamId: tm.id,
+                mapX: tm.mapX,
+                mapY: tm.mapY,
+                lat: tm.lat,
+                lon: tm.lon
+            }));
+            return entries;
+        }
+
+        function getThreatMapMarkers() {
+            if (isSinglePlayer) return getAllTeams();
+            const room = CurrencySafeRoom.getRoom(roomId);
+            if (!room) return [];
+            ROOM_SHARED.ensureTeamsAndBank(room);
+            const myTeamId = getMyTeamId();
+            const markers = [];
+            (room.teams || []).forEach(tm => {
+                const leadIds = ROOM_SHARED.memberIdList(tm.memberIds);
+                const lead = leadIds
+                    .map(id => room.players.find(p => p.id === id))
+                    .find(Boolean) || room.players.find(p => p.teamId === tm.id);
+                const repId = lead?.id || tm.id;
+                const entity = {
+                    id: repId,
+                    teamId: tm.id,
+                    name: tm.name || lead?.name || tm.state || "队伍",
+                    state: tm.state || lead?.state,
+                    stateId: tm.stateId || lead?.stateId,
+                    city: tm.state || lead?.state,
+                    balance: ROOM_SHARED.teamBalance(room, tm.id),
+                    mapX: tm.mapX ?? lead?.mapX,
+                    mapY: tm.mapY ?? lead?.mapY,
+                    lat: tm.lat ?? lead?.lat,
+                    lon: tm.lon ?? lead?.lon,
+                    icon: tm.id === myTeamId ? "🧑" : "💻",
+                    isBank: false,
+                    isSelf: tm.id === myTeamId
+                };
+                const pct = getTeamMapPercent(entity);
+                entity.x = pct.x;
+                entity.y = pct.y;
+                markers.push(entity);
+            });
+            if (!markers.length && room.players?.length) {
+                room.players.forEach(p => {
+                    const entity = {
+                        id: p.id,
+                        teamId: p.teamId,
+                        name: p.name,
+                        state: p.state,
+                        stateId: p.stateId,
+                        city: p.state,
+                        balance: ROOM_SHARED.playerVaultBalance(room, p.id),
+                        mapX: p.mapX,
+                        mapY: p.mapY,
+                        lat: p.lat,
+                        lon: p.lon,
+                        icon: p.teamId === myTeamId ? "🧑" : "💻",
+                        isBank: false,
+                        isSelf: p.teamId === myTeamId
+                    };
+                    const pct = getTeamMapPercent(entity);
+                    entity.x = pct.x;
+                    entity.y = pct.y;
+                    markers.push(entity);
+                });
+            }
+            return markers;
+        }
 
         function getPlayer() { return state.player; }
 
-        function getOpponent(id) { return (state.opponents || []).find(t => t.id === id); }
+        function getOpponent(id) {
+            if (!id) return null;
+            if (isBankTarget(id)) return getBankTarget();
+            return (state.opponents || []).find(t => t.id === id);
+        }
+
+        function getSoloMatchRemainingMs() {
+            const started = state.matchStartedAt || Date.now();
+            return started + getRoundMs() - Date.now();
+        }
+
+        function ensureIntelFinale(intel, team) {
+            if (!intel || !team) return;
+            if (intel.finale?.solved) return;
+            const frags = intel.fragments?.every(Boolean)
+                ? intel.fragments.slice(0, 3)
+                : splitPassword(team.password);
+            const seed = `${team.password}|${team.id}|${intel.deploySeq ?? 0}|finale`;
+            if (!intel.finale) {
+                intel.finale = MissionFinale.create(frags, seed);
+            } else {
+                MissionFinale.migrate(intel.finale);
+                intel.finale.cards = frags.map((text, id) => ({
+                    id,
+                    badge: MissionFinale.BADGES[id],
+                    text
+                }));
+            }
+        }
+
+        function allMinigamesSolved() {
+            return !!(currentIntel?.games?.length && currentIntel.games.every(g => g.solved));
+        }
+
+        function applyFinaleUnlock(password) {
+            const target = refreshOpponentFromRoom(state.targetId) || getOpponent(state.targetId);
+            if (!target) return;
+            $("passwordGuess").value = password;
+            if (isSinglePlayer) {
+                breachUnlocked = true;
+                saveStateNow();
+                render();
+                playLevelCompleteSound();
+                showToast(`金库破解成功：${target.name} 已解锁！请确认转账。`);
+                return;
+            }
+            Promise.resolve(CurrencySafeRoom.applyBreach(roomId, target.id)).then(res => {
+                if (!res.ok) { showToast(res.error); return; }
+                breachUnlocked = true;
+                syncFromRoom();
+                syncProgressToRoom();
+                render();
+                playLevelCompleteSound();
+                showToast(`金库破解成功：${target.name} 已解锁！`);
+            });
+        }
+
+        function onFinaleLock() {
+            const finale = currentIntel?.finale;
+            if (!finale || finale.solved || !allMinigamesSolved()) return;
+            const res = MissionFinale.lockOrder(finale);
+            if (res.win) {
+                finale.solved = true;
+                const pwd = res.password || MissionFinale.getCombinedPassword(finale);
+                const target = getOpponent(state.targetId);
+                if (target && pwd !== target.password) {
+                    showToast("组合与目标金库不匹配，请检查片段顺序。");
+                    finale.solved = false;
+                    return;
+                }
+                applyFinaleUnlock(pwd);
+                saveStateNow();
+                renderMiniGames();
+                return;
+            }
+            const card = document.getElementById("miniGameFinale");
+            if (card) shake(card);
+            showToast(res.hint ? "顺序不对！已将 ① 提示到最左侧。" : "顺序不对，继续调整片段。");
+            onMissionMistake();
+            renderMiniGames();
+            saveStateNow();
+        }
+
+        function endSoloMatch(reason) {
+            if (state._soloMatchEnded) return;
+            state._soloMatchEnded = true;
+            stopTypingArc();
+            stopGridPhaseTimers();
+            saveStateNow();
+            const msg = $("soloEndMessage");
+            if (msg) {
+                msg.textContent = reason === "manual"
+                    ? "你已手动结束本次练习。"
+                    : "练习时间已到，本次任务结束。";
+            }
+            $("soloEndModal")?.classList.add("show");
+        }
+
+        function resetSoloProgress(reload) {
+            localStorage.removeItem("currencySafeSingle");
+            state._soloMatchEnded = false;
+            if (reload !== false) location.reload();
+        }
+
+        function checkSoloMatchExpired() {
+            if (!isSinglePlayer || !state.player || state._soloMatchEnded) return false;
+            if (getSoloMatchRemainingMs() > 0) return false;
+            endSoloMatch("time");
+            return true;
+        }
+
+        function ensureSoloMatchClock() {
+            if (!isSinglePlayer || !state.player || state._soloMatchEnded) return;
+            if (!state.matchStartedAt) state.matchStartedAt = Date.now();
+            else checkSoloMatchExpired();
+        }
+
+        function goToEndedPage() {
+            if (isSinglePlayer) return;
+            location.href = "ended.html?room=" + roomId;
+        }
+
+        function checkRoomEndedAndRedirect(room) {
+            if (isSinglePlayer) return false;
+            const r = room || CurrencySafeRoom.getRoom(roomId);
+            if (r?.status === "ended") {
+                goToEndedPage();
+                return true;
+            }
+            return false;
+        }
+
+        function checkMultiplayerMatchExpired() {
+            if (isSinglePlayer) return false;
+            const room = CurrencySafeRoom.getRoom(roomId);
+            const rem = CurrencySafeRoomShared.getMatchRemainingMs(room);
+            if (room?.status !== "playing" || rem == null || rem > 0) return false;
+            Promise.resolve(CurrencySafeRoom.autoEndGameIfExpired(roomId)).then(res => {
+                if (res?.ok) {
+                    goToEndedPage();
+                    return;
+                }
+                const latest = CurrencySafeRoom.getRoom(roomId);
+                if (latest?.status === "ended") {
+                    goToEndedPage();
+                    return;
+                }
+                if (CurrencySafeRoom.isHost(latest) && CurrencySafeRoomShared.getMatchRemainingMs(latest) <= 0) {
+                    Promise.resolve(CurrencySafeRoom.endGame(roomId)).then(r => {
+                        if (r?.ok) goToEndedPage();
+                    });
+                }
+            });
+            return true;
+        }
 
         function formatRemaining(ms) {
             const s = Math.max(0, Math.floor(ms / 1000));
@@ -2675,42 +3723,181 @@
             return true;
         }
 
-        function computeMissionTransferAmount(intel, target) {
-            if (!intel || !target) return { amount: 0, score: 0 };
-            const cfg = getAgentCfg();
-            const games = intel.games || [];
-            if (!games.every(g => g.solved)) return { amount: 0, score: 0 };
+        function sumIntelMistakes(intel) {
+            if (!intel?.games) return 0;
+            let total = 0;
+            intel.games.forEach(g => {
+                if (typeof g.mistakes === "number") total += g.mistakes;
+                else if (g.kind === "typing") {
+                    const cfg = getAgentCfg();
+                    total += Math.max(0, cfg.mistakes - (g.mistakesLeft ?? cfg.mistakes));
+                } else if (g.kind === "grid") {
+                    total += Math.max(0, 3 - (g.shields ?? 3));
+                }
+            });
+            if (intel.finale?.mistakes) total += intel.finale.mistakes;
+            return Math.min(20, total);
+        }
 
-            let score = 100;
-            const typing = games.find(g => g.kind === "typing");
-            if (typing) {
-                const used = Math.max(0, cfg.mistakes - (typing.mistakesLeft ?? 0));
-                score -= used * 15;
+        function computeMissionTransferAmount(intel, target) {
+            if (!intel || !target) return { amount: 0, score: 0, mistakes: 0 };
+            const games = intel.games || [];
+            if (!games.every(g => g.solved)) return { amount: 0, score: 0, mistakes: 0 };
+            if (intel.finale && !intel.finale.solved && !breachUnlocked) {
+                return { amount: 0, score: 0, mistakes: 0 };
             }
-            const dial = games.find(g => g.kind === "dial");
-            if (dial) {
-                const wheels = dial.wheels?.filter(isDialWheelRotatable).length || 1;
-                const extra = Math.max(0, (dial.spinCount || 0) - wheels * 4);
-                score -= Math.min(20, Math.round(extra * 1.5));
+            const mistakes = sumIntelMistakes(intel);
+
+            if (!isSinglePlayer && !target.isBank) {
+                const room = CurrencySafeRoom.getRoom(roomId);
+                const me = room?.players?.find(p => p.id === csClientId);
+                const victimTeamId = target.teamId
+                    || room?.players?.find(p => p.id === target.id)?.teamId;
+                if (victimTeamId && me) {
+                    const preview = ROOM_SHARED.previewRaidPayout(room, victimTeamId, me.id, mistakes);
+                    const factor = Math.max(0, 1 - mistakes / 20);
+                    return {
+                        amount: preview.payout,
+                        score: Math.round(factor * 100),
+                        mistakes,
+                        raidPercent: preview.percent,
+                        raidShare: Math.round(preview.share),
+                        poolRemaining: preview.poolRemaining,
+                        activeRaiders: preview.activeCount
+                    };
+                }
             }
-            const grid = games.find(g => g.kind === "grid");
-            if (grid) {
-                score -= Math.max(0, 3 - (grid.shields ?? 0)) * 12;
-                score -= Math.max(0, 2 - (grid.scansLeft ?? 0)) * 6;
-            }
-            score = Math.max(40, Math.min(100, Math.round(score)));
-            const maxLoot = Math.min(target.balance, 600);
-            let amt = Math.round(maxLoot * score / 100 / 10) * 10;
-            amt = Math.max(50, Math.min(target.balance, amt));
-            return { amount: amt, score };
+
+            const score = ROOM_SHARED.computeMissionScorePercent(intel, getAgentCfg());
+            const pool = target.isBank ? (target.balance || 0) : (target.balance || 0);
+            const amt = ROOM_SHARED.computeLootAmount(pool, score);
+            return { amount: amt, score, mistakes };
         }
 
         function getMissionTransferPreview() {
             const target = getOpponent(state.targetId);
             if (!target || !currentIntel) return null;
             const allSolved = currentIntel.games?.every(g => g.solved);
-            if (!allSolved && !breachUnlocked) return null;
+            const finaleOk = !currentIntel.finale || currentIntel.finale.solved || breachUnlocked;
+            if (!allSolved || !finaleOk) return null;
             return computeMissionTransferAmount(currentIntel, target);
+        }
+
+        function computeLiveMissionScore(intel, cfg) {
+            if (!intel?.games) return 25;
+            let score = 25;
+            const games = intel.games;
+            const typing = games.find(g => g.kind === "typing");
+            if (typing && cfg) {
+                score -= Math.max(0, cfg.mistakes - (typing.mistakesLeft ?? cfg.mistakes));
+            }
+            const grid = games.find(g => g.kind === "grid");
+            if (grid) {
+                score -= Math.max(0, 3 - (grid.shields ?? 3));
+                score -= Math.max(0, 2 - (grid.scansLeft ?? 2));
+            }
+            games.forEach(g => {
+                const m = Number(g.mistakes) || 0;
+                if (m <= 0) return;
+                if (g.kind === "mastermind") score -= Math.min(4, m);
+                else if (g.kind === "fragsort") score -= Math.min(3, m);
+                else if (g.kind === "binary") score -= Math.min(3, m);
+            });
+            if (intel.finale?.mistakes) score -= Math.min(3, intel.finale.mistakes);
+            return Math.max(10, Math.min(25, Math.round(score)));
+        }
+
+        function computeLiveLootPreview(intel, target) {
+            if (!intel || !target) return null;
+            const mistakes = sumIntelMistakes(intel);
+
+            if (!isSinglePlayer && !target.isBank) {
+                const room = CurrencySafeRoom.getRoom(roomId);
+                const me = room?.players?.find(p => p.id === csClientId);
+                const victimTeamId = target.teamId
+                    || room?.players?.find(p => p.id === target.id)?.teamId;
+                if (victimTeamId && me) {
+                    const preview = ROOM_SHARED.previewRaidPayout(room, victimTeamId, me.id, mistakes);
+                    return {
+                        amount: preview.payout,
+                        mistakes,
+                        mode: "raid",
+                        share: Math.round(preview.share),
+                        raidPercent: preview.percent,
+                        activeRaiders: preview.activeCount,
+                        targetName: target.name
+                    };
+                }
+            }
+
+            const score = computeLiveMissionScore(intel, getAgentCfg());
+            const pool = target.balance || 0;
+            return {
+                amount: ROOM_SHARED.computeLootAmount(pool, score),
+                score,
+                mistakes,
+                mode: "solo",
+                targetName: target.name
+            };
+        }
+
+        function updateRaidLivePreview() {
+            const panel = $("raidLivePanel");
+            if (!panel) return;
+            const target = getOpponent(state.targetId);
+            const show = !!(currentIntel && target && !breachUnlocked);
+            if (!show) {
+                panel.classList.add("hidden");
+                lastRaidLiveAmount = null;
+                return;
+            }
+
+            const preview = computeLiveLootPreview(currentIntel, target);
+            if (!preview) {
+                panel.classList.add("hidden");
+                lastRaidLiveAmount = null;
+                return;
+            }
+
+            panel.classList.remove("hidden");
+            const targetEl = $("raidLiveTarget");
+            const amountEl = $("raidLiveAmount");
+            const metaEl = $("raidLiveMeta");
+            if (targetEl) targetEl.textContent = preview.targetName || target.name;
+            if (amountEl) {
+                if (lastRaidLiveAmount != null && preview.amount < lastRaidLiveAmount) {
+                    amountEl.classList.add("raid-live-tick-down");
+                    setTimeout(() => amountEl.classList.remove("raid-live-tick-down"), 420);
+                }
+                amountEl.textContent = `RM ${money(preview.amount)}`;
+            }
+            if (metaEl) {
+                if (preview.mode === "raid") {
+                    const factor = Math.max(0, 1 - preview.mistakes / 20);
+                    metaEl.textContent =
+                        `攻坚池 P=${preview.raidPercent}% · 份额 RM ${money(preview.share)}` +
+                        ` · 失误 ${preview.mistakes}/20 · 实拿 ×${factor.toFixed(2)}` +
+                        (preview.activeRaiders > 1 ? ` · ${preview.activeRaiders} 人同时攻坚` : "");
+                } else {
+                    metaEl.textContent =
+                        `表现约 ${preview.score}% · 失误 ${preview.mistakes} 次 · 答错会压低夺取额`;
+                }
+            }
+            lastRaidLiveAmount = preview.amount;
+
+            const mapEl = $("missionReward");
+            if (mapEl) mapEl.textContent = `RM ${money(preview.amount)}`;
+        }
+
+        function onMissionMistake() {
+            const target = getOpponent(state.targetId);
+            if (!currentIntel || !target || breachUnlocked) return;
+            const prev = computeLiveLootPreview(currentIntel, target);
+            updateRaidLivePreview();
+            const next = computeLiveLootPreview(currentIntel, target);
+            if (prev && next && next.amount < prev.amount) {
+                showToast(`失误！实拿预估 RM ${money(next.amount)}（−RM ${money(prev.amount - next.amount)}）`);
+            }
         }
 
         function updateTransferRewardUI() {
@@ -2722,11 +3909,19 @@
                 rewardEl.textContent = preview ? `RM ${money(preview.amount)}` : "RM —";
             }
             if (hintEl && preview) {
-                hintEl.textContent = `${t("transferPerfScore")} ${preview.score}%`;
+                if (!isSinglePlayer && preview.raidPercent != null) {
+                    hintEl.textContent =
+                        `攻坚池 P=${preview.raidPercent}% · 份额 RM ${money(preview.raidShare || 0)}` +
+                        ` · 失误 ${preview.mistakes}/20 · 实拿 ×${Math.max(0, 1 - (preview.mistakes || 0) / 20).toFixed(2)}`;
+                } else if (preview.score != null) {
+                    hintEl.textContent = `${t("transferPerfScore")} ${preview.score}%`;
+                } else {
+                    hintEl.textContent = t("transferPerfHint");
+                }
             } else if (hintEl) {
                 hintEl.textContent = t("transferPerfHint");
             }
-            if (mapEl) {
+            if (mapEl && breachUnlocked) {
                 mapEl.textContent = preview ? `RM ${money(preview.amount)}` : "—";
             }
         }
@@ -2751,11 +3946,55 @@
             return clean.slice(0, len) || "VAULT9";
         }
 
+        function getMissionSlotIndex(game) {
+            if (!game) return -1;
+            if (game.slotIndex != null) return game.slotIndex;
+            return currentIntel?.games?.indexOf(game) ?? -1;
+        }
+
+        function findMissionGame(kind, preferActive = true) {
+            if (!currentIntel?.games) return null;
+            if (preferActive) {
+                const ai = getActiveMissionIndex();
+                const ag = currentIntel.games[ai];
+                if (ag?.kind === kind && !ag.solved) return ag;
+            }
+            return currentIntel.games.find(g => g.kind === kind && !g.solved)
+                || currentIntel.games.find(g => g.kind === kind);
+        }
+
+        function missionKindLabel(kindId) {
+            return MissionGames.getKindMeta(kindId)?.shortLabel || kindId || "任务";
+        }
+
+        function completeMissionSlot(game, opts = {}) {
+            const slotIdx = getMissionSlotIndex(game);
+            if (slotIdx < 0 || game.solved) return;
+            game.solved = true;
+            currentIntel.fragments[slotIdx] = game.reveal;
+            if (opts.beforeOnLevelComplete) opts.beforeOnLevelComplete();
+            if (opts.toast) showToast(opts.toast);
+            onLevelComplete(slotIdx);
+            renderFragments();
+            renderMissionSteps();
+            renderMiniGames();
+            const next = slotIdx + 1;
+            if (next < currentIntel.games.length) {
+                scrollToMission(next);
+                const meta = MissionGames.getKindMeta(currentIntel.pickedKinds?.[next]);
+                if (meta) showToast(`下一项已解锁：${meta.icon} ${meta.shortLabel}`);
+            }
+            saveStateNow();
+        }
+
         function onLevelComplete(idx) {
             trackMissionStat("levelsDone", 1);
             const player = getPlayer();
             const target = getOpponent(state.targetId);
-            logGameActivity("level_complete", `${player?.name} 完成第 ${idx + 1} 关（目标：${target?.name || "—"}）`);
+            const kindId = currentIntel?.pickedKinds?.[idx];
+            const kindLabel = missionKindLabel(kindId);
+            logGameActivity("level_complete",
+                `${player?.name} 完成【${kindLabel}】（${idx + 1}/${MissionGames.SLOT_COUNT}，目标：${target?.name || "—"}）`);
             syncProgressToRoom();
             if (idx === 0 && window.flashMapCityPercent) {
                 const target = getOpponent(state.targetId);
@@ -2765,8 +4004,11 @@
                 }
             }
             if (currentIntel?.fragments?.every(Boolean)) {
-                playSuccessSound();
-                $("vaultDoorModal")?.classList.add("show");
+                playLevelCompleteSound();
+                const target = getOpponent(state.targetId);
+                if (target) ensureIntelFinale(currentIntel, target);
+                showToast("三关任务完成！请组合密钥片段并解锁金库。");
+                renderMiniGames();
             }
             saveStateNow();
         }
@@ -2799,7 +4041,7 @@
                 id: me.id,
                 name,
                 password,
-                balance: me.balance ?? 1000,
+                balance: ROOM_SHARED.playerVaultBalance(room, me.id),
                 x: pct.x,
                 y: pct.y,
                 mapX: me.mapX,
@@ -2819,8 +4061,7 @@
             CurrencySafeRoom.updatePlayerInRoom(roomId, {
                 password,
                 passwordUpdatedAt: state.player.passwordUpdatedAt,
-                agentRank,
-                balance: state.player.balance
+                agentRank
             });
             state._syncSnapshot = {
                 balance: state.player.balance,
@@ -2951,8 +4192,6 @@
                 keyword,
                 typedIndex: 0,
                 mistakesLeft: cfg.mistakes,
-                arcProgress: 0,
-                arcGraceUntil: null,
                 interceptEnergy: 0,
                 originLabel: originLabel || "瑞士银行",
                 targetTeam,
@@ -3065,7 +4304,7 @@
                 title: "游戏3 · 潜入核金库安保网格",
                 solved: false,
                 phase: "ready",
-                scoutCountdown: 3,
+                scoutCountdown: GRID_SCOUT_SEC,
                 size,
                 grid,
                 start,
@@ -3105,7 +4344,7 @@
             if (!game.revealed || typeof game.revealed !== "object") game.revealed = {};
             if (typeof game.shields !== "number") game.shields = 3;
             if (typeof game.scansLeft !== "number") game.scansLeft = 2;
-            if (typeof game.scoutCountdown !== "number") game.scoutCountdown = 3;
+            if (typeof game.scoutCountdown !== "number") game.scoutCountdown = GRID_SCOUT_SEC;
 
             const gridOk = game.grid && Array.isArray(game.grid) && game.grid.length === size
                 && game.grid.every(row => Array.isArray(row) && row.length === size)
@@ -3126,25 +4365,76 @@
             }
         }
 
-        if (currentIntel?.games?.[2]) migrateGridGame(currentIntel.games[2]);
+        MissionGames.setGenerators({
+            typing: (frag, ctx) => generateTypingGame(
+                frag, ctx.password, ctx.origin, ctx.target, ctx.player
+            ),
+            dial: (frag) => generateDialGame(frag),
+            grid: (frag) => generateVaultGrid(frag),
+            mastermind: (frag, ctx) => MissionMastermind.generate(frag, ctx),
+            fragsort: (frag, ctx) => MissionFragsort.generate(frag, ctx),
+            binary: (frag, ctx) => MissionBinary.generate(frag, ctx)
+        });
 
-        function buildIntelForTarget(team) {
+        if (currentIntel?.games) {
+            currentIntel.games.forEach(g => {
+                if (g.kind === "grid") migrateGridGame(g);
+                if (g.kind === "mastermind") MissionMastermind.migrate(g);
+                if (g.kind === "fragsort") MissionFragsort.migrate(g);
+                if (g.kind === "binary") MissionBinary.migrate(g);
+            });
+            if (currentIntel?.finale) MissionFinale.migrate(currentIntel.finale);
+        }
+
+        function buildIntelForTarget(team, options = {}) {
             if (!team) return null;
             const frags = splitPassword(team.password);
             const city = randomPick(cityPool);
             const origin = `${city.label}（${team.name}）`;
             const player = getPlayer();
+            const room = CurrencySafeRoom.getRoom(roomId);
+            const deploySeq = options.deploySeq ?? getDeployCount(team.id);
+            const pickCtx = {
+                roomId: isSinglePlayer ? "SOLO" : roomId,
+                targetId: team.id,
+                deploySeq,
+                matchStartedAt: room?.matchStartedAt || state.matchStartedAt || 0,
+                competitive: !isSinglePlayer && room?.mode === "competitive",
+                modeKey: isSinglePlayer ? "solo" : "mp",
+                roomSettings: room?.settings?.missionGames
+            };
+            let pickedKinds = options.pickedKinds;
+            if (!pickedKinds || pickedKinds.length !== MissionGames.SLOT_COUNT) {
+                const pick = MissionGames.pickMissionKindIds(pickCtx);
+                if (!pick.ok) {
+                    showToast(pick.error);
+                    return null;
+                }
+                pickedKinds = pick.kinds;
+            }
+            const gameCtx = {
+                password: team.password,
+                target: team,
+                player,
+                origin,
+                competitive: pickCtx.competitive
+            };
+            const games = pickedKinds.map((kindId, slotIdx) => {
+                const game = MissionGames.createMissionGame(kindId, frags[slotIdx] || "", gameCtx);
+                game.slotIndex = slotIdx;
+                game.kind = kindId;
+                return game;
+            });
             state.missionStats.missionsStarted = (state.missionStats.missionsStarted || 0) + 1;
             missionStartedAt = Date.now();
             return {
                 targetId: team.id,
                 startedAt: Date.now(),
-                fragments: [null, null, null],
-                games: [
-                    generateTypingGame(frags[0] || "", team.password, origin, team, player),
-                    generateDialGame(frags[1] || ""),
-                    generateVaultGrid(frags[2] || "")
-                ]
+                pickedKinds,
+                deploySeq,
+                fragments: options.fragments || [null, null, null],
+                games,
+                finale: MissionFinale.create(frags, `${team.password}|${team.id}|${deploySeq}|finale`)
             };
         }
 
@@ -3153,6 +4443,10 @@
             const tid = $("targetTeamSelect").value || state.targetId;
             const target = refreshOpponentFromRoom(tid) || getOpponent(tid);
             if (!state.player) { showToast("请先进入战场。"); return false; }
+            if (!isSinglePlayer && isBankTarget(tid)) {
+                showToast("央行攻击已改为海域闪灯 Bonus，请等待地图图钉闪灯。");
+                return false;
+            }
             if (!target) { showToast("请选择目标金库。"); return false; }
             if (!isSinglePlayer && (!target.vaultReady || !target.password)) {
                 showToast(`${target.name} 金库尚未就绪，请稍后重试。`);
@@ -3162,8 +4456,8 @@
             const isNewDeploy = resetAll && (!currentIntel || currentIntel.targetId !== target.id);
             const prevTargetId = state.targetId;
 
-            function finishDeploy() {
-                if (isNewDeploy) {
+            function finishDeploy(deploySeqOverride) {
+                if (isNewDeploy && isSinglePlayer) {
                     const used = getDeployCount(target.id);
                     const max = getMaxDeploy();
                     if (used >= max) {
@@ -3180,42 +4474,48 @@
                 }
                 if (isNewDeploy) {
                     const max = getMaxDeploy();
+                    const used = getDeployCount(target.id);
                     if (!isSinglePlayer) {
                         logGameActivity("mission_deployed",
-                            `${getPlayer().name} 对 ${target.name} 部署截获任务（${state.deployCounts[target.id]}/${max === 999 ? "∞" : max}）`);
-                        CurrencySafeRoom.updatePlayerProgress(roomId, {
-                            targetId: target.id,
-                            targetName: target.name,
-                            levels: [false, false, false]
-                        });
+                            `${getPlayer().name} 对 ${target.name} 部署截获任务（${used}/${max === 999 ? "∞" : max}）`);
                     }
                 }
                 if (resetAll || !currentIntel || currentIntel.targetId !== target.id) {
-                    currentIntel = buildIntelForTarget(target);
+                    const seq = deploySeqOverride ?? (isNewDeploy ? getDeployCount(target.id) : currentIntel?.deploySeq);
+                    currentIntel = buildIntelForTarget(target, { deploySeq: seq });
+                    if (!currentIntel) return false;
                     breachUnlocked = false;
                     $("passwordGuess").value = "";
                     lastScrolledMissionIdx = -1;
                 }
+                if (isNewDeploy && !isSinglePlayer) {
+                    CurrencySafeRoom.updatePlayerProgress(roomId, {
+                        targetId: target.id,
+                        targetName: target.name,
+                        levels: [false, false, false],
+                        pickedKinds: currentIntel.pickedKinds || []
+                    });
+                }
                 state.missionStats.missionsStarted = (state.missionStats.missionsStarted || 0) + (isNewDeploy && isPracticeMode() ? 1 : 0);
                 saveStateNow();
                 render();
-                typingArcStart = Date.now();
-                if (currentIntel?.games?.[0]) {
-                    currentIntel.games[0].arcProgress = 0;
-                    currentIntel.games[0].arcGraceUntil = null;
-                }
-                startTypingArcIfNeeded();
                 startGridScoutIfNeeded();
                 showTab("attack");
                 scrollToMission(0);
-                showToast(resetAll ? `任务已部署：${target.name}` : `继续任务：${target.name}`);
+                const pickLabel = currentIntel.pickedKinds
+                    ? MissionGames.formatPickedKindsLabel(currentIntel.pickedKinds)
+                    : "";
+                showToast(resetAll
+                    ? `任务已部署：${target.name}${pickLabel ? " · " + pickLabel : ""}`
+                    : `继续任务：${target.name}`);
                 return true;
             }
 
             if (isNewDeploy && !isSinglePlayer) {
-                return Promise.resolve(CurrencySafeRoom.claimTargetDeploy(roomId, target.id)).then(res => {
+                return Promise.resolve(CurrencySafeRoom.claimTeamDeploy(roomId, target.id)).then(res => {
                     if (!res.ok) { showToast(res.error); return false; }
-                    return finishDeploy();
+                    state.deployCounts[target.id] = res.deploySeq;
+                    return finishDeploy(res.deploySeq);
                 });
             }
             return finishDeploy();
@@ -3233,8 +4533,7 @@
             const matchEl = $("hudMatchTime");
             if (matchEl) {
                 if (isSinglePlayer) {
-                    const started = state.matchStartedAt || Date.now();
-                    matchEl.textContent = formatRemaining(started + getRoundMs() - Date.now());
+                    matchEl.textContent = formatRemaining(getSoloMatchRemainingMs());
                 } else {
                     const rem = CurrencySafeRoomShared.getMatchRemainingMs(room);
                     matchEl.textContent = rem != null ? formatRemaining(rem) : "--:--";
@@ -3243,6 +4542,8 @@
             if (!hudBalanceAnimSkip) {
                 $("hudBalance").textContent = player ? money(player.balance) : "0";
             }
+            const balLabel = $("hudBalancePill")?.querySelector("small");
+            if (balLabel) balLabel.textContent = isSinglePlayer ? t("balance") : t("teamVault");
             const target = getOpponent(state.targetId);
             $("hudTargetName").textContent = target ? target.name : t("noTarget");
             if ($("hudMoreRoom")) $("hudMoreRoom").textContent = roomId;
@@ -3279,7 +4580,7 @@
         }
 
         function teamStateColor(team) {
-            return window.getStateColor?.(team?.stateId) || "#5aff9a";
+            return window.getStateColor?.(team?.stateId) || "#38bdf8";
         }
 
         function updateSidebarAlert() {
@@ -3289,7 +4590,15 @@
             if (!player) { bar.classList.add("hidden"); return; }
             let msg = "";
             let warn = false;
-            if (state._wasAttacked) { msg = t("alertAttacked"); warn = true; }
+            if (state._wasAttacked) {
+                const rob = state._lastRobbery;
+                msg = rob
+                    ? t("alertAttackedDetail")
+                        .replace("{name}", rob.attacker)
+                        .replace("{amount}", money(rob.amount))
+                    : t("alertAttacked");
+                warn = true;
+            }
             if (msg) {
                 bar.textContent = msg;
                 bar.classList.toggle("warn", warn);
@@ -3315,7 +4624,7 @@
             const player = getPlayer();
             const target = getOpponent(state.targetId);
             const gamesDone = currentIntel?.games?.filter(g => g.solved).length || 0;
-            const allDone = gamesDone >= 3;
+            const allMinisDone = !!(currentIntel?.games?.length && currentIntel.games.every(g => g.solved));
             flow.querySelectorAll("span").forEach(span => {
                 const step = span.dataset.step;
                 span.classList.remove("active", "done");
@@ -3323,21 +4632,22 @@
                     if (target) span.classList.add("done");
                     else if (player) span.classList.add("active");
                 } else if (step === "play") {
-                    if (allDone) span.classList.add("done");
+                    if (allMinisDone) span.classList.add("done");
                     else if (target) span.classList.add("active");
                 } else if (step === "breach") {
                     if (breachUnlocked) span.classList.add("done");
-                    else if (allDone) span.classList.add("active");
+                    else if (allMinisDone) span.classList.add("active");
                 }
             });
         }
 
         function getActiveMissionIndex() {
             if (!currentIntel) return -1;
+            if (allMinigamesSolved()) return -1;
             for (let i = 0; i < currentIntel.games.length; i++) {
                 if (!currentIntel.games[i]?.solved && isGameUnlocked(i)) return i;
             }
-            return currentIntel.games.every(g => g.solved) ? 2 : 0;
+            return 0;
         }
 
         function updateRegisterTabVisibility() {
@@ -3388,8 +4698,13 @@
             $("playerDisplay").value = player ? player.name : notReady;
             $("transferTo").value = player ? player.name : notReady;
 
-            $("targetTeamSelect").innerHTML = state.opponents.length ? "" :
-                `<option value="">${t("noTarget")}</option>`;
+            $("targetTeamSelect").innerHTML = "";
+            if (!state.opponents.length) {
+                const opt = document.createElement("option");
+                opt.value = "";
+                opt.textContent = t("noTarget");
+                $("targetTeamSelect").appendChild(opt);
+            }
             state.opponents.forEach(team => {
                 const opt = document.createElement("option");
                 opt.value = team.id;
@@ -3397,7 +4712,8 @@
                 opt.textContent = `${team.name}${stateTag} · RM ${money(team.balance)}`;
                 $("targetTeamSelect").appendChild(opt);
             });
-            if (state.targetId && state.opponents.some(o => o.id === state.targetId)) $("targetTeamSelect").value = state.targetId;
+            const hasTarget = state.targetId && state.opponents.some(o => o.id === state.targetId);
+            if (hasTarget) $("targetTeamSelect").value = state.targetId;
             else if (state.opponents[0]) $("targetTeamSelect").value = state.opponents[0].id;
         }
 
@@ -3427,7 +4743,10 @@
             updateMissionFlow();
             renderMiniGames();
             $("breachBtn").disabled = !player || !target;
+            const manualUi = $("breachManualUi");
+            if (manualUi) manualUi.classList.add("hidden");
             $("transferPanel").style.display = breachUnlocked ? "block" : "none";
+            updateRaidLivePreview();
             updateTransferRewardUI();
         }
 
@@ -3452,19 +4771,21 @@
             steps.forEach((el, i) => {
                 const solved = currentIntel.games[i]?.solved;
                 const unlocked = isGameUnlocked(i);
+                const meta = MissionGames.getKindMeta(currentIntel.pickedKinds?.[i]);
+                el.textContent = meta ? meta.icon : String(i + 1);
                 el.classList.toggle("done", solved);
                 el.classList.toggle("active", !solved && unlocked);
-                el.classList.toggle("clickable", solved || unlocked);
-                el.classList.toggle("locked-step", !solved && !unlocked);
-                el.title = !unlocked && !solved ? "请先完成上一关" : (solved ? "点击查看本关情报" : "当前关卡");
-                el.onclick = () => {
-                    if (!unlocked && !solved) {
-                        showToast("请先完成上一关任务。");
-                        return;
-                    }
-                    scrollToMission(i);
-                };
+                el.classList.remove("clickable", "locked-step");
+                if (!unlocked && !solved) el.classList.add("locked-step");
+                const stepName = meta?.shortLabel || `任务 ${i + 1}`;
+                el.title = !unlocked && !solved
+                    ? "请先完成上一项任务"
+                    : (solved ? `${stepName} · 已完成` : `当前：${stepName}`);
+                el.onclick = null;
             });
+            if (allMinigamesSolved() && currentIntel.finale && !currentIntel.finale.solved) {
+                steps.forEach(el => el.classList.remove("active"));
+            }
         }
 
         function isGameUnlocked(idx) {
@@ -3484,18 +4805,14 @@
         }
 
         // --- 游戏1：拦截转账码 ---
-        function stopTypingArc() {
-            if (typingArcTimer) { clearInterval(typingArcTimer); typingArcTimer = null; }
-        }
+        function stopTypingArc() {}
 
         function updateTypingUI() {
-            const game = currentIntel?.games?.[0];
+            const game = findMissionGame("typing");
             if (!game || game.kind !== "typing") return;
-            const fill = document.getElementById("typingArcFill");
             const energyFill = document.getElementById("interceptEnergyFill");
             const giant = document.getElementById("typingGiantChar");
             const prog = document.getElementById("typingProgress");
-            if (fill) fill.style.width = (game.arcProgress * 100).toFixed(0) + "%";
             if (energyFill) energyFill.style.width = (game.interceptEnergy * 100).toFixed(0) + "%";
             if (giant && !game.solved) giant.textContent = game.keyword[game.typedIndex] || "✓";
             if (prog) {
@@ -3506,66 +4823,21 @@
             }
         }
 
-        function startTypingArcIfNeeded() {
-            if (typingArcTimer) return;
-            const game = currentIntel?.games?.[0];
-            if (!game || game.kind !== "typing" || game.solved) return;
-            const cfg = getAgentCfg();
-            typingArcStart = Date.now();
-            typingArcTimer = setInterval(() => {
-                if (!currentIntel?.games?.[0] || currentIntel.games[0].solved) {
-                    stopTypingArc();
-                    return;
-                }
-                const g = currentIntel.games[0];
-                const elapsed = Date.now() - typingArcStart;
-                g.arcProgress = Math.min(1, elapsed / cfg.arcDurationMs);
-                updateTypingUI();
-                if (g.arcProgress >= 1) {
-                    if (!g.arcGraceUntil) {
-                        g.arcGraceUntil = Date.now() + GAME_CONFIG.arcGraceMs;
-                        showToast("密钥即将被截走！3 秒内快敲！");
-                        playAlarmSound();
-                    } else if (Date.now() > g.arcGraceUntil) {
-                        g.arcGraceUntil = null;
-                        g.typedIndex = Math.max(0, g.typedIndex - GAME_CONFIG.arcFailBackoffChars);
-                        g.arcProgress = Math.max(0, g.arcProgress - 0.2);
-                        typingArcStart = Date.now();
-                        trackMissionStat("typingFails", 1);
-                        logLevelFail("typing");
-                        showToast("敌方用了更长密钥，下次盯紧大字母！进度倒退 2 字。");
-                        saveState();
-                    }
-                }
-            }, 80);
-        }
-
         function submitTypingChar(key) {
-            const game = currentIntel?.games?.[0];
-            if (!game || game.kind !== "typing" || game.solved || !isGameUnlocked(0)) return;
+            const game = findMissionGame("typing");
+            const slotIdx = getMissionSlotIndex(game);
+            if (!game || game.kind !== "typing" || game.solved || !isGameUnlocked(slotIdx)) return;
             const expected = game.keyword[game.typedIndex];
             if (key === expected) {
                 game.typedIndex++;
                 game.interceptEnergy = game.typedIndex / game.keyword.length;
-                game.arcProgress = Math.max(0, game.arcProgress - GAME_CONFIG.arcRetreatPerChar);
-                typingArcStart += GAME_CONFIG.arcRetreatPerChar * getAgentCfg().arcDurationMs;
-                game.arcGraceUntil = null;
                 playCoinSound();
                 if (game.typedIndex >= game.keyword.length) {
-                    game.solved = true;
                     game.interceptEnergy = 1;
-                    currentIntel.fragments[0] = game.reveal;
-                    stopTypingArc();
-                    confetti();
-                    playSuccessSound();
-                    showToast("转账密钥截获成功！片段 1 已到手！");
-                    onLevelComplete(0);
-                    renderFragments();
-                    renderMissionSteps();
-                    renderMiniGames();
-                    scrollToMission(1);
-                    showToast("第二关已解锁：破译特工坐标密语 ↓");
-                    saveStateNow();
+                    completeMissionSlot(game, {
+                        beforeOnLevelComplete: () => { playLevelCompleteSound(); },
+                        toast: "转账密钥截获成功！片段已到手！"
+                    });
                     return;
                 }
                 renderFragments();
@@ -3578,13 +4850,14 @@
                     const card = document.getElementById("typingGameCard");
                     if (card) { card.classList.add("signal-warn"); setTimeout(() => card.classList.remove("signal-warn"), 500); }
                     showToast(`信号干扰！还可容错 ${game.mistakesLeft} 次`);
+                    onMissionMistake();
                 } else {
                     trackMissionStat("typingFails", 1);
                     logLevelFail("typing");
                     showToast("拦截失败！密钥飘走了，重来！");
                     game.typedIndex = Math.max(0, game.typedIndex - 1);
                     game.mistakesLeft = getAgentCfg().mistakes;
-                    typingArcStart = Date.now();
+                    onMissionMistake();
                 }
                 updateTypingUI();
                 saveState();
@@ -3594,9 +4867,12 @@
         function handleTypingKey(e) {
             const attackTab = document.getElementById("attack");
             if (!attackTab || !attackTab.classList.contains("active")) return;
+            if (hostEndKeyTimer) return;
+            if (e.repeat) return;
             if (e.target && ["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName) && e.target.id !== "typingFocusTrap") return;
-            const game = currentIntel?.games?.[0];
-            if (!game || game.kind !== "typing" || game.solved || !isGameUnlocked(0)) return;
+            const game = findMissionGame("typing");
+            const slotIdx = getMissionSlotIndex(game);
+            if (!game || game.kind !== "typing" || game.solved || !isGameUnlocked(slotIdx)) return;
             if (e.ctrlKey || e.metaKey || e.altKey) return;
             const key = e.key.length === 1 ? e.key.toUpperCase() : "";
             if (!key) return;
@@ -3610,9 +4886,9 @@
             const cur = game.keyword[game.typedIndex] || "✓";
             const eliteWord = cfg.showWholeWord ? `<p class="cipher">整词传输：${escapeHtml(game.keyword)}</p>` : "";
             return `
-                <div class="mini-game-card ${game.solved ? "solved" : ""} ${locked ? "locked" : ""}" id="miniGame0">
+                <div class="mini-game-card ${game.solved ? "solved" : ""} ${locked ? "locked" : ""}" id="miniGame${idx}">
                     <h3>${game.solved ? "✅" : "💰"} ${game.title}</h3>
-                    <p class="muted">从 <strong>${escapeHtml(game.originLabel)}</strong> 飞向你的基地的转账密钥正在传输！在光点到达前逐字截获。</p>
+                    <p class="muted">从 <strong>${escapeHtml(game.originLabel)}</strong> 发往你基地的转账密钥正在传输，逐字截获即可。</p>
                     ${eliteWord}
                     ${game.solved ? `<div class="reveal">密钥片段：<strong>${escapeHtml(game.reveal)}</strong></div>
                     <div class="agent-note">${escapeHtml(game.agentNote || "")}</div>` : `
@@ -3624,8 +4900,7 @@
                             <small>拦截能量（满格解锁片段，不再中途刷金币）</small>
                             <div class="intercept-energy-bar"><div class="intercept-energy-fill" id="interceptEnergyFill" style="width:${(game.interceptEnergy*100).toFixed(0)}%"></div></div>
                         </div>
-                        <div class="arc-bar-wrap"><div class="arc-bar-fill" id="typingArcFill" style="width:${(game.arcProgress*100).toFixed(0)}%"></div></div>
-                        <p class="muted" style="font-size:.82rem">容错剩余：${game.mistakesLeft} 次 · 敲对一字弧线会回退 · 请用键盘输入</p>
+                        <p class="muted" style="font-size:.82rem">容错剩余：${game.mistakesLeft} 次 · 请用键盘输入</p>
                         <input id="typingFocusTrap" style="opacity:0;position:absolute;width:1px;height:1px" autocomplete="off" />
                     </div>`}
                 </div>`;
@@ -3692,14 +4967,39 @@
             return false;
         }
 
-        function repairDialGame(game) {
-            if (!game || game.kind !== "dial") return;
+        function migrateDialGame(game) {
+            if (!game || game.kind !== "dial" || game.solved || game._dialShiftFixed) return;
             const shift = game.shift ?? 3;
+            const reveal = game.reveal || "";
+            const initial = game.initialCipher || game.cipherDisplay || "";
+            if (!reveal || initial !== reveal) return;
             game.wheels.forEach(w => {
                 w.kind = dialWheelKind(w);
-                if (w.kind === "digit" && w.current === w.target && !game.solved) {
+                if (w.kind === "letter") {
+                    w.current = shiftLetter(w.target, shift);
+                    w.reelOffset = defaultReelOffset(w.current);
+                } else if (w.kind === "digit") {
                     w.current = shiftDigit(w.target, shift);
+                    w.reelOffset = defaultDigitReelOffset(w.current);
                 }
+            });
+            game.cipherDisplay = game.wheels.map(w => w.current).join("");
+            game.initialCipher = game.cipherDisplay;
+            game.initialWheels = game.wheels.map(w => ({
+                current: w.current,
+                reelOffset: w.reelOffset ?? 0,
+                isLetter: w.isLetter,
+                kind: w.kind,
+                target: w.target
+            }));
+            game._dialShiftFixed = true;
+        }
+
+        function repairDialGame(game) {
+            if (!game || game.kind !== "dial") return;
+            migrateDialGame(game);
+            game.wheels.forEach(w => {
+                w.kind = dialWheelKind(w);
                 if (w.kind === "letter" && w.reelOffset == null) w.reelOffset = defaultReelOffset(w.current);
                 if (w.kind === "digit" && w.reelOffset == null) w.reelOffset = defaultDigitReelOffset(w.current);
             });
@@ -3714,18 +5014,11 @@
                     target: w.target
                 }));
             } else {
-                let touched = false;
                 game.initialWheels.forEach((init, i) => {
                     const w = game.wheels[i];
                     if (!init || !w) return;
                     init.kind = init.kind || dialWheelKind(w);
-                    if (init.kind === "digit" && init.current === init.target && !game.solved) {
-                        init.current = shiftDigit(init.target, shift);
-                        init.reelOffset = defaultDigitReelOffset(init.current);
-                        touched = true;
-                    }
                 });
-                if (touched) game.initialCipher = game.initialWheels.map(x => x.current).join("");
             }
         }
 
@@ -3790,7 +5083,6 @@
 
             reelEl.addEventListener("mousedown", (e) => {
                 if (e.button !== 0 || game.solved) return;
-                repairDialGame(game);
                 const wheel = game.wheels[wheelIdx];
                 const startY = e.clientY;
                 const startOffset = wheel.reelOffset ?? (dialWheelKind(wheel) === "digit"
@@ -3821,15 +5113,17 @@
         }
 
         function bindAllSlotReels() {
-            const game = currentIntel?.games?.[1];
-            if (!game || game.kind !== "dial" || game.solved) return;
-            repairDialGame(game);
-            const card = document.getElementById("miniGame1");
-            if (!card) return;
-            card.querySelectorAll(".slot-reel.interactive").forEach(reel => {
-                const wi = Number(reel.dataset.wheel);
-                updateSlotReelVisual(reel, game.wheels[wi], false);
-                bindSlotReel(reel, game, 1, wi);
+            if (!currentIntel?.games) return;
+            currentIntel.games.forEach((game, idx) => {
+                if (game.kind !== "dial" || game.solved) return;
+                repairDialGame(game);
+                const card = document.getElementById("miniGame" + idx);
+                if (!card) return;
+                card.querySelectorAll(".slot-reel.interactive").forEach(reel => {
+                    const wi = Number(reel.dataset.wheel);
+                    updateSlotReelVisual(reel, game.wheels[wi], false);
+                    bindSlotReel(reel, game, idx, wi);
+                });
             });
         }
 
@@ -3851,7 +5145,7 @@
                 }
             });
             game.cipherDisplay = game.initialCipher || game.wheels.map(x => x.current).join("");
-            syncDialGameUI(game, 1);
+            syncDialGameUI(game, getMissionSlotIndex(game));
             playClickSound();
             showToast(t("dialResetDone"));
             saveStateNow();
@@ -3877,18 +5171,14 @@
             const card = document.getElementById("miniGame" + gameIdx);
             const reel = card?.querySelector(`.slot-reel[data-wheel="${wheelIdx}"]`);
             if (checkDialSolved(game)) {
-                game.solved = true;
-                currentIntel.fragments[1] = game.reveal;
-                state.dialLessonSeen = true;
-                if (window.flashMapCity) window.flashMapCity(game.city.lat, game.city.lon, game.city.label);
-                confetti();
-                playSuccessSound();
-                showToast(`密电片段已恢复！坐标 ${game.city.label} 只是掩护情报。`);
-                onLevelComplete(1);
-                renderFragments();
-                renderMissionSteps();
-                renderMiniGames();
-                scrollToMission(2);
+                completeMissionSlot(game, {
+                    beforeOnLevelComplete: () => {
+                        state.dialLessonSeen = true;
+                        if (window.flashMapCity) window.flashMapCity(game.city.lat, game.city.lon, game.city.label);
+                        playLevelCompleteSound();
+                    },
+                    toast: `密电片段已恢复！坐标 ${game.city.label} 只是掩护情报。`
+                });
             } else {
                 game.cipherDisplay = game.wheels.map(x => x.current).join("");
                 if (card) {
@@ -3922,7 +5212,7 @@
             repairDialGame(game);
             const wheelsHtml = game.wheels.map((w, wi) => renderSlotWheel(w, wi, game, idx)).join("");
             return `
-                <div class="mini-game-card ${game.solved ? "solved" : ""} ${locked ? "locked" : ""}" id="miniGame1">
+                <div class="mini-game-card ${game.solved ? "solved" : ""} ${locked ? "locked" : ""}" id="miniGame${idx}">
                     <h3>${game.solved ? "✅" : "🗺️"} ${game.title}</h3>
                     <p class="muted">总部在 <strong>${escapeHtml(game.city.label)}</strong> 截获密电（掩护坐标，不是答案）：</p>
                     <p class="cipher" style="text-align:center">${escapeHtml(game.cipherDisplay)}</p>
@@ -4014,7 +5304,7 @@
         function vaultLevelReset(game) {
             game.solved = false;
             game.phase = "ready";
-            game.scoutCountdown = 3;
+            game.scoutCountdown = GRID_SCOUT_SEC;
             game.shields = 3;
             game.scansLeft = 2;
             game.meltdownSec = 0;
@@ -4035,7 +5325,7 @@
                 } else if (game.phase === "meltdown") {
                     banner.textContent = `核冷却系统触发自毁倒计时 ${game.meltdownSec} 秒！`;
                 } else if (game.phase === "scan_flash") {
-                    banner.textContent = "热感扫描：亮灯 2 秒——只显示换位后的激光！";
+                    banner.textContent = "热感扫描：亮灯 1 秒——只显示换位后的激光！";
                 } else if (game.solved) {
                     banner.textContent = "核能宝石已到手，潜入成功！";
                 } else {
@@ -4063,7 +5353,7 @@
             updateGridHud(game);
             renderMiniGames();
             gridMeltdownTimer = setInterval(() => {
-                const g = currentIntel?.games?.[2];
+                const g = findMissionGame("grid");
                 if (!g || g.phase !== "meltdown") { stopGridMeltdownTimer(); return; }
                 g.meltdownSec--;
                 updateGridHud(g);
@@ -4080,7 +5370,7 @@
         function vaultStartScout(game) {
             if (!game || game.solved || game.phase !== "ready") return;
             game.phase = "scout";
-            game.scoutCountdown = 3;
+            game.scoutCountdown = GRID_SCOUT_SEC;
             showToast("开牌！盯住起点到宝石之间的绿色安全走廊！");
             renderMiniGames();
             startGridScoutIfNeeded();
@@ -4088,14 +5378,14 @@
         }
 
         function startGridScoutIfNeeded() {
-            const game = currentIntel?.games?.[2];
+            const game = findMissionGame("grid");
             if (!game || game.kind !== "grid" || game.solved || game.phase !== "scout") {
                 stopGridScoutTimer();
                 return;
             }
             if (gridScoutTimer) return;
             gridScoutTimer = setInterval(() => {
-                const g = currentIntel?.games?.[2];
+                const g = findMissionGame("grid");
                 if (!g || g.solved || g.phase !== "scout") { stopGridScoutTimer(); return; }
                 g.scoutCountdown--;
                 updateGridHud(g);
@@ -4116,19 +5406,19 @@
             reshuffleVaultLasers(game);
             game.revealed = {};
             game.phase = "scan_flash";
-            showToast("激光阵已换位！亮灯 2 秒——只显示新的激光位置。");
+            showToast("激光阵已换位！亮灯 1 秒——只显示新的激光位置。");
             renderMiniGames();
             saveState();
             if (gridScanTimeout) clearTimeout(gridScanTimeout);
             gridScanTimeout = setTimeout(() => {
                 gridScanTimeout = null;
-                const g = currentIntel?.games?.[2];
+                const g = findMissionGame("grid");
                 if (!g || g.solved) return;
                 g.phase = "hidden";
                 showToast("扫描结束！继续摸黑前进。");
                 renderMiniGames();
                 saveState();
-            }, 2000);
+            }, GRID_SCAN_FLASH_MS);
         }
 
         function vaultCellIcon(type, isPlayer, inPath) {
@@ -4195,7 +5485,7 @@
 
         function vaultCellClick(game, r, c) {
             if (!game || game.kind !== "grid" || !game.grid?.[r] || game.grid[r][c] === undefined) return;
-            if (game.solved || !isGameUnlocked(2)) return;
+            if (game.solved || !isGameUnlocked(getMissionSlotIndex(game))) return;
             if (game.phase === "scout" || game.phase === "scan_flash" || game.phase === "meltdown" || game.phase === "ready") return;
             if (game.playerPos.r === r && game.playerPos.c === c) return;
             if (!isAdjacent(game.playerPos, { r, c })) {
@@ -4217,6 +5507,7 @@
                     showToast(game.shields > 0
                         ? `哔——！踩到激光阵！特工护盾剩余 ${game.shields} 次。`
                         : "哔——！护盾耗尽！再踩雷将触发自毁倒计时！");
+                    onMissionMistake();
                     renderFragments();
                     renderMissionSteps();
                     renderMiniGames();
@@ -4235,18 +5526,17 @@
             }
 
             if (r === game.end.r && c === game.end.c) {
-                game.solved = true;
-                game.footprint = pathToFootprint(game.playerPath);
-                currentIntel.fragments[2] = game.reveal;
-                if (!state.gridAdvancedUnlocked) {
-                    state.gridAdvancedUnlocked = true;
-                    saveStateNow();
-                }
-                stopGridPhaseTimers();
-                confetti();
-                playSuccessSound();
-                showToast("总部用你的路线生成了第三段密钥！");
-                onLevelComplete(2);
+                completeMissionSlot(game, {
+                    beforeOnLevelComplete: () => {
+                        game.footprint = pathToFootprint(game.playerPath);
+                        if (!state.gridAdvancedUnlocked) {
+                            state.gridAdvancedUnlocked = true;
+                        }
+                        stopGridPhaseTimers();
+                        playLevelCompleteSound();
+                    },
+                    toast: "总部用你的路线生成了密钥片段！"
+                });
             }
             renderFragments();
             renderMissionSteps();
@@ -4271,7 +5561,7 @@
                 : game.phase === "scout"
                 ? "阶段一·开牌：记住绿色安全走廊，从左上角「入」走到右下角 💎。"
                 : game.phase === "scan_flash"
-                    ? "热感扫描：亮灯 2 秒，只显示换位后的激光位置（🚨）。"
+                    ? "热感扫描：亮灯 1 秒，只显示换位后的激光位置（🚨）。"
                     : "阶段二·关灯：摸黑点击相邻格子；踩雷扣护盾，不重置整关。";
             const startBlock = !locked && !game.solved && game.phase === "ready"
                 ? `<div class="vault-start-wrap">
@@ -4281,7 +5571,7 @@
                    </div>`
                 : "";
             return `
-                <div class="mini-game-card ${game.solved ? "solved" : ""} ${locked ? "locked" : ""}" id="miniGame2">
+                <div class="mini-game-card ${game.solved ? "solved" : ""} ${locked ? "locked" : ""}" id="miniGame${idx}">
                     <h3>${game.solved ? "✅" : "🚨"} ${game.title}</h3>
                     <div class="vault-hud">
                         <span class="vault-shields" id="gridShields">${"❤️".repeat(game.shields || 0)}</span>
@@ -4300,6 +5590,183 @@
                 </div>`;
         }
 
+        function getMiniGameRenderHelpers() {
+            return { escapeHtml };
+        }
+
+        function getMissionGameCtx() {
+            const target = getOpponent(state.targetId);
+            const room = CurrencySafeRoom.getRoom(roomId);
+            return {
+                password: target?.password || "",
+                target,
+                player: getPlayer(),
+                competitive: !isSinglePlayer && room?.mode === "competitive"
+            };
+        }
+
+        function onMastermindSubmit(game, idx) {
+            if (!game || game.kind !== "mastermind" || !isGameUnlocked(idx)) return;
+            const res = MissionMastermind.submitGuess(game);
+            if (!res.ok) {
+                if (res.reason === "incomplete") showToast("请先选满四色再提交。");
+                return;
+            }
+            if (res.win) {
+                completeMissionSlot(game, {
+                    beforeOnLevelComplete: () => { playLevelCompleteSound(); },
+                    toast: "四色核密码破解成功！"
+                });
+                return;
+            }
+            if (res.exhausted) {
+                const frag = game.reveal;
+                const nextMistakes = (game.mistakes || 0) + 1;
+                const fresh = MissionMastermind.generate(frag, getMissionGameCtx());
+                Object.assign(game, fresh, {
+                    slotIndex: game.slotIndex,
+                    kind: "mastermind",
+                    mistakes: nextMistakes
+                });
+                showToast("试探次数用尽，密码已重置——再试一次！");
+                onMissionMistake();
+                renderMiniGames();
+                saveStateNow();
+                return;
+            }
+            const card = document.getElementById("miniGame" + idx);
+            if (card) shake(card);
+            showToast(`反馈：${res.greens} 绿 · ${res.yellows} 黄`);
+            renderMiniGames();
+            saveStateNow();
+        }
+
+        function onFragsortLock(game, idx) {
+            if (!game || game.kind !== "fragsort" || !isGameUnlocked(idx)) return;
+            const res = MissionFragsort.lockOrder(game);
+            if (res.win) {
+                completeMissionSlot(game, {
+                    beforeOnLevelComplete: () => { playLevelCompleteSound(); },
+                    toast: "碎片顺序正确，密钥段已拼接！"
+                });
+                return;
+            }
+            const card = document.getElementById("miniGame" + idx);
+            if (card) shake(card);
+            showToast(res.hint ? "顺序不对！已将 ① 提示到最左侧。" : "顺序不对，继续调整碎片。");
+            onMissionMistake();
+            renderMiniGames();
+            saveStateNow();
+        }
+
+        function bindMastermindAndFragsortEvents() {
+            const grid = $("puzzleGrid");
+            if (!grid) return;
+            const helpers = getMiniGameRenderHelpers();
+
+            grid.querySelectorAll("[data-mm-color]").forEach(btn => {
+                btn.onclick = () => {
+                    const idx = Number(btn.dataset.mmIdx);
+                    const game = currentIntel?.games?.[idx];
+                    if (!game || game.kind !== "mastermind" || game.solved || !isGameUnlocked(idx)) return;
+                    MissionMastermind.pickColor(game, btn.dataset.mmColor);
+                    saveStateNow();
+                    renderMiniGames();
+                };
+            });
+            grid.querySelectorAll("[data-mm-slot]").forEach(btn => {
+                btn.onclick = () => {
+                    const card = btn.closest(".mini-game-card");
+                    const idx = Number((card?.id || "").replace("miniGame", ""));
+                    const game = currentIntel?.games?.[idx];
+                    if (!game || game.kind !== "mastermind") return;
+                    game.activeSlot = Number(btn.dataset.mmSlot);
+                    renderMiniGames();
+                };
+            });
+            grid.querySelectorAll("[data-mm-clear]").forEach(btn => {
+                btn.onclick = () => {
+                    const game = currentIntel?.games?.[Number(btn.dataset.mmClear)];
+                    if (!game) return;
+                    MissionMastermind.clearPick(game);
+                    renderMiniGames();
+                    saveStateNow();
+                };
+            });
+            grid.querySelectorAll("[data-mm-submit]").forEach(btn => {
+                btn.onclick = () => onMastermindSubmit(currentIntel?.games?.[Number(btn.dataset.mmSubmit)], Number(btn.dataset.mmSubmit));
+            });
+            grid.querySelectorAll("[data-fs-lock]").forEach(btn => {
+                btn.onclick = () => onFragsortLock(currentIntel?.games?.[Number(btn.dataset.fsLock)], Number(btn.dataset.fsLock));
+            });
+
+            let fsDrag = { gameIdx: -1, from: -1 };
+            grid.querySelectorAll(".fs-card[draggable='true']").forEach(el => {
+                el.addEventListener("dragstart", (e) => {
+                    fsDrag = { gameIdx: Number(el.dataset.fsIdx), from: Number(el.dataset.fsPos) };
+                    e.dataTransfer.effectAllowed = "move";
+                });
+                el.addEventListener("dragover", (e) => e.preventDefault());
+                el.addEventListener("drop", (e) => {
+                    e.preventDefault();
+                    const game = currentIntel?.games?.[fsDrag.gameIdx];
+                    if (!game || game.kind !== "fragsort") return;
+                    MissionFragsort.moveCard(game, fsDrag.from, Number(el.dataset.fsPos));
+                    renderMiniGames();
+                    saveStateNow();
+                });
+            });
+        }
+
+        function onBinaryPick(game, idx, value) {
+            if (!game || game.kind !== "binary" || game.solved || !isGameUnlocked(idx)) return;
+            const res = MissionBinary.pickAnswer(game, value);
+            if (!res.ok) return;
+            if (res.win) {
+                completeMissionSlot(game, {
+                    beforeOnLevelComplete: () => { playLevelCompleteSound(); },
+                    toast: "机器人密语破解成功！"
+                });
+                return;
+            }
+            const card = document.getElementById("miniGame" + idx);
+            if (card) shake(card);
+            if (res.wrong) onMissionMistake();
+            showToast(res.wrong
+                ? "数字不对，机器人拒绝开门！"
+                : `正确！进度 ${game.round}/${game.roundsNeeded}`);
+            renderMiniGames();
+            saveStateNow();
+        }
+
+        function bindFinaleEvents() {
+            const grid = $("puzzleGrid");
+            if (!grid) return;
+            grid.querySelectorAll("[data-finale-lock]").forEach(btn => {
+                btn.onclick = () => onFinaleLock();
+            });
+            grid.querySelectorAll("[data-finale-pos]").forEach(el => {
+                el.addEventListener("dragstart", (e) => {
+                    if (!currentIntel?.finale || currentIntel.finale.solved) return;
+                    currentIntel.finale.dragFrom = Number(el.dataset.finalePos);
+                    e.dataTransfer?.setData("text/plain", el.dataset.finalePos);
+                });
+                el.addEventListener("dragover", (e) => e.preventDefault());
+                el.addEventListener("drop", (e) => {
+                    e.preventDefault();
+                    const finale = currentIntel?.finale;
+                    if (!finale || finale.solved) return;
+                    const from = finale.dragFrom;
+                    const to = Number(el.dataset.finalePos);
+                    if (from == null || from === to) return;
+                    MissionFinale.moveCard(finale, from, to);
+                    finale.dragFrom = null;
+                    renderMiniGames();
+                    saveStateNow();
+                });
+            });
+        }
+
         function renderMiniGames() {
             const grid = $("puzzleGrid");
             grid.innerHTML = "";
@@ -4307,15 +5774,39 @@
                 grid.innerHTML = `<div class="notice">请先加载目标情报。</div>`;
                 return;
             }
-            currentIntel.games.forEach((game, idx) => {
-                let html = "";
-                if (game.kind === "typing") html = renderTypingGame(game, idx);
-                else if (game.kind === "dial") html = renderDialGame(game, idx);
-                else if (game.kind === "grid") html = renderGridGame(game, idx);
-                const wrap = document.createElement("div");
-                wrap.innerHTML = html;
-                grid.appendChild(wrap.firstElementChild);
-            });
+
+            const target = getOpponent(state.targetId);
+            if (target) ensureIntelFinale(currentIntel, target);
+
+            if (allMinigamesSolved()) {
+                if (currentIntel.finale && !currentIntel.finale.solved) {
+                    grid.innerHTML = MissionFinale.render(currentIntel.finale, getMiniGameRenderHelpers());
+                    bindFinaleEvents();
+                    return;
+                }
+                if (breachUnlocked) {
+                    grid.innerHTML = `<div class="notice success">三关任务与密钥组合已完成，请在下方确认转账。</div>`;
+                } else {
+                    grid.innerHTML = `<div class="notice">三关已完成，请组合密钥片段。</div>`;
+                }
+                return;
+            }
+
+            const activeIdx = getActiveMissionIndex();
+            if (activeIdx < 0) return;
+
+            const game = currentIntel.games[activeIdx];
+            const miniHelpers = getMiniGameRenderHelpers();
+            let html = "";
+            if (game.kind === "typing") html = renderTypingGame(game, activeIdx);
+            else if (game.kind === "dial") html = renderDialGame(game, activeIdx);
+            else if (game.kind === "grid") html = renderGridGame(game, activeIdx);
+            else if (game.kind === "mastermind") html = MissionMastermind.render(game, activeIdx, false, miniHelpers);
+            else if (game.kind === "fragsort") html = MissionFragsort.render(game, activeIdx, false, miniHelpers);
+            else if (game.kind === "binary") html = MissionBinary.render(game, activeIdx, false, miniHelpers);
+            const wrap = document.createElement("div");
+            wrap.innerHTML = html;
+            grid.appendChild(wrap.firstElementChild);
 
             grid.querySelectorAll("[data-dial-reset]").forEach(btn => {
                 btn.onclick = (e) => {
@@ -4336,38 +5827,34 @@
                     vaultCellClick(g, Number(cell.dataset.gr), Number(cell.dataset.gc));
                 };
             });
-            const g3 = currentIntel.games[2];
-            if (g3?.kind === "grid") {
-                updateGridHud(g3);
+            const gridGame = currentIntel.games[activeIdx]?.kind === "grid" ? currentIntel.games[activeIdx] : null;
+            if (gridGame?.kind === "grid") {
+                updateGridHud(gridGame);
                 startGridScoutIfNeeded();
             }
             const trap = document.getElementById("typingFocusTrap");
-            if (trap && currentIntel.games[0] && !currentIntel.games[0].solved && isGameUnlocked(0)) {
+            const typingActive = game.kind === "typing" ? game : null;
+            if (trap && typingActive && !typingActive.solved) {
                 trap.focus();
                 updateTypingUI();
             }
 
-            const activeIdx = getActiveMissionIndex();
-            grid.querySelectorAll(".mini-game-card").forEach((card, idx) => {
-                const game = currentIntel.games[idx];
-                card.onclick = null;
-                card.classList.remove("mission-collapsed");
-                if (game?.solved) {
-                    card.classList.add("mission-collapsed");
-                    card.onclick = (e) => {
-                        if (e.target.closest("button") || e.target.closest(".vault-cell") || e.target.closest(".slot-reel")) return;
-                        card.classList.toggle("mission-collapsed");
-                    };
-                }
-            });
-            if (activeIdx >= 0 && activeIdx !== lastScrolledMissionIdx) {
+            if (activeIdx !== lastScrolledMissionIdx) {
                 lastScrolledMissionIdx = activeIdx;
                 const card = document.getElementById("miniGame" + activeIdx);
-                if (card && !card.classList.contains("mission-collapsed")) {
+                if (card) {
                     requestAnimationFrame(() => card.scrollIntoView({ behavior: "smooth", block: "nearest" }));
                 }
             }
             bindAllSlotReels();
+            bindMastermindAndFragsortEvents();
+            grid.querySelectorAll("[data-binary-pick]").forEach(btn => {
+                btn.onclick = () => onBinaryPick(
+                    currentIntel.games[Number(btn.dataset.binaryPick)],
+                    Number(btn.dataset.binaryPick),
+                    btn.dataset.binaryVal
+                );
+            });
         }
 
         function autofillPassword() {
@@ -4387,7 +5874,7 @@
                     breachUnlocked = true;
                     saveStateNow();
                     render();
-                    confetti();
+                    playLevelCompleteSound();
                     showToast(`金库破解成功：${target.name} 已解锁！`);
                     return;
                 }
@@ -4397,7 +5884,7 @@
                     syncFromRoom();
                     syncProgressToRoom();
                     render();
-                    confetti();
+                    playLevelCompleteSound();
                     showToast(`金库破解成功：${target.name} 已解锁！`);
                 });
             } else {
@@ -4406,14 +5893,21 @@
             }
         }
 
-        function finishTransferFx(oldBal, newBal, toastMsg) {
-            confetti();
+        function applyMoneyGainFx(oldBal, newBal, toastMsg, opts) {
+            opts = opts || {};
+            if (opts.confetti !== false) confetti({ zone: "mission", light: false });
             playCoinSound();
-            showToast(toastMsg);
+            if (toastMsg) showToast(toastMsg);
             hudBalanceAnimSkip = true;
             render();
-            hudBalanceAnimSkip = false;
-            if (window.CurrencySafeFx) CurrencySafeFx.animateHudBalance(oldBal, newBal);
+            const finishAnim = () => { hudBalanceAnimSkip = false; };
+            if (window.CurrencySafeFx) {
+                CurrencySafeFx.animateHudBalance(oldBal, newBal).then(finishAnim);
+            } else finishAnim();
+        }
+
+        function finishTransferFx(oldBal, newBal, toastMsg) {
+            applyMoneyGainFx(oldBal, newBal, toastMsg);
         }
 
         function doTransfer() {
@@ -4449,20 +5943,36 @@
                 $("passwordGuess").value = "";
                 drawRoute(target, player);
                 saveState();
-                startTypingArcIfNeeded();
                 startGridScoutIfNeeded();
                 finishTransferFx(oldBal, player.balance,
                     `RM ${amt} 已从 ${target.name} 转入 ${player.name}。目标密码已轮换。`);
                 return;
             }
             const oldBal = player.balance;
-            Promise.resolve(CurrencySafeRoom.applyTransfer(roomId, target.id, amount)).then(res => {
+            const mistakes = sumIntelMistakes(currentIntel);
+            const transferPromise = isBankTarget(target.id)
+                ? CurrencySafeRoom.applyBankTransfer(roomId, amount)
+                : CurrencySafeRoom.applyTransfer(roomId, target.id, { mistakes });
+            Promise.resolve(transferPromise).then(res => {
                 if (!res.ok) { showToast(res.error); return; }
-                player.balance = res.attacker.balance;
-                target.balance = res.target.balance;
-                target.password = res.target.password;
-                target.passwordUpdatedAt = res.target.passwordUpdatedAt;
-                target._syncedPasswordAt = res.target.passwordUpdatedAt;
+                const freshRoom = CurrencySafeRoom.getRoom(roomId);
+                applyTeamVaultToDisplay(freshRoom, player, csClientId);
+                if (isBankTarget(target.id)) {
+                    const bank = res.bank;
+                    target.balance = bank.balance;
+                    target.password = bank.password;
+                    target.passwordUpdatedAt = bank.passwordUpdatedAt;
+                    target._syncedPasswordAt = bank.passwordUpdatedAt;
+                    state.bankTarget = target;
+                } else {
+                    const vicTeam = res.victimTeam;
+                    target.balance = vicTeam ? (vicTeam.vaultBalance ?? 0) : 0;
+                    if (vicTeam?.password) {
+                        target.password = vicTeam.password;
+                        target.passwordUpdatedAt = vicTeam.passwordUpdatedAt;
+                        target._syncedPasswordAt = vicTeam.passwordUpdatedAt;
+                    }
+                }
                 state._syncSnapshot = {
                     balance: player.balance,
                     password: player.password,
@@ -4477,10 +5987,9 @@
                 syncFromRoom();
                 syncProgressToRoom();
                 saveState();
-                startTypingArcIfNeeded();
                 startGridScoutIfNeeded();
                 finishTransferFx(oldBal, player.balance,
-                    `RM ${amount} 已从 ${target.name} 转入 ${player.name}。目标密码已轮换。`);
+                    `RM ${res.amount ?? amount} 已从 ${target.name} 转入队库。目标密码已轮换。`);
             });
         }
 
@@ -4508,10 +6017,12 @@
             const box = $("mapLeaderboard");
             if (!box) return;
             const medals = ["🥇", "🥈", "🥉"];
-            const allTeams = getAllTeams().sort((a, b) => b.balance - a.balance);
+            const allTeams = getLeaderboardTeams().sort((a, b) => b.balance - a.balance);
             const top3 = allTeams.slice(0, 3);
             const player = getPlayer();
-            const myRank = player ? allTeams.findIndex(t => t.id === player.id) + 1 : 0;
+            const myRank = player
+                ? allTeams.findIndex(t => t.id === player.teamId || t.id === player.id) + 1
+                : 0;
             let html = "";
             for (let i = 0; i < 3; i++) {
                 const team = top3[i];
@@ -4540,7 +6051,7 @@
         function renderMapStats() {
             const player = getPlayer();
             const room = CurrencySafeRoom.getRoom(roomId);
-            const teams = getAllTeams();
+            const teams = getLeaderboardTeams();
             const txs = room?.transactions || state.transactions || [];
             if ($("totalMoney")) $("totalMoney").textContent = "RM " + money(teams.reduce((sum, t) => sum + t.balance, 0));
             if ($("totalTransfers")) $("totalTransfers").textContent = String(txs.length);
@@ -4549,9 +6060,42 @@
             updateTransferRewardUI();
         }
 
+        function renderPlayerLeaderboard() {
+            const box = $("playerScoreboard");
+            if (!box) return;
+            if (isSinglePlayer) {
+                box.innerHTML = `<div class="notice">${t("soloNoPlayerBoard")}</div>`;
+                return;
+            }
+            const room = CurrencySafeRoom.getRoom(roomId);
+            if (!room?.players?.length) {
+                box.innerHTML = `<div class="notice">${t("notRegistered")}</div>`;
+                return;
+            }
+            const stats = room.playerStats || {};
+            const rows = room.players.map(p => {
+                const st = stats[p.id] || {};
+                const raid = Number(st.raidEarned) || 0;
+                const bonus = Number(st.bonusEarned) || 0;
+                return { ...p, raid, bonus, total: raid + bonus };
+            }).sort((a, b) => b.total - a.total);
+            box.innerHTML = "";
+            rows.forEach((p, idx) => {
+                const row = document.createElement("div");
+                row.className = "score-row";
+                const team = (room.teams || []).find(t => t.id === p.teamId);
+                const stateLabel = team?.state ? escapeHtml(team.state) + " · " : "";
+                row.innerHTML =
+                    `<div class="rank">${idx + 1}</div><div><b>${escapeHtml(p.name)}</b>` +
+                    `<span>${stateLabel}${t("playerEarnedMeta").replace("{raid}", money(p.raid)).replace("{bonus}", money(p.bonus))}</span></div>` +
+                    `<div class="money">RM ${money(p.total)}</div>`;
+                box.appendChild(row);
+            });
+        }
+
         function renderScoreboard() {
             const box = $("scoreboard");
-            const teams = getAllTeams().sort((a, b) => b.balance - a.balance);
+            const teams = getLeaderboardTeams().sort((a, b) => b.balance - a.balance);
             box.innerHTML = teams.length ? "" : `<div class="notice">${t("notRegistered")}</div>`;
             teams.forEach((team, idx) => {
                 const row = document.createElement("div");
@@ -4567,23 +6111,83 @@
             });
         }
 
+        const RAID_ACTIVITY_TYPES = new Set(["transfer", "vault_breach"]);
+        const RAID_ACTIVITY_LABELS = {
+            transfer: "activityTransfer",
+            vault_breach: "activityBreach"
+        };
+
+        function getRaidActivityFeed(room) {
+            const raw = room?.activity;
+            const list = Array.isArray(raw) ? raw : (raw ? Object.values(raw) : []);
+            return list.filter(a => RAID_ACTIVITY_TYPES.has(a.type));
+        }
+
+        function renderRaidActivity() {
+            if (isSinglePlayer) return;
+            const room = CurrencySafeRoom.getRoom(roomId);
+            const feed = getRaidActivityFeed(room);
+            const compact = $("raidActivityFeed");
+            const full = $("scoreActivityFeed");
+            const renderItem = (a) => {
+                const labelKey = RAID_ACTIVITY_LABELS[a.type] || a.type;
+                const tag = t(labelKey);
+                const time = a.at ? new Date(a.at).toLocaleTimeString() : "";
+                return `<div class="${compact ? "raid-act-item" : "act-item"}" data-type="${escapeHtml(a.type || "")}">` +
+                    (compact ? `<strong>[${escapeHtml(tag)}]</strong> ` : `<span class="act-tag">${escapeHtml(tag)}</span>`) +
+                    `${escapeHtml(a.message || "")}` +
+                    (time ? ` <span class="muted">${escapeHtml(time)}</span>` : "") +
+                    `</div>`;
+            };
+            if (compact) {
+                const recent = feed.slice(0, 3);
+                if (!recent.length) {
+                    compact.classList.add("hidden");
+                    compact.innerHTML = "";
+                } else {
+                    compact.classList.remove("hidden");
+                    compact.innerHTML = recent.map(renderItem).join("");
+                }
+            }
+            if (full) {
+                const recent = feed.slice(0, 8);
+                full.innerHTML = recent.length
+                    ? recent.map(renderItem).join("")
+                    : `<div class="act-item muted">—</div>`;
+            }
+        }
+
         function renderTransactions() {
             const box = $("transactions");
             const room = CurrencySafeRoom.getRoom(roomId);
             const txs = room?.transactions || state.transactions || [];
             const recent = txs.slice(0, 5);
+            const myTeamId = getMyTeamId();
             box.innerHTML = recent.length ? "" : `<div class="notice">—</div>`;
             recent.forEach(tx => {
                 const div = document.createElement("div");
-                div.className = "tx";
+                let cls = "tx";
+                let badge = "";
+                if (!isSinglePlayer && myTeamId) {
+                    if (tx.fromTeamId === myTeamId) {
+                        cls += " tx-robbed";
+                        badge = `<span class="tx-badge robbed">${escapeHtml(t("txRobbedBadge"))}</span><br/>`;
+                    } else if (tx.toTeamId === myTeamId) {
+                        cls += " tx-earned";
+                        badge = `<span class="tx-badge earned">${escapeHtml(t("txEarnedBadge"))}</span><br/>`;
+                    }
+                }
+                div.className = cls;
                 div.innerHTML =
-                    `<strong>RM ${money(tx.amount)}</strong> ${escapeHtml(tx.from)} → ${escapeHtml(tx.to)}<br/>${new Date(tx.at).toLocaleTimeString()}`;
+                    badge +
+                    `<strong>RM ${money(tx.amount)}</strong> ${escapeHtml(tx.from)} → ${escapeHtml(tx.to)}<br/>` +
+                    `${new Date(tx.at).toLocaleTimeString()}`;
                 box.appendChild(div);
             });
         }
 
         function exportReport() {
-            const teams = getAllTeams().sort((a, b) => b.balance - a.balance);
+            const teams = getLeaderboardTeams().sort((a, b) => b.balance - a.balance);
             let report = t("reportTitle") + "\n";
             report += `生成时间：${new Date().toLocaleString()}\n`;
             const st = state.missionStats || {};
@@ -4600,10 +6204,23 @@
                 const done = currentIntel.games.filter(g => g.solved).length;
                 report += `- 当前任务进度：${done}/3 关\n`;
             }
-            report += "\n排行榜：\n";
+            report += "\n分队榜：\n";
             teams.forEach((team, idx) => {
                 report += `${idx+1}. ${team.name} - RM ${team.balance} - ${formatTransferStatsLine(team)}\n`;
             });
+            if (!isSinglePlayer) {
+                const room = CurrencySafeRoom.getRoom(roomId);
+                const stats = room?.playerStats || {};
+                const players = (room?.players || []).map(p => {
+                    const st = stats[p.id] || {};
+                    const total = (Number(st.raidEarned) || 0) + (Number(st.bonusEarned) || 0);
+                    return { name: p.name, total, raid: st.raidEarned || 0, bonus: st.bonusEarned || 0 };
+                }).sort((a, b) => b.total - a.total);
+                report += "\n个人贡献榜：\n";
+                players.forEach((p, idx) => {
+                    report += `${idx+1}. ${p.name} - RM ${money(p.total)}（攻坚 ${money(p.raid)} + Bonus ${money(p.bonus)}）\n`;
+                });
+            }
             report += "\n转账日志：\n";
             const room = CurrencySafeRoom.getRoom(roomId);
             const txs = room?.transactions || state.transactions || [];
@@ -4631,12 +6248,12 @@
             renderMapLeaderboard();
             renderMapStats();
             renderScoreboard();
+            renderPlayerLeaderboard();
             renderTransactions();
+            renderRaidActivity();
             updateRegisterTabVisibility();
             if (window.updateTeamMarkers3D) window.updateTeamMarkers3D();
-            if (currentIntel?.games?.[0] && !currentIntel.games[0].solved && isGameUnlocked(0)) {
-                startTypingArcIfNeeded();
-            }
+            updateBankBonusPin();
         }
 
         // --- 绑定事件 ---
@@ -4655,6 +6272,19 @@
             $("vaultDoorModal").classList.remove("show");
             autofillPassword();
             $("breachBtn")?.focus();
+        };
+        $("closeBankBonusBtn").onclick = closeBankBonusModal;
+        $("bankBonusModal").onclick = (e) => {
+            if (e.target === $("bankBonusModal")) closeBankBonusModal();
+        };
+        $("soloEndExportBtn").onclick = () => exportReport();
+        $("soloReplayBtn").onclick = () => {
+            $("soloEndModal")?.classList.remove("show");
+            resetSoloProgress(true);
+        };
+        $("soloEndHomeBtn").onclick = () => {
+            localStorage.removeItem("currencySafeSingle");
+            location.href = "index.html";
         };
         $("targetTeamSelect").onchange = () => { Promise.resolve(deployTargetIntel(true)); };
         window.addEventListener("beforeunload", (e) => {
@@ -4697,13 +6327,10 @@
             }
 
             if (!isSinglePlayer) {
-                const room = CurrencySafeRoom.getRoom(roomId);
-                const rem = CurrencySafeRoomShared.getMatchRemainingMs(room);
-                if (room?.status === "playing" && rem != null && rem <= 0) {
-                    Promise.resolve(CurrencySafeRoom.autoEndGameIfExpired(roomId)).then(res => {
-                        if (res?.ok) location.href = "ended.html?room=" + roomId;
-                    });
-                }
+                if (checkRoomEndedAndRedirect()) return;
+                checkMultiplayerMatchExpired();
+            } else {
+                checkSoloMatchExpired();
             }
 
             const selfChanged = syncFromRoom();
@@ -4712,11 +6339,16 @@
             renderMapLeaderboard();
             renderMapStats();
             renderScoreboard();
+            renderPlayerLeaderboard();
             renderTransactions();
+            renderRaidActivity();
             if (selfChanged) {
                 renderAttack();
-                if (window.updateTeamMarkers3D) window.updateTeamMarkers3D();
             }
+            if (!isSinglePlayer && window.updateTeamMarkers3D) {
+                window.updateTeamMarkers3D();
+            }
+            updateBankBonusPin();
             runSinglePlayerAITick();
         }, 1000);
 
@@ -4734,13 +6366,12 @@
             if ($("muteBtn")) $("muteBtn").textContent = t(soundMuted ? "muteOn" : "muteOff");
             initStateSelect();
             prefillFromRoom();
-            if (!state.matchStartedAt && state.player) {
-                state.matchStartedAt = state.player.passwordUpdatedAt || Date.now();
-            }
+            ensureSoloMatchClock();
+            bindMatchEndHotkey();
+            if (!state.matchStartedAt && state.player) state.matchStartedAt = Date.now();
             pickInitialTab();
             render();
             if (currentIntel) {
-                startTypingArcIfNeeded();
                 startGridScoutIfNeeded();
             }
         }
@@ -4755,15 +6386,17 @@
             syncFromRoom();
             prefillFromRoom();
             bindLeaveMatchBtn();
-            bindHostLongPressEnd();
-            Promise.resolve(bootstrapMultiplayerFromRoom()).then(() => {
-                pickInitialTab();
-                render();
-                if (currentIntel) {
-                    startTypingArcIfNeeded();
-                    startGridScoutIfNeeded();
-                }
-            });
+            bindMatchEndHotkey();
+            syncMatchSessionFromRoom();
+            Promise.resolve(bootstrapMultiplayerFromRoom())
+                .then(() => autoDeployMissionIfNeeded())
+                .then(() => {
+                    pickInitialTab();
+                    render();
+                    if (currentIntel) {
+                        startGridScoutIfNeeded();
+                    }
+                });
         }
 
         const HOST_END_HOLD_MS = 10000;
@@ -4775,42 +6408,65 @@
             return e.key === "0" || e.code === "Digit0" || e.code === "Numpad0";
         }
 
-        function bindHostLongPressEnd() {
-            if (isSinglePlayer) return;
+        function cancelHoldEndTimer() {
+            if (hostEndKeyTimer) {
+                clearInterval(hostEndKeyTimer);
+                hostEndKeyTimer = null;
+            }
+        }
+
+        function startHoldEndTimer(onComplete) {
+            hostEndKeyStart = Date.now();
+            cancelHoldEndTimer();
+            hostEndKeyTimer = setInterval(() => {
+                const elapsed = Date.now() - hostEndKeyStart;
+                if (elapsed >= HOST_END_HOLD_MS) {
+                    cancelHoldEndTimer();
+                    onComplete();
+                } else if (elapsed >= 2000 && Date.now() - hostEndToastAt > 900) {
+                    hostEndToastAt = Date.now();
+                    const left = Math.ceil((HOST_END_HOLD_MS - elapsed) / 1000);
+                    showToast(isSinglePlayer
+                        ? `按住 0 · ${left}s 后结束练习`
+                        : `房主按住 0 · ${left}s 后结束比赛`);
+                }
+            }, 200);
+        }
+
+        function bindMatchEndHotkey() {
+            if (window.__csMatchEndHotkeyBound) return;
+            window.__csMatchEndHotkeyBound = true;
+
             document.addEventListener("keydown", (e) => {
                 if (!isZeroKey(e) || e.repeat) return;
+                if (isSinglePlayer) {
+                    if (!state.player || state._soloMatchEnded) return;
+                    startHoldEndTimer(() => endSoloMatch("manual"));
+                    return;
+                }
                 const room = CurrencySafeRoom.getRoom(roomId);
                 if (!room || room.status !== "playing" || !CurrencySafeRoom.isHost(room)) return;
-                hostEndKeyStart = Date.now();
-                if (hostEndKeyTimer) clearInterval(hostEndKeyTimer);
-                hostEndKeyTimer = setInterval(() => {
-                    const elapsed = Date.now() - hostEndKeyStart;
-                    if (elapsed >= HOST_END_HOLD_MS) {
-                        clearInterval(hostEndKeyTimer);
-                        hostEndKeyTimer = null;
-                        Promise.resolve(CurrencySafeRoom.endGame(roomId)).then(res => {
-                            if (res?.ok) location.href = "ended.html?room=" + roomId;
-                            else showToast(res?.error || "无法结束比赛");
-                        });
-                    } else if (elapsed >= 2000 && Date.now() - hostEndToastAt > 900) {
-                        hostEndToastAt = Date.now();
-                        const left = Math.ceil((HOST_END_HOLD_MS - elapsed) / 1000);
-                        showToast(`房主按住 0 · ${left}s 后结束比赛`);
-                    }
-                }, 200);
-            });
+                startHoldEndTimer(() => {
+                    Promise.resolve(CurrencySafeRoom.endGame(roomId)).then(res => {
+                        if (res?.ok) goToEndedPage();
+                        else showToast(res?.error || "无法结束比赛");
+                    });
+                });
+            }, true);
+
             document.addEventListener("keyup", (e) => {
                 if (!isZeroKey(e)) return;
-                if (hostEndKeyTimer) {
-                    clearInterval(hostEndKeyTimer);
-                    hostEndKeyTimer = null;
-                }
-            });
+                cancelHoldEndTimer();
+            }, true);
+        }
+
+        function bindHostLongPressEnd() {
+            bindMatchEndHotkey();
         }
 
         function gameRoomGuard(room) {
             if (!room) { location.href = "index.html"; return false; }
-            if (room.status === "ended") { location.href = "ended.html?room=" + roomId; return false; }
+            if (room.status === "ended") { goToEndedPage(); return false; }
             if (room.status !== "playing") { location.href = "lobby.html?room=" + roomId; return false; }
             CurrencySafeI18n.lockLang();
             const me = room.players.find(p => p.id === csClientId);
@@ -4832,9 +6488,24 @@
                     const room = CurrencySafeRoom.getRoom(roomId);
                     if (!gameRoomGuard(room)) return;
                     CurrencySafeRoom.subscribe(roomId, r => {
-                        if (r?.status === "ended") location.href = "ended.html?room=" + roomId;
+                        if (checkRoomEndedAndRedirect(r)) return;
+                        if (!r) return;
+                        applyMapVisualMode(r);
+                        syncFromRoom();
+                        render();
                     });
                     startGameApp();
+                    let wsWasReconnecting = false;
+                    CurrencySafeRoom.onConnectionChange?.((st) => {
+                        if (st.status === "reconnecting") {
+                            wsWasReconnecting = true;
+                            showToast("网络断开，正在自动重连…");
+                        } else if (st.status === "connected" && wsWasReconnecting) {
+                            wsWasReconnecting = false;
+                            showToast("已重新连接服务器");
+                            CurrencySafeRoom.reconnectRoom(roomId);
+                        }
+                    });
                 });
         }
 
@@ -4855,7 +6526,23 @@
             let cityFlashTimer = null;
 
             const mapImg = new Image();
+
+            function onMapImageReady() {
+                mapReady = true;
+                if (mapImg.naturalWidth > 0 && mapImg.naturalHeight > 0) {
+                    MAP_CONFIG.w = mapImg.naturalWidth;
+                    MAP_CONFIG.h = mapImg.naturalHeight;
+                }
+                resize();
+            }
+
+            mapImg.onload = onMapImageReady;
+            mapImg.onerror = () => {
+                mapReady = false;
+                console.warn('Malaysia map image failed to load:', MAP_CONFIG.image);
+            };
             mapImg.src = MAP_CONFIG.image;
+            if (mapImg.complete && mapImg.naturalWidth > 0) onMapImageReady();
 
             const THREAT_HUBS = MALAYSIA_STATES.map(s => ({ mapX: s.mapX, mapY: s.mapY }));
 
@@ -4960,7 +6647,10 @@
                 if (!wrap) return;
                 const w = wrap.clientWidth;
                 const h = wrap.clientHeight;
-                if (w <= 0 || h <= 0) return;
+                if (w <= 0 || h <= 0) {
+                    requestAnimationFrame(resize);
+                    return;
+                }
                 window.__mapLayout = computeMapLayout(w, h);
                 dpr = Math.min(window.devicePixelRatio || 1, 2);
                 canvas.width = Math.floor(w * dpr);
@@ -4984,34 +6674,27 @@
                 ctx.translate(layout.offsetX, layout.offsetY);
                 ctx.scale(layout.scale, layout.scale);
                 drawMapBase();
-                drawAttacks(performance.now());
+                try {
+                    drawAttacks(performance.now());
+                } catch (err) {
+                    console.warn("threat map drawAttacks:", err);
+                }
                 ctx.restore();
                 requestAnimationFrame(animate);
             }
 
-            mapImg.onload = () => {
-                mapReady = true;
-                if (mapImg.naturalWidth > 0 && mapImg.naturalHeight > 0) {
-                    MAP_CONFIG.w = mapImg.naturalWidth;
-                    MAP_CONFIG.h = mapImg.naturalHeight;
-                }
-                resize();
-            };
-            mapImg.onerror = () => {
-                mapReady = false;
-                console.warn('Malaysia map image failed to load:', MAP_CONFIG.image);
-            };
-
             function updateThreatMapMarkers() {
-                const teams = getAllTeams();
+                try {
+                const teams = getThreatMapMarkers();
                 const targetId = state.targetId;
-                const playerId = state.player ? state.player.id : null;
+                const myTeamId = getMyTeamId();
                 markersEl.innerHTML = '';
                 teams.forEach(team => {
+                    const isBank = !!team.isBank;
                     const isTarget = team.id === targetId;
-                    const isPlayer = team.id === playerId;
+                    const isPlayer = !!team.isSelf || (!isBank && team.teamId === myTeamId);
                     const cls = [
-                        isPlayer ? "player" : "ai",
+                        isBank ? "bank" : (isPlayer ? "player" : "ai"),
                         isTarget ? "target" : ""
                     ].filter(Boolean).join(" ");
                     const pos = getTeamMapPercent(team);
@@ -5030,7 +6713,7 @@
                         `<span class="pin-line pin-balance">RM ${money(team.balance)}</span></span>`;
                     el.onclick = (e) => {
                         e.stopPropagation();
-                        if (team.id !== playerId) {
+                        if (!team.isSelf && team.id !== csClientId) {
                             $("targetTeamSelect").value = team.id;
                             Promise.resolve(deployTargetIntel(true));
                         } else {
@@ -5039,6 +6722,9 @@
                     };
                     markersEl.appendChild(el);
                 });
+                } catch (err) {
+                    console.warn("threat map markers:", err);
+                }
             }
 
             window.updateTeamMarkers3D = updateThreatMapMarkers;
@@ -5069,6 +6755,9 @@
             window.__globeResize = resize;
             resize();
             updateThreatMapMarkers();
+            const bankBonusPinEl = document.getElementById("bankBonusPin");
+            if (bankBonusPinEl) bankBonusPinEl.onclick = onBankBonusPinClick;
+            updateBankBonusPin();
 
             const mapWrapZoom = document.getElementById("mapWrap");
             if (mapWrapZoom) {

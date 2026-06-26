@@ -4,142 +4,551 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Currency Safe · Lobby</title>
+    <link rel="icon" href="fcitlogo.png" type="image/png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,700;14..32,900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,700;14..32,900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/shared.css" />
     <link rel="stylesheet" href="css/fx.css" />
-    <link rel="stylesheet" href="css/lobby-hud.css" />
-    <script src="js/i18n.js"></script>
+    <link rel="stylesheet" href="css/lobby-hud.css?v=20260624c" />
+    <script>
+        (function () {
+            var p = new URLSearchParams(location.search);
+            if (!p.get("room")) location.replace("index.html");
+        })();
+    </script>
+    <script src="js/i18n.js?v=20260624b"></script>
 </head>
 <body class="lobby-page" data-i18n-page-title="pageTitleLobby">
-    <main class="portal portal-wide">
-        <div class="lobby-command-bar">
-            <div class="lobby-command-top">
-                <h1 data-i18n="lobbyCommand">作战大厅</h1>
-                <span class="status-pill" id="statusPill"><span id="statusLabel">—</span></span>
+    <div class="lobby-dot-grid" aria-hidden="true"></div>
+    <div class="lobby-hud-overlay" aria-hidden="true"></div>
+
+    <main class="lobby-shell">
+        <!-- Top brand header -->
+        <header class="lobby-top-header glass-panel">
+            <div class="lobby-brand">
+                <div class="lobby-brand-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div>
+                    <p class="lobby-brand-kicker" data-i18n="lobbyCommand">作战大厅</p>
+                    <h1 class="lobby-brand-title">
+                        Currency Safe
+                        <span class="lobby-version-badge">Live</span>
+                    </h1>
+                </div>
             </div>
-            <div class="lobby-room-row">
-                <span data-i18n="roomCodeLabel">房间码</span>
-                <span class="room-code" id="roomCodeDisplay">----</span>
-                <button type="button" class="secondary" id="copyCodeBtn" style="padding:8px 14px;font-size:0.8rem" data-i18n="copy">复制</button>
-                <a href="ended.html" class="btn cyan hidden" id="viewResultsBtn" data-i18n="viewResults">查看颁奖</a>
+            <div class="lobby-top-actions">
+                <div class="lobby-lang-slot" id="lobbyLangSlot" aria-label="Language"></div>
+                <a href="index.html" class="lobby-back-home" id="backHomeBtn" data-i18n="backHome">返回主页</a>
+            </div>
+        </header>
+
+        <!-- Room status command bar -->
+        <div class="lobby-status-bar glass-panel">
+            <div class="lobby-status-cell">
+                <span class="lobby-label" data-i18n="lobbyCommand">作战大厅</span>
+                <div class="lobby-status-row">
+                    <span class="status-pill" id="statusPill"><span id="statusLabel">—</span></span>
+                    <span class="grid-area-badge" data-i18n="gridArea">马来西亚战区</span>
+                </div>
+            </div>
+            <div class="lobby-status-cell lobby-room-code-cell">
+                <span class="lobby-label" data-i18n="roomCodeLabel">房间码</span>
+                <div class="lobby-code-row">
+                    <code class="room-code" id="roomCodeDisplay">----</code>
+                    <script>
+                        (function () {
+                            var c = new URLSearchParams(location.search).get("room");
+                            if (!c) return;
+                            var el = document.getElementById("roomCodeDisplay");
+                            if (el) el.textContent = c.trim().toUpperCase();
+                        })();
+                    </script>
+                    <button type="button" class="lobby-icon-btn" id="copyCodeBtn" data-i18n-title="copy" aria-label="复制房间码">
+                        <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        <svg class="icon-check hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="lobby-status-cell lobby-status-end">
+                <span class="backend-badge" id="backendBadge" title="数据同步方式"></span>
+                <a href="ended.html" class="lobby-results-btn hidden" id="viewResultsBtn" data-i18n="viewResults">查看颁奖</a>
             </div>
         </div>
 
-        <div class="hud-panel" id="hostPanel">
-            <h2><span data-i18n="gameMode">比赛模式</span> <span class="tag" id="hostBadge"></span></h2>
-            <div class="mode-toggle">
-                <button type="button" data-mode="practice" id="modePractice" data-i18n="modePracticeBtn">练习</button>
-                <button type="button" data-mode="competitive" id="modeCompetitive" data-i18n="modeCompetitiveBtn">竞赛</button>
-            </div>
-            <p class="notice" style="margin-top:0" id="modeDesc"></p>
-            <div class="checkbox-row">
-                <input type="checkbox" id="shuffleStatesCheck" />
-                <label for="shuffleStatesCheck" style="margin:0" data-i18n="shuffleRandomStates">Shuffle 时随机分配州属</label>
-            </div>
-            <label for="matchDurationInput" data-i18n="matchDuration">比赛时长（分钟）</label>
-            <input type="number" id="matchDurationInput" min="1" step="1" value="12" inputmode="numeric" />
-            <div class="btn-row">
-                <button type="button" class="cyan" id="shuffleBtn" data-i18n="shuffleTeams">Shuffle 分队</button>
-                <button type="button" class="primary" id="startGameBtn" data-i18n="startGame">开始游戏</button>
-            </div>
-            <div class="checkbox-row">
-                <input type="checkbox" id="forceStartCheck" />
-                <label for="forceStartCheck" style="margin:0" data-i18n="forceStart">强制开始（试讲 · 允许不足 2 人）</label>
+        <!-- Bento grid: left controls / right map + squads -->
+        <div class="lobby-bento">
+
+            <!-- LEFT: Host controls -->
+            <aside class="lobby-bento-side">
+
+                <section class="glass-panel lobby-panel lobby-panel--host" id="hostPanel">
+                    <div class="panel-head">
+                        <h2><span data-i18n="gameMode">比赛模式</span></h2>
+                        <span class="tag host-tag" id="hostBadge"></span>
+                    </div>
+                    <div class="mode-toggle">
+                        <button type="button" data-mode="practice" id="modePractice" data-i18n="modePracticeBtn">练习</button>
+                        <button type="button" data-mode="competitive" id="modeCompetitive" data-i18n="modeCompetitiveBtn">竞赛</button>
+                    </div>
+                    <div class="mode-desc-box" id="modeDesc"></div>
+                    <div class="lobby-action-stack lobby-shuffle-stack">
+                        <button type="button" class="lobby-btn shuffle" id="shuffleBtn" data-i18n="shuffleTeams">Shuffle 分队</button>
+                        <button type="button" class="lobby-btn shuffle secondary" id="shuffleStatesBtn" data-i18n="shuffleStatesOnly">随机重分州属</button>
+                    </div>
+                    <div class="room-password-block" id="roomPasswordBlock">
+                        <label class="lobby-check-row">
+                            <input type="checkbox" id="roomPasswordEnabled" />
+                            <span data-i18n="roomTokenEnable">开启进房令牌</span>
+                        </label>
+                        <button type="button" class="lobby-btn secondary full" id="regenTokenBtn" data-i18n="regenJoinToken">生成 / 刷新令牌</button>
+                        <p class="notice" id="joinTokenNotice" style="display:none"></p>
+                    </div>
+                    <div class="duration-block">
+                        <div class="duration-head">
+                            <span data-i18n="matchDuration">比赛时长（分钟）</span>
+                            <span class="duration-val" id="matchDurationLabel">12 min</span>
+                        </div>
+                        <input type="range" id="matchDurationRange" min="3" max="30" step="1" value="12" />
+                        <div class="duration-ticks"><span>3m</span><span>15m</span><span>30m</span></div>
+                        <input type="hidden" id="matchDurationInput" value="12" />
+                    </div>
+                    <div class="lobby-action-stack">
+                        <button type="button" class="lobby-btn start" id="startGameBtn" data-i18n="startGame">开始游戏</button>
+                        <label class="lobby-check-row center">
+                            <input type="checkbox" id="forceStartCheck" />
+                            <span data-i18n="forceStart">强制开始（试讲 · 允许不足 2 人）</span>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="glass-panel lobby-panel mock-panel" id="mockPanel">
+                    <div class="mock-panel-inner">
+                        <div class="mock-panel-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"/><path d="M5 19l1 3 1-3 3-1-3-1-1-3-1 3-3 1 3 1z"/></svg>
+                        </div>
+                        <div>
+                            <h3 data-i18n="addMockPlayer">试讲加人</h3>
+                            <p data-i18n="addMockPlayerDesc">多人试讲请开多个浏览器标签，或用隐身窗口分别以不同名称加入本房。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="glass-panel lobby-panel host-console" id="teacherPanel">
+                    <div class="panel-head">
+                        <h2 data-i18n="hostConsole">HOST 控制台</h2>
+                        <span class="tag warn" data-i18n="hostOnly">仅房主</span>
+                    </div>
+                    <label for="kickPlayerSelect" data-i18n="kickMember">踢出成员</label>
+                    <div class="kick-row">
+                        <select id="kickPlayerSelect"></select>
+                        <button type="button" class="lobby-btn kick" id="kickPlayerBtn" data-i18n="kick">踢出</button>
+                    </div>
+                    <p class="notice" id="pendingVisitorsNotice" style="display:none"></p>
+                    <div class="export-grid">
+                        <button type="button" class="lobby-btn secondary" id="exportCsvBtn" data-i18n="exportCsv">导出 CSV</button>
+                        <button type="button" class="lobby-btn secondary" id="exportReportBtn" data-i18n="exportReport">导出报告</button>
+                        <a href="history.html" class="lobby-btn secondary" id="historyLinkBtn" data-i18n="matchHistory">历史赛局</a>
+                        <button type="button" class="lobby-btn secondary full" id="endGameBtn" data-i18n="endGame">结束比赛</button>
+                    </div>
+                    <div class="tactical-terminal">
+                        <span class="tactical-terminal-label" data-i18n="tacticalTerminal">战术终端</span>
+                        <div class="tactical-terminal-log" id="tacticalLog"></div>
+                    </div>
+                </section>
+            </aside>
+
+            <!-- RIGHT: Join dock → map → squads -->
+            <div class="lobby-bento-main">
+
+                <section class="glass-panel lobby-panel lobby-join-dock is-expanded" id="joinDock">
+                    <div class="panel-head split">
+                        <h2 data-i18n="joinRoomCard">加入本房</h2>
+                        <button type="button" class="lobby-icon-btn join-dock-toggle hidden" id="joinDockToggle" title="展开登记表单" aria-expanded="true">▼</button>
+                    </div>
+                    <p class="join-dock-summary hidden" id="joinDockSummary"></p>
+                    <div class="join-dock-body" id="joinDockBody">
+                        <div class="join-grid">
+                            <div>
+                                <label for="joinName" data-i18n="displayName">显示名称 / 队名</label>
+                                <input id="joinName" maxlength="24" data-i18n-placeholder="namePlaceholder" placeholder="例如：暗影金库小队" />
+                            </div>
+                            <div>
+                                <label for="joinState" data-i18n="homeStatePlayer">金库所在州属（新建队伍时）</label>
+                                <select id="joinState"></select>
+                            </div>
+                            <div>
+                                <label for="joinTeam">加入已有队伍（可选）</label>
+                                <select id="joinTeam">
+                                    <option value="">创建新队伍</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="join-actions">
+                            <button type="button" class="lobby-btn join-player" id="joinPlayerBtn" data-i18n="joinAsPlayer">以玩家加入</button>
+                            <button type="button" class="lobby-btn join-spec" id="joinSpectatorBtn" data-i18n="joinAsSpectator">以观战加入</button>
+                        </div>
+                        <div id="lobbyNotice" class="notice hidden"></div>
+                        <p id="joinReminder" class="notice error hidden"></p>
+                    </div>
+                </section>
+
+                <section class="glass-panel lobby-panel map-preview-card" id="mapPreviewCard">
+                    <div class="panel-head split">
+                        <div>
+                            <h2 data-i18n="mapPreview">地图预览</h2>
+                            <p class="panel-sub" data-i18n="mapPreviewTag">Shuffle 后图钉同步更新</p>
+                        </div>
+                        <span class="live-tag">● Vault Coordinates</span>
+                    </div>
+                    <div class="map-preview-wrap tactical-scan" id="lobbyMapPreview"></div>
+                </section>
+
+                <section class="glass-panel lobby-panel squad-roster-panel">
+                    <div class="panel-head split squad-roster-head">
+                        <div class="squad-roster-title">
+                            <span class="squad-roster-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            </span>
+                            <div>
+                                <h2>队伍编队 <span id="teamCount" class="squad-count-inline">0</span></h2>
+                                <p class="panel-sub">每队最多 4 人 · 一队一州 · 空州可点击加入或换州</p>
+                            </div>
+                        </div>
+                        <span class="active-squads-badge" id="activeSquadsBadge">0 Active Squads</span>
+                    </div>
+                    <div id="teamBoard" class="squad-bento-grid"></div>
+                    <div class="host-team-actions hidden" id="hostTeamActions">
+                        <select id="hostNewTeamState"></select>
+                        <button type="button" class="lobby-btn secondary" id="hostCreateTeamBtn">新建空队</button>
+                    </div>
+
+                    <div class="spectators-block">
+                        <div class="panel-head compact">
+                            <h3 data-i18n="spectators">观战</h3>
+                            <span class="count-pill" id="spectatorCount">0</span>
+                        </div>
+                        <div id="spectatorList" class="spectator-grid"></div>
+                    </div>
+                </section>
             </div>
         </div>
 
-        <div class="hud-panel host-console" id="teacherPanel">
-            <h2><span data-i18n="hostConsole">HOST 控制台</span> <span class="tag" data-i18n="hostOnly">仅房主</span></h2>
-            <label for="kickPlayerSelect" data-i18n="kickMember">踢出成员</label>
-            <select id="kickPlayerSelect"></select>
-            <p class="notice" id="pendingVisitorsNotice" style="margin:8px 0 0;display:none"></p>
-            <div class="btn-row">
-                <button type="button" class="secondary" id="kickPlayerBtn" data-i18n="kick">踢出</button>
-                <button type="button" class="secondary" id="endGameBtn" data-i18n="endGame">结束比赛</button>
-                <button type="button" class="cyan" id="exportCsvBtn" data-i18n="exportCsv">导出 CSV</button>
-                <button type="button" class="cyan" id="exportReportBtn" data-i18n="exportReport">导出报告</button>
-            </div>
-        </div>
-
-        <div class="lobby-grid">
-            <div class="hud-panel">
-                <h2><span data-i18n="players">玩家</span> <span id="playerCount">0</span></h2>
-                <div id="playerList"></div>
-            </div>
-            <div class="hud-panel">
-                <h2><span data-i18n="spectators">观战</span> <span id="spectatorCount">0</span></h2>
-                <div id="spectatorList"></div>
-            </div>
-        </div>
-
-        <div class="hud-panel map-preview-card" id="mapPreviewCard">
-            <h2><span data-i18n="mapPreview">地图预览</span> <span class="tag" data-i18n="mapPreviewTag">Shuffle 后图钉同步更新</span></h2>
-            <div class="map-preview-wrap" id="lobbyMapPreview"></div>
-        </div>
-
-        <div class="hud-panel lobby-join-dock">
-            <h2 data-i18n="joinRoomCard">加入本房</h2>
-            <label for="joinName" data-i18n="displayName">显示名称 / 队名</label>
-            <input id="joinName" maxlength="24" data-i18n-placeholder="namePlaceholder" placeholder="例如：暗影金库小队" />
-            <label for="joinState" data-i18n="homeStatePlayer">金库所在州属（Player）</label>
-            <select id="joinState"></select>
-            <div class="btn-row">
-                <button type="button" class="primary" id="joinPlayerBtn" data-i18n="joinAsPlayer">以玩家加入</button>
-                <button type="button" class="cyan" id="joinSpectatorBtn" data-i18n="joinAsSpectator">以观战加入</button>
-            </div>
-            <div id="lobbyNotice" class="notice hidden"></div>
-            <p id="joinReminder" class="notice error hidden" style="margin-top:10px;margin-bottom:0"></p>
-        </div>
-
-        <div class="btn-row">
-            <a href="index.html" class="btn secondary" id="leaveBtn" data-i18n="leaveRoom">离开房间</a>
-        </div>
+        <footer class="lobby-footer">
+            Currency Safe · Secure Multiplayer Lobby Protocol
+        </footer>
     </main>
+
+    <div id="lobbyToast" class="lobby-toast hidden" role="status"></div>
+
+    <div id="startOverlay" class="start-overlay hidden" aria-hidden="true">
+        <div class="start-overlay-card">
+            <div class="start-overlay-bar"></div>
+            <h2 data-i18n="launchTitle">比赛即将开始</h2>
+            <p data-i18n="launchSubtitle">锁定各州金库坐标</p>
+            <div class="start-countdown" id="startCountdown">5</div>
+            <div class="start-overlay-stats" id="startOverlayStats"></div>
+            <button type="button" class="lobby-btn secondary" id="cancelStartBtn" data-i18n="launchCancel">取消开赛</button>
+        </div>
+    </div>
 
     <script src="js/malaysia-states.js"></script>
     <script src="js/map-attack-lines.js"></script>
     <script src="js/malaysia-map.js"></script>
-    <script src="js/firebase-config.js"></script>
+    <script src="js/server-config.js?v=20260626"></script>
+    <script src="js/join-token.js"></script>
     <script src="js/room-shared.js"></script>
     <script src="js/room-local.js"></script>
-    <script src="js/room-firebase.js"></script>
-    <script src="js/room.js"></script>
+    <script src="js/room-ws.js?v=20260626"></script>
+    <script src="js/room.js?v=20260624d"></script>
     <script>
         const $ = (id) => document.getElementById(id);
-        const t = (k) => CurrencySafeI18n.t(k);
+        const t = (k) => (window.CurrencySafeI18n?.t?.(k) ?? k);
         const S = window.CurrencySafeRoomShared;
         const params = new URLSearchParams(location.search);
-        let roomId = (params.get("room") || sessionStorage.getItem(CurrencySafeRoom.SK.roomId) || "").toUpperCase();
+        const urlRoom = (params.get("room") || "").trim().toUpperCase();
+        if (!urlRoom) {
+            location.replace("index.html");
+        }
+        let roomId = urlRoom;
+
+        function setRoomCodeDisplay(code) {
+            const el = $("roomCodeDisplay");
+            if (!el) return;
+            const next = String(code || roomId || urlRoom || "----").trim().toUpperCase();
+            el.textContent = next || "----";
+        }
+
+        setRoomCodeDisplay(roomId);
         let unsub = null;
         let refreshTimer = null;
+        let launchTickTimer = null;
+        let launchTriggered = false;
+        const tacticalLogs = [];
 
-        CurrencySafeI18n.mountLangBar({
-            onChange: () => {
-                const room = CurrencySafeRoom.getRoom(roomId);
-                if (room) renderRoom(room);
+        function addLog(msg) {
+            const ts = new Date().toLocaleTimeString();
+            tacticalLogs.unshift(`[${ts}] ${msg}`);
+            if (tacticalLogs.length > 6) tacticalLogs.length = 6;
+            const el = $("tacticalLog");
+            if (el) {
+                el.innerHTML = tacticalLogs.map(line =>
+                    `<div class="tactical-line"><span>&gt;</span> ${escapeHtml(line)}</div>`
+                ).join("");
             }
-        });
-        CurrencySafeI18n.unlockLang();
+        }
+
+        function applyPendingJoinFromHome() {
+            const pendingName = sessionStorage.getItem("csPendingJoinName");
+            const pendingState = sessionStorage.getItem("csPendingJoinState");
+            if (pendingName && $("joinName")) $("joinName").value = pendingName;
+            if (pendingState && $("joinState")) $("joinState").value = pendingState;
+            if (pendingName) sessionStorage.removeItem("csPendingJoinName");
+            if (pendingState) sessionStorage.removeItem("csPendingJoinState");
+        }
+
+        function hideStartOverlay() {
+            if (launchTickTimer) {
+                clearInterval(launchTickTimer);
+                launchTickTimer = null;
+            }
+            const overlay = $("startOverlay");
+            if (overlay) {
+                overlay.classList.add("hidden");
+                overlay.setAttribute("aria-hidden", "true");
+            }
+        }
+
+        function syncLaunchOverlay(room) {
+            if (!room) return;
+            const rem = S.getLaunchCountdownRemaining(room);
+            const overlay = $("startOverlay");
+            const cancelBtn = $("cancelStartBtn");
+            if (!overlay) return;
+
+            if (rem == null || room.status !== "lobby") {
+                hideStartOverlay();
+                launchTriggered = false;
+                return;
+            }
+
+            const stats = $("startOverlayStats");
+            $("startCountdown").textContent = String(rem);
+            if (stats) {
+                const teams = room.teams?.length || 0;
+                const players = room.players?.length || 0;
+                stats.innerHTML =
+                    `<div><span>队伍</span><strong>${teams}</strong></div>` +
+                    `<div><span>玩家</span><strong>${players}</strong></div>` +
+                    `<div><span>模式</span><strong>${room.mode === "competitive" ? t("modeCompetitiveBtn") : t("modePracticeBtn")}</strong></div>`;
+            }
+            overlay.classList.remove("hidden");
+            overlay.setAttribute("aria-hidden", "false");
+            if (cancelBtn) {
+                cancelBtn.style.display = CurrencySafeRoom.isHost(room) ? "" : "none";
+            }
+
+            if (rem <= 0 && CurrencySafeRoom.isHost(room) && !launchTriggered) {
+                launchMatch();
+                return;
+            }
+
+            if (!launchTickTimer) {
+                launchTickTimer = setInterval(() => {
+                    const fresh = CurrencySafeRoom.getRoom(roomId);
+                    if (fresh) syncLaunchOverlay(fresh);
+                }, 200);
+            }
+        }
+
+        function launchMatch() {
+            if (launchTriggered) return;
+            launchTriggered = true;
+            hideStartOverlay();
+            runAction(CurrencySafeRoom.startGame(roomId, $("forceStartCheck").checked), res => {
+                launchTriggered = false;
+                if (!res || res.ok === false) {
+                    Promise.resolve(CurrencySafeRoom.cancelLaunchCountdown(roomId));
+                    return;
+                }
+                addLog("BATTLE: 比赛已开始");
+                const room = CurrencySafeRoom.getRoom(roomId);
+                const me = room?.players.find(p => p.id === CurrencySafeRoom.getClientId());
+                if (me) {
+                    sessionStorage.setItem(CurrencySafeRoom.SK.roomRole, "player");
+                    location.href = "game.html?room=" + roomId;
+                } else {
+                    sessionStorage.setItem(CurrencySafeRoom.SK.roomRole, "spectator");
+                    location.href = "spectator.html?room=" + roomId;
+                }
+            });
+        }
+
+        function getLobbyClientId() {
+            return window.CurrencySafeRoom?.getClientId?.()
+                || sessionStorage.getItem("csClientId")
+                || "";
+        }
+
+        function makeShellRoom(id) {
+            const bank = S.defaultBank ? S.defaultBank() : { balance: 50000 };
+            return {
+                id, status: "lobby", mode: "practice", hostId: "",
+                players: [], teams: [], spectators: [],
+                bank, settings: { maxTeamSize: 4 },
+                teamDeployCounts: {}
+            };
+        }
+
+        function renderLobbyMap(room) {
+            if (!window.MalaysiaMapPreview) return;
+            const mapEl = $("lobbyMapPreview");
+            if (!mapEl) return;
+            const markers = mapMarkersFromRoom(room);
+            if (mapEl._mapSetPlayers) mapEl._mapSetPlayers(markers);
+            else MalaysiaMapPreview.render(mapEl, markers, { orderNumbers: false, showAttackLines: false });
+        }
+
+        function paintLobbyShell() {
+            try {
+                if (window.MALAYSIA_STATES?.length) initStateSelect();
+                const shell = makeShellRoom(roomId);
+                setRoomCodeDisplay(roomId);
+                $("statusLabel").textContent = t("lobbyStatusWaiting");
+                $("modeDesc").textContent = t("modeDescPractice");
+                renderTeamBoard(shell);
+                renderLobbyMap(shell);
+                syncJoinStateField();
+            } catch (err) {
+                console.error("paintLobbyShell", err);
+                showBootError("界面渲染失败：" + (err.message || err));
+            }
+        }
+
+        function shouldAdoptRoom() {
+            return sessionStorage.getItem("csJustCreatedRoom") === roomId;
+        }
+
+        function ensureLobbyReady() {
+            return CurrencySafeRoom.ready.then(() => {
+                return CurrencySafeRoom.ensureRoom(roomId, { adoptIfMissing: shouldAdoptRoom() });
+            }).then((res) => {
+                if (!res || !res.ok) {
+                    throw new Error(res?.error || "房间未就绪，请从主页重新创建或加入。");
+                }
+                roomId = res.room.id;
+                setRoomCodeDisplay(roomId);
+                if (!unsub) {
+                    unsub = CurrencySafeRoom.subscribe(roomId, renderRoom);
+                }
+                renderRoom(res.room);
+                return res.room;
+            });
+        }
+
+        function showBootError(msg) {
+            const el = $("lobbyNotice") || $("joinReminder");
+            if (el) {
+                el.textContent = msg;
+                el.className = "notice error";
+                el.classList.remove("hidden");
+            }
+            showNotice(msg, true);
+        }
+
+        function bootstrapLobby() {
+            try {
+                paintLobbyShell();
+            } catch (err) {
+                console.error(err);
+                showBootError(err.message || String(err));
+            }
+
+            if (window.CurrencySafeI18n?.mountLangBar) {
+                CurrencySafeI18n.mountLangBar({
+                    onChange: () => {
+                        const room = CurrencySafeRoom.getRoom(roomId);
+                        if (room) renderRoom(room);
+                        else paintLobbyShell();
+                    }
+                });
+                const langSlot = $("lobbyLangSlot");
+                const langBar = document.getElementById("csLangBar");
+                if (langSlot && langBar) {
+                    langBar.classList.add("lang-bar--inline", "lang-bar--lobby");
+                    langSlot.appendChild(langBar);
+                }
+                CurrencySafeI18n.unlockLang();
+            }
+            addLog("LOBBY: 等待战术小队部署…");
+
+            ensureLobbyReady().then(() => {
+                initStateSelect();
+                syncDurationLabel();
+                applyPendingJoinFromHome();
+                refreshBackendBadge();
+                CurrencySafeRoom.onConnectionChange?.(() => refreshBackendBadge());
+                if (!refreshTimer) {
+                    refreshTimer = setInterval(() => {
+                        CurrencySafeRoom.touchLobbyPresence(roomId);
+                        const room = CurrencySafeRoom.getRoom(roomId);
+                        if (room) renderRoom(room);
+                    }, 1000);
+                }
+            }).catch(err => {
+                console.error(err);
+                showBootError(err.message || "大厅加载失败");
+            });
+        }
 
         function showNotice(msg, isError) {
             const el = $("lobbyNotice");
-            el.textContent = msg;
-            el.className = "notice " + (isError ? "error" : "success");
-            el.classList.remove("hidden");
+            if (el) {
+                el.textContent = msg;
+                el.className = "notice " + (isError ? "error" : "success");
+                el.classList.remove("hidden");
+            }
+            const toast = $("lobbyToast");
+            if (toast) {
+                toast.textContent = msg;
+                toast.className = "lobby-toast " + (isError ? "error" : "success");
+                clearTimeout(showNotice._timer);
+                showNotice._timer = setTimeout(() => { toast.className = "lobby-toast hidden"; }, 4000);
+            }
         }
 
         function initStateSelect() {
-            $("joinState").innerHTML = MALAYSIA_STATES.map(s =>
+            const states = window.MALAYSIA_STATES || [];
+            if (!states.length || !$("joinState")) return;
+            const stateOpts = states.map(s =>
                 `<option value="${s.id}">${s.label}</option>`
             ).join("");
+            $("joinState").innerHTML = stateOpts;
             $("joinState").value = "selangor";
+            refreshHostStateSelect();
+        }
+
+        function refreshHostStateSelect() {
+            const hostState = $("hostNewTeamState");
+            if (!hostState) return;
+            const room = CurrencySafeRoom.getRoom(roomId);
+            const taken = new Set((room?.teams || []).map(t => t.stateId).filter(Boolean));
+            const available = MALAYSIA_STATES.filter(s => !taken.has(s.id));
+            hostState.innerHTML = available.length
+                ? available.map(s => `<option value="${s.id}">${s.label}</option>`).join("")
+                : `<option value="">无可用州属</option>`;
+            if (available.length) hostState.value = available[0].id;
+        }
+
+        function syncDurationLabel() {
+            const v = $("matchDurationRange")?.value || $("matchDurationInput")?.value || "12";
+            if ($("matchDurationLabel")) $("matchDurationLabel").textContent = v + " min";
+            if ($("matchDurationInput")) $("matchDurationInput").value = v;
         }
 
         function applyMatchDuration() {
-            const input = $("matchDurationInput");
-            if (!input) return;
-            runAction(CurrencySafeRoom.setMatchDuration(roomId, input.value), () => {
+            syncDurationLabel();
+            runAction(CurrencySafeRoom.setMatchDuration(roomId, $("matchDurationInput").value), () => {
                 showNotice(t("matchDurationSet"), false);
             });
         }
@@ -148,17 +557,264 @@
             return Number(n || 0).toLocaleString("en-MY");
         }
 
-        function renderAgentCard(p, i, room, isPlayer) {
-            const color = window.getStateColor?.(p.stateId) || "#5aff9a";
-            const host = p.id === room.hostId ? ` · ${t("hostTag")}` : "";
-            const bal = isPlayer ? `<br/>RM ${money(p.balance)}` : "";
-            return `<div class="agent-card">
-                <div class="agent-card-bar" style="background:${color}"></div>
-                <div class="agent-card-body">
-                    <strong style="color:${color}">${escapeHtml(p.name)}</strong>
-                    <span>${escapeHtml(p.state || "")}${bal}</span>
+        function renderAssignOptions(room, player) {
+            const maxTeam = room.settings?.maxTeamSize || 4;
+            let html = `<option value="">→ 新建队伍</option>`;
+            (room.teams || []).forEach(tm => {
+                const n = (tm.memberIds || []).length;
+                const full = n >= maxTeam && tm.id !== player.teamId;
+                const label = `${stateLabelForTeam(tm)} (${n}/${maxTeam})`;
+                html += `<option value="${tm.id}" ${tm.id === player.teamId ? "selected" : ""} ${full ? "disabled" : ""}>${escapeHtml(label)}</option>`;
+            });
+            return html;
+        }
+
+        function stateLabelForTeam(team) {
+            const st = (window.MALAYSIA_STATES || []).find(s => s.id === team.stateId);
+            return st?.label || team.state || team.name || "未分配州属";
+        }
+
+        function stateCodeLabel(st) {
+            const map = {
+                kl: "KUALA LUMPUR", negeri_sembilan: "N. SEMBILAN", putrajaya: "PUTRAJAYA"
+            };
+            return map[st.id] || st.id.replace(/_/g, " ").toUpperCase();
+        }
+
+        function tryJoinState(stateId, teamId) {
+            if (!stateId && !teamId) return;
+            const name = ($("joinName").value || "").trim();
+            if (!name) {
+                showNotice("请先在下方填写显示名称", true);
+                $("joinName").focus();
+                return;
+            }
+            ensureLobbyReady().then((room) => {
+                if (room.status !== "lobby") {
+                    showNotice("比赛已开始，无法更换州属。", true);
+                    return;
+                }
+                const me = room.players.find(p => p.id === CurrencySafeRoom.getClientId());
+                if (me && teamId && me.teamId === teamId) return;
+                if (me && !teamId && me.stateId === stateId) return;
+                $("joinState").value = stateId || $("joinState").value;
+                if (teamId) $("joinTeam").value = teamId;
+                else $("joinTeam").value = "";
+                syncJoinStateField();
+                return runAction(
+                    CurrencySafeRoom.joinRoomAsPlayer(roomId, name, stateId || $("joinState").value, teamId || null),
+                    () => {
+                        const st = (MALAYSIA_STATES || []).find(s => s.id === stateId);
+                        showNotice(teamId ? "已加入该队" : `已进驻 ${st?.label || stateId}`, false);
+                    }
+                );
+            }).catch(err => showNotice(err.message || String(err), true));
+        }
+
+        function renderStateSquadCard(st, team, room, maxTeam, host, clientId, index) {
+            const color = st.color || "#38bdf8";
+            const members = team
+                ? (team.memberIds || []).map(id => room.players.find(p => p.id === id)).filter(Boolean)
+                : [];
+            const isOpen = !team || members.length === 0;
+            const canJoin = room.status === "lobby";
+            const teamLabel = team?.name || `${st.label} 金库`;
+            const vaultBal = team ? S.teamBalance(room, team.id) : 0;
+            const slots = [];
+            for (let i = 0; i < maxTeam; i++) {
+                const p = members[i];
+                if (p) {
+                    const isMe = p.id === clientId;
+                    const isHost = p.id === room.hostId;
+                    const assignUi = host && room.status === "lobby"
+                        ? `<select class="team-assign-select" data-player="${p.id}">${renderAssignOptions(room, p)}</select>`
+                        : "";
+                    slots.push(`<div class="squad-slot filled${isMe ? " is-me" : ""}">
+                        <div class="squad-slot-name">
+                            <span class="squad-dot" style="background:${color}"></span>
+                            <span>${escapeHtml(p.name)}</span>
+                            ${isHost ? '<span class="mini-tag host">HOST</span>' : ""}
+                            ${isMe ? '<span class="mini-tag you">YOU</span>' : ""}
+                        </div>
+                        <div class="squad-slot-meta">
+                            ${isMe ? '<span class="mini-tag you">YOU</span>' : ""}
+                            ${assignUi}
+                        </div>
+                    </div>`);
+                } else {
+                    const click = canJoin
+                        ? ` data-join-state="${st.id}"${team ? ` data-join-team="${team.id}"` : ""} tabindex="0" role="button"`
+                        : "";
+                    slots.push(`<div class="squad-slot empty joinable${canJoin ? "" : " disabled"}"${click}>
+                        <span class="empty-slot-icon">+</span>
+                        <span>空位</span>
+                    </div>`);
+                }
+            }
+            const squadId = team?.id ? team.id.slice(0, 8).toUpperCase() : `S${index + 1}`;
+            return `<article class="squad-card${isOpen ? " squad-open" : ""}" style="--squad-color:${color}">
+                <div class="squad-card-head">
+                    <div class="squad-card-title-block">
+                        <div class="squad-state-row">
+                            <span class="squad-dot lg" style="background:${color}"></span>
+                            <span class="squad-state-code">${escapeHtml(stateCodeLabel(st))}</span>
+                        </div>
+                        <h3 class="squad-team-name">${escapeHtml(teamLabel)}</h3>
+                    </div>
+                    <div class="squad-balance">
+                        <small>团队金库储备</small>
+                        <strong class="vault-total">RM ${money(vaultBal)}</strong>
+                    </div>
                 </div>
-                <div class="agent-card-meta">#${i + 1}${host}</div>
+                <div class="squad-slots">${slots.join("")}</div>
+                <div class="squad-foot">
+                    <span>Tactical Squad #${escapeHtml(squadId)}</span>
+                    <span>Density: ${members.length} / ${maxTeam}</span>
+                </div>
+            </article>`;
+        }
+
+        function renderBankCard(room) {
+            const bal = room.bank?.balance ?? room.settings?.bankInitialBalance ?? 50000;
+            return `<article class="squad-card bank-card squad-card--bank-grid">
+                <div class="squad-card-head">
+                    <div>
+                        <span class="squad-state-label">🏦 央行</span>
+                        <h3>中央银行金库</h3>
+                    </div>
+                    <span class="mini-tag active">ACTIVE</span>
+                </div>
+                <p class="bank-desc">全队可攻，资金来自央行池（初始 RM 50,000）</p>
+                <div class="bank-balance-row">
+                    <span>储备余额</span>
+                    <strong>RM ${money(bal)}</strong>
+                </div>
+            </article>`;
+        }
+
+        function buildStateRoster(room) {
+            const teamsByState = {};
+            (room.teams || []).forEach(tm => {
+                if (tm.stateId) teamsByState[tm.stateId] = tm;
+            });
+            const entries = (window.MALAYSIA_STATES || []).map(st => ({
+                state: st,
+                team: teamsByState[st.id] || null
+            }));
+            const orphans = (room.teams || []).filter(tm =>
+                !tm.stateId || !(window.MALAYSIA_STATES || []).some(s => s.id === tm.stateId)
+            );
+            return { entries, orphans };
+        }
+
+        function mapMarkersFromRoom(room) {
+            const { entries } = buildStateRoster(room);
+            return entries.map(entry => {
+                const team = entry.team;
+                const st = entry.state;
+                const members = team
+                    ? (team.memberIds || []).map(id => room.players.find(p => p.id === id)).filter(Boolean)
+                    : [];
+                if (members.length) {
+                    const lead = members[0];
+                    const marker = {
+                        ...lead,
+                        mapX: lead.mapX ?? st.mapX,
+                        mapY: lead.mapY ?? st.mapY,
+                        stateId: st.id,
+                        state: st.label
+                    };
+                    if (team) marker.balance = S.teamBalance(room, team.id);
+                    return marker;
+                }
+                return {
+                    id: `ghost-${st.id}`,
+                    name: st.label,
+                    stateId: st.id,
+                    state: st.label,
+                    mapX: st.mapX,
+                    mapY: st.mapY,
+                    balance: 0,
+                    icon: "○",
+                    _ghost: true
+                };
+            });
+        }
+
+        function renderTeamBoard(room) {
+            S.ensureTeamsAndBank(room);
+            const { entries, orphans } = buildStateRoster(room);
+            const maxTeam = room.settings?.maxTeamSize || 4;
+            const host = window.CurrencySafeRoom?.isHost?.(room) || false;
+            const clientId = getLobbyClientId();
+            const occupied = entries.filter(e => e.team && (e.team.memberIds || []).length).length;
+            const totalStates = (window.MALAYSIA_STATES || []).length;
+            $("teamCount").textContent = `${occupied} / ${totalStates}`;
+            const badge = $("activeSquadsBadge");
+            if (badge) badge.textContent = `${occupied} Active Squads`;
+
+            let html = entries.map((entry, i) =>
+                renderStateSquadCard(entry.state, entry.team, room, maxTeam, host, clientId, i)
+            ).join("");
+
+            if (orphans.length) {
+                html += orphans.map((team, i) => {
+                    const st = (MALAYSIA_STATES || []).find(s => s.id === team.stateId)
+                        || { id: team.stateId || "unknown", label: team.state || "未分配", color: "#38bdf8", mapX: team.mapX, mapY: team.mapY };
+                    return renderStateSquadCard(st, team, room, maxTeam, host, clientId, entries.length + i);
+                }).join("");
+            }
+
+            html += renderBankCard(room);
+            $("teamBoard").innerHTML = html;
+
+            const hostActions = $("hostTeamActions");
+            if (hostActions) {
+                hostActions.classList.toggle("hidden", !(host && room.status === "lobby"));
+            }
+
+            document.querySelectorAll(".squad-slot.empty.joinable").forEach(slot => {
+                const go = () => {
+                    tryJoinState(slot.dataset.joinState, slot.dataset.joinTeam || null);
+                };
+                slot.onclick = go;
+                slot.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } };
+            });
+
+            document.querySelectorAll(".team-assign-select").forEach(sel => {
+                sel.onchange = () => {
+                    runAction(CurrencySafeRoom.assignPlayerToTeam(roomId, sel.dataset.player, sel.value || null), () => {
+                        showNotice("分队已更新", false);
+                    });
+                };
+            });
+
+            document.querySelectorAll(".squad-join-state-btn").forEach(btn => {
+                btn.onclick = () => tryJoinState(btn.dataset.stateId, null);
+            });
+
+            const joinTeam = $("joinTeam");
+            if (joinTeam) {
+                const opts = [`<option value="">创建新队伍</option>`];
+                (room.teams || []).forEach(tm => {
+                    const n = (tm.memberIds || []).length;
+                    const full = n >= maxTeam;
+                    opts.push(`<option value="${tm.id}" ${full ? "disabled" : ""}>${escapeHtml(stateLabelForTeam(tm))} (${n}/${maxTeam})</option>`);
+                });
+                joinTeam.innerHTML = opts.join("");
+                const me = room.players.find(p => p.id === clientId);
+                if (me?.teamId) joinTeam.value = me.teamId;
+            }
+            syncJoinStateField();
+        }
+
+        function renderSpectatorChip(s, i, room) {
+            const clientId = CurrencySafeRoom.getClientId();
+            const isMe = s.id === clientId;
+            return `<div class="spectator-chip${isMe ? " is-me" : ""}">
+                <span class="spectator-dot"></span>
+                <span>${escapeHtml(s.name)}</span>
+                ${isMe ? '<span class="mini-tag you">ME</span>' : ""}
             </div>`;
         }
 
@@ -185,9 +841,10 @@
         }
 
         function renderRoom(room) {
-            if (!room) room = CurrencySafeRoom.getRoom(roomId);
+            if (room && typeof room.then === "function") return;
+            if (!room || typeof room.id !== "string") room = CurrencySafeRoom.getRoom(roomId);
             if (!room) {
-                location.href = "index.html";
+                setRoomCodeDisplay(roomId);
                 return;
             }
             if (room.status !== "playing") CurrencySafeI18n.unlockLang();
@@ -195,21 +852,19 @@
             setRoomStatus(room);
 
             sessionStorage.setItem(CurrencySafeRoom.SK.roomId, room.id);
-            $("roomCodeDisplay").textContent = room.id;
-            $("playerCount").textContent = "(" + room.players.length + ")";
+            setRoomCodeDisplay(room.id);
             $("spectatorCount").textContent = "(" + (room.spectators || []).length + ")";
-
-            $("playerList").innerHTML = room.players.length
-                ? room.players.map((p, i) => renderAgentCard(p, i, room, true)).join("")
-                : `<div class="notice" style="margin:0">${escapeHtml(t("waitingPlayers"))}</div>`;
+            renderTeamBoard(room);
+            syncJoinDock(room);
+            refreshHostStateSelect();
 
             $("spectatorList").innerHTML = (room.spectators || []).length
-                ? room.spectators.map((s, i) => renderAgentCard(s, i, room, false)).join("")
-                : `<div class="notice" style="margin:0">${escapeHtml(t("noSpectators"))}</div>`;
+                ? room.spectators.map((s, i) => renderSpectatorChip(s, i, room)).join("")
+                : `<div class="notice empty-squads">${escapeHtml(t("noSpectators"))}</div>`;
 
             const host = CurrencySafeRoom.isHost(room);
-            $("hostPanel").style.display = host ? "block" : "none";
-            $("teacherPanel").style.display = host ? "block" : "none";
+            $("hostPanel").style.display = host ? "" : "none";
+            $("teacherPanel").style.display = host ? "" : "none";
             $("hostBadge").textContent = host ? t("hostBadge") : "";
             $("kickPlayerSelect").innerHTML = (() => {
                 const opts = [];
@@ -231,28 +886,38 @@
             } else if (pendingEl) {
                 pendingEl.style.display = "none";
             }
-            $("endGameBtn").style.display = room.status === "playing" ? "inline-block" : "none";
+            $("endGameBtn").style.display = room.status === "playing" ? "" : "none";
             $("modePractice").classList.toggle("active", room.mode === "practice");
             $("modeCompetitive").classList.toggle("active", room.mode === "competitive");
-            $("shuffleStatesCheck").checked = !!room.shuffleRandomStates;
+            $("shuffleStatesBtn").disabled = !host || room.status !== "lobby" || !(room.teams || []).length;
+            if ($("shuffleBtn")) $("shuffleBtn").disabled = !host || room.status !== "lobby" || !(room.players || []).length;
+            const pwdEnabled = $("roomPasswordEnabled");
+            if (pwdEnabled && document.activeElement !== pwdEnabled) {
+                pwdEnabled.checked = !!room.joinPasswordEnabled;
+            }
+            if ($("roomPasswordBlock")) {
+                $("roomPasswordBlock").style.display = host && room.status === "lobby" ? "" : "none";
+            }
+            const tokenNotice = $("joinTokenNotice");
+            if (tokenNotice && !room.joinPasswordEnabled) tokenNotice.style.display = "none";
             const roundMs = room.settings?.roundMs ?? S.defaultRoomSettings(room.mode).roundMs;
-            const durInput = $("matchDurationInput");
-            if (durInput && document.activeElement !== durInput) {
-                durInput.value = String(Math.max(1, Math.round(roundMs / 60000)));
+            const mins = String(Math.max(1, Math.round(roundMs / 60000)));
+            const durRange = $("matchDurationRange");
+            if (durRange && document.activeElement !== durRange) {
+                durRange.value = mins;
+                syncDurationLabel();
             }
 
             if (window.MalaysiaMapPreview) {
-                const mapEl = $("lobbyMapPreview");
-                if (mapEl._mapSetPlayers) mapEl._mapSetPlayers(room.players);
-                else MalaysiaMapPreview.render(mapEl, room.players, {
-                    orderNumbers: true,
-                    showAttackLines: false
-                });
+                renderLobbyMap(room);
             }
 
-            $("modeDesc").textContent = room.mode === "practice"
-                ? t("modeDescPractice")
-                : t("modeDescCompetitive");
+            const modeDesc = $("modeDesc");
+            if (modeDesc) {
+                modeDesc.textContent = room.mode === "practice"
+                    ? t("modeDescPractice")
+                    : t("modeDescCompetitive");
+            }
 
             const me = room.players.find(p => p.id === CurrencySafeRoom.getClientId());
             const spec = (room.spectators || []).find(s => s.id === CurrencySafeRoom.getClientId());
@@ -275,8 +940,9 @@
 
             if (room.status === "lobby" && host) {
                 const ready = S.validateLobbyForStart(room, CurrencySafeRoom.getClientId());
-                $("startGameBtn").disabled = !ready.ok;
-                $("startGameBtn").title = ready.ok ? "" : ready.error;
+                const counting = S.getLaunchCountdownRemaining(room) != null;
+                $("startGameBtn").disabled = counting || !ready.ok;
+                $("startGameBtn").title = counting ? "倒计时进行中" : (ready.ok ? "" : ready.error);
             } else {
                 $("startGameBtn").disabled = false;
                 $("startGameBtn").title = "";
@@ -286,21 +952,112 @@
                 location.href = "ended.html?room=" + room.id;
                 return;
             } else if (room.status === "playing") {
+                hideStartOverlay();
                 if (me) {
                     sessionStorage.setItem(CurrencySafeRoom.SK.roomRole, "player");
                     location.href = "game.html?room=" + room.id;
                 } else {
                     location.href = "spectator.html?room=" + room.id;
                 }
+            } else {
+                syncLaunchOverlay(room);
             }
             CurrencySafeI18n.syncLangBarButtons();
         }
 
         function runAction(promise, onOk) {
-            Promise.resolve(promise).then(res => {
-                if (res && res.ok === false) showNotice(res.error, true);
-                else if (onOk) onOk(res);
-            });
+            return ensureLobbyReady()
+                .then(() => Promise.resolve(promise))
+                .then(res => {
+                    if (res && res.ok === false) {
+                        showNotice(res.error || "操作失败", true);
+                        return res;
+                    }
+                    if (onOk) onOk(res);
+                    const room = CurrencySafeRoom.getRoom(roomId);
+                    if (room) renderRoom(room);
+                    return res;
+                })
+                .catch(err => {
+                    console.error(err);
+                    showNotice(err?.message || String(err), true);
+                });
+        }
+
+        function refreshBackendBadge() {
+            const el = $("backendBadge");
+            if (!el) return;
+            const backend = CurrencySafeRoom.getBackend();
+            const online = CurrencySafeRoom.isOnline();
+            const wsSt = CurrencySafeRoom.getConnectionStatus?.() || {};
+            if (wsSt.status === "reconnecting") {
+                el.textContent = "↻ 重连中…";
+                el.className = "backend-badge local";
+                el.title = wsSt.detail || "WebSocket 断线，正在自动重连";
+                return;
+            }
+            if (window.CURRENCY_SAFE_WS_ERROR && (window.CURRENCY_SAFE_SERVER?.enabled !== false)) {
+                el.textContent = "⚠ 未连服务器";
+                el.className = "backend-badge local";
+                el.title = `WebSocket 失败：${window.CURRENCY_SAFE_WS_ERROR}\n请用 http://本机IP:8787 打开（Tunnel 也要指向 8787）`;
+                return;
+            }
+            el.textContent = backend === "ws" ? "🔌 服务器同步" : "💾 本机同步";
+            if (!online && !el.dataset.linked) {
+                el.dataset.linked = "1";
+                el.style.cursor = "pointer";
+                el.onclick = () => { location.href = "BACKEND_ROADMAP.md"; };
+            }
+            el.className = "backend-badge " + (online ? "online" : "local");
+            el.title = backend === "ws"
+                ? "WebSocket 服务器已连接，多设备可通过房间码加入"
+                : "本机演示模式：请在本机运行 cd server && npm start，并通过 Tunnel 或局域网访问";
+        }
+
+        function syncJoinStateField() {
+            const teamSel = $("joinTeam");
+            const stateSel = $("joinState");
+            if (!teamSel || !stateSel) return;
+            const joiningExisting = !!teamSel.value;
+            stateSel.disabled = joiningExisting;
+            stateSel.closest("div")?.classList.toggle("field-muted", joiningExisting);
+        }
+
+        let joinDockExpanded = false;
+
+        function syncJoinDock(room) {
+            const dock = $("joinDock");
+            const summary = $("joinDockSummary");
+            const toggle = $("joinDockToggle");
+            if (!dock) return;
+            const clientId = getLobbyClientId();
+            const mePlayer = (room.players || []).find(p => p.id === clientId);
+            const meSpec = (room.spectators || []).find(s => s.id === clientId);
+            const registered = !!(mePlayer || meSpec);
+            dock.classList.toggle("is-registered", registered);
+            if (toggle) {
+                toggle.classList.toggle("hidden", !registered);
+                toggle.setAttribute("aria-expanded", joinDockExpanded ? "true" : "false");
+                toggle.textContent = joinDockExpanded ? "▲" : "▼";
+            }
+            dock.classList.toggle("is-expanded", !registered || joinDockExpanded);
+            if (summary) {
+                if (registered) {
+                    if (mePlayer) {
+                        const team = (room.teams || []).find(tm => tm.id === mePlayer.teamId);
+                        const st = team ? stateLabelForTeam(team) : "";
+                        summary.textContent = `✓ 已登记 · ${mePlayer.name}${st ? ` · ${st}` : ""}`;
+                    } else {
+                        summary.textContent = `✓ 观战中 · ${meSpec.name}`;
+                    }
+                    summary.classList.remove("hidden");
+                } else {
+                    summary.classList.add("hidden");
+                }
+            }
+            if (mePlayer?.name && $("joinName") && !$("joinName").value.trim()) {
+                $("joinName").value = mePlayer.name;
+            }
         }
 
         function escapeHtml(text) {
@@ -309,26 +1066,35 @@
             return d.innerHTML;
         }
 
-        if (!roomId) {
-            location.href = "index.html";
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", bootstrapLobby);
         } else {
-            CurrencySafeRoom.ready.then(() => {
-                initStateSelect();
-                return Promise.resolve(CurrencySafeRoom.reconnectRoom(roomId));
-            }).then(() => {
-                unsub = CurrencySafeRoom.subscribe(roomId, renderRoom);
-                refreshTimer = setInterval(() => {
-                    CurrencySafeRoom.touchLobbyPresence(roomId);
-                    const room = CurrencySafeRoom.getRoom(roomId);
-                    if (room) renderRoom(room);
-                }, 1000);
-            });
+            bootstrapLobby();
         }
+
+        $("joinTeam")?.addEventListener("change", syncJoinStateField);
+
+        $("joinDockToggle")?.addEventListener("click", () => {
+            joinDockExpanded = !joinDockExpanded;
+            const dock = $("joinDock");
+            if (dock) dock.classList.toggle("is-expanded", joinDockExpanded);
+            const toggle = $("joinDockToggle");
+            if (toggle) {
+                toggle.setAttribute("aria-expanded", joinDockExpanded ? "true" : "false");
+                toggle.textContent = joinDockExpanded ? "▲" : "▼";
+            }
+        });
 
         $("copyCodeBtn").onclick = async () => {
             try {
                 await navigator.clipboard.writeText(roomId);
                 showNotice(t("copiedCode") + roomId, false);
+                $("copyCodeBtn").querySelector(".icon-copy")?.classList.add("hidden");
+                $("copyCodeBtn").querySelector(".icon-check")?.classList.remove("hidden");
+                setTimeout(() => {
+                    $("copyCodeBtn").querySelector(".icon-copy")?.classList.remove("hidden");
+                    $("copyCodeBtn").querySelector(".icon-check")?.classList.add("hidden");
+                }, 2000);
             } catch {
                 showNotice(t("copyFallback") + roomId, false);
             }
@@ -343,36 +1109,73 @@
         };
 
         $("shuffleBtn").onclick = () => {
-            runAction(CurrencySafeRoom.shufflePlayers(roomId, $("shuffleStatesCheck").checked), () => {
+            $("shuffleBtn").classList.add("is-shuffling");
+            addLog("SYS: Shuffle 分队协议启动");
+            runAction(CurrencySafeRoom.shufflePlayers(roomId, false), () => {
                 showNotice(t("shuffleDone"), false);
+                addLog("SYS: 分队与坐标同步完成");
+                $("mapPreviewCard").classList.add("shuffle-flash");
+                setTimeout(() => {
+                    $("mapPreviewCard").classList.remove("shuffle-flash");
+                    $("shuffleBtn").classList.remove("is-shuffling");
+                }, 700);
+            });
+        };
+
+        $("shuffleStatesBtn").onclick = () => {
+            runAction(CurrencySafeRoom.shuffleStatesOnly(roomId), () => {
+                showNotice(t("shuffleStatesDone"), false);
+                addLog("SYS: 州属随机重分完成");
                 $("mapPreviewCard").classList.add("shuffle-flash");
                 setTimeout(() => $("mapPreviewCard").classList.remove("shuffle-flash"), 700);
             });
         };
 
-        $("matchDurationInput").onchange = applyMatchDuration;
-        $("matchDurationInput").onblur = applyMatchDuration;
+        function showJoinToken(token) {
+            const el = $("joinTokenNotice");
+            if (!el || !token) return;
+            el.style.display = "block";
+            el.innerHTML = `${t("joinTokenReveal")} <code style="font-family:var(--mono);color:var(--cyan)">${escapeHtml(token)}</code><br/><span class="muted">${t("joinTokenHint")}</span>`;
+        }
+
+        function applyRoomPassword(enabledOverride) {
+            const enabled = enabledOverride != null ? enabledOverride : $("roomPasswordEnabled").checked;
+            if (enabledOverride != null) $("roomPasswordEnabled").checked = enabled;
+            runAction(CurrencySafeRoom.setRoomJoinPassword(roomId, enabled, ""), (res) => {
+                if (res?.joinToken) showJoinToken(res.joinToken);
+                showNotice(enabled ? t("roomTokenOn") : t("roomTokenOff"), false);
+            });
+        }
+        $("roomPasswordEnabled")?.addEventListener("change", () => applyRoomPassword());
+        $("regenTokenBtn")?.addEventListener("click", () => applyRoomPassword(true));
+
+        $("matchDurationRange")?.addEventListener("input", syncDurationLabel);
+        $("matchDurationRange")?.addEventListener("change", applyMatchDuration);
 
         $("startGameBtn").onclick = () => {
-            runAction(CurrencySafeRoom.startGame(roomId, $("forceStartCheck").checked), res => {
-                if (!res || res.ok === false) return;
-                const room = CurrencySafeRoom.getRoom(roomId);
-                const me = room?.players.find(p => p.id === CurrencySafeRoom.getClientId());
-                if (me) {
-                    sessionStorage.setItem(CurrencySafeRoom.SK.roomRole, "player");
-                    location.href = "game.html?room=" + roomId;
-                } else {
-                    sessionStorage.setItem(CurrencySafeRoom.SK.roomRole, "spectator");
-                    location.href = "spectator.html?room=" + roomId;
-                }
-            });
+            if ($("startGameBtn").disabled) return;
+            addLog("SYS: 战略封锁启动，开赛倒计时");
+            runAction(CurrencySafeRoom.beginLaunchCountdown(roomId));
         };
 
+        $("cancelStartBtn")?.addEventListener("click", () => {
+            runAction(CurrencySafeRoom.cancelLaunchCountdown(roomId), () => {
+                addLog("SYS: 开赛已取消");
+            });
+        });
+
         $("joinPlayerBtn").onclick = () => {
-            runAction(CurrencySafeRoom.joinRoomAsPlayer(roomId, $("joinName").value, $("joinState").value), () => {
+            const teamId = $("joinTeam").value || null;
+            runAction(CurrencySafeRoom.joinRoomAsPlayer(roomId, $("joinName").value, $("joinState").value, teamId), () => {
                 showNotice(t("joinedPlayer"), false);
             });
         };
+
+        $("hostCreateTeamBtn")?.addEventListener("click", () => {
+            runAction(CurrencySafeRoom.createTeam(roomId, $("hostNewTeamState").value), () => {
+                showNotice("已创建空队伍", false);
+            });
+        });
 
         $("joinSpectatorBtn").onclick = () => {
             runAction(CurrencySafeRoom.joinRoomAsSpectator(roomId, $("joinName").value), () => {
@@ -410,14 +1213,24 @@
             else showNotice(t("reportDownloaded"), false);
         };
 
-        $("leaveBtn").onclick = (e) => {
+        function goHomeFromLobby(e) {
             e.preventDefault();
-            if (unsub) unsub();
+            if (typeof unsub === "function") unsub();
             if (refreshTimer) clearInterval(refreshTimer);
-            Promise.resolve(CurrencySafeRoom.leaveRoom(roomId)).then(() => {
+            const sk = CurrencySafeRoom.SK;
+            sessionStorage.removeItem(sk.roomId);
+            sessionStorage.removeItem(sk.roomRole);
+            sessionStorage.removeItem(sk.roomJoinPassword);
+            const leaveDone = Promise.resolve(CurrencySafeRoom.leaveRoom(roomId)).catch(() => {});
+            Promise.race([
+                leaveDone,
+                new Promise((r) => setTimeout(r, 600))
+            ]).finally(() => {
                 location.href = "index.html";
             });
-        };
+        }
+
+        $("backHomeBtn")?.addEventListener("click", goHomeFromLobby);
     </script>
 </body>
 </html>

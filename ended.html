@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Currency Safe · 比赛结束</title>
+    <link rel="icon" href="fcitlogo.png" type="image/png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,700;14..32,900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/shared.css" />
@@ -40,16 +41,17 @@
             <button type="button" class="cyan hidden" id="stopCelebrationBtn" data-i18n="stopCelebration">停止庆祝</button>
             <button type="button" class="cyan" id="exportCsvBtn" data-i18n="exportCsv">导出 CSV</button>
             <button type="button" class="primary" id="backHomeBtn" data-i18n="backHome">返回首页</button>
+            <a href="history.html" class="lobby-btn secondary" style="text-decoration:none" data-i18n="matchHistory">历史赛局</a>
         </div>
     </main>
 
     <script src="js/malaysia-states.js"></script>
     <script src="js/fx.js"></script>
-    <script src="js/firebase-config.js"></script>
+    <script src="js/server-config.js?v=20260626"></script>
     <script src="js/room-shared.js"></script>
     <script src="js/room-local.js"></script>
-    <script src="js/room-firebase.js"></script>
-    <script src="js/room.js"></script>
+    <script src="js/room-ws.js?v=20260626"></script>
+    <script src="js/room.js?v=20260626"></script>
     <script>
         const $ = (id) => document.getElementById(id);
         const t = (k) => CurrencySafeI18n.t(k);
@@ -82,7 +84,7 @@
                 slotEl.innerHTML = `<div class="podium-placeholder">—</div>`;
                 return;
             }
-            const color = window.getStateColor?.(player.stateId) || "#5aff9a";
+            const color = window.getStateColor?.(player.stateId) || "#38bdf8";
             const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : "🥉";
             slotEl.innerHTML =
                 `<div class="podium-rank">${medal}</div>` +
@@ -95,31 +97,45 @@
         async function runPodiumReveal(room) {
             if (revealStarted) return;
             revealStarted = true;
-            const sorted = [...room.players].sort((a, b) => (b.balance || 0) - (a.balance || 0));
+            const S = CurrencySafeRoomShared;
+            const sortedTeams = [...(room.teams || [])].sort(
+                (a, b) => S.teamBalance(room, b.id) - S.teamBalance(room, a.id)
+            );
             const txs = room.transactions || [];
-            const order = sorted.length >= 3
-                ? [{ p: sorted[2], rank: 3, slot: $("slot3") },
-                   { p: sorted[1], rank: 2, slot: $("slot2") },
-                   { p: sorted[0], rank: 1, slot: $("slot1") }]
-                : sorted.length === 2
-                    ? [{ p: sorted[1], rank: 2, slot: $("slot2") },
-                       { p: sorted[0], rank: 1, slot: $("slot1") }]
-                    : [{ p: sorted[0], rank: 1, slot: $("slot1") }];
+            const order = sortedTeams.length >= 3
+                ? [{ tm: sortedTeams[2], rank: 3, slot: $("slot3") },
+                   { tm: sortedTeams[1], rank: 2, slot: $("slot2") },
+                   { tm: sortedTeams[0], rank: 1, slot: $("slot1") }]
+                : sortedTeams.length === 2
+                    ? [{ tm: sortedTeams[1], rank: 2, slot: $("slot2") },
+                       { tm: sortedTeams[0], rank: 1, slot: $("slot1") }]
+                    : [{ tm: sortedTeams[0], rank: 1, slot: $("slot1") }];
 
             for (const item of order) {
                 await CurrencySafeFx.delay(item.rank === 1 ? 1400 : 1200);
-                if (item.p) fillSlot(item.slot, item.p, item.rank, txs);
+                if (item.tm) {
+                    const color = window.getStateColor?.(item.tm.stateId) || "#38bdf8";
+                    const medal = item.rank === 1 ? "🥇" : item.rank === 2 ? "🥈" : "🥉";
+                    item.slot.innerHTML =
+                        `<div class="podium-rank">${medal}</div>` +
+                        `<div class="podium-name" style="color:${color}">${escapeHtml(item.tm.name || item.tm.state)}</div>` +
+                        `<div class="podium-state" style="color:${color}">${escapeHtml(item.tm.state || "")}</div>` +
+                        `<div class="podium-balance">RM ${money(S.teamBalance(room, item.tm.id))}</div>`;
+                }
                 item.slot.classList.add("revealed");
             }
 
             const meId = CurrencySafeRoom.getClientId();
             const me = room.players.find(p => p.id === meId);
-            if (me) {
+            if (me?.teamId) {
                 await CurrencySafeFx.delay(800);
-                const myRank = sorted.findIndex(p => p.id === meId) + 1;
+                const myTeamRank = sortedTeams.findIndex(t => t.id === me.teamId) + 1;
+                const myTeam = sortedTeams.find(t => t.id === me.teamId);
+                const stats = (room.playerStats || {})[meId] || {};
+                const earned = (stats.raidEarned || 0) + (stats.bonusEarned || 0);
                 $("endedYouBody").innerHTML =
-                    `<strong style="color:${window.getStateColor?.(me.stateId) || "#5aff9a"}">#${myRank} ${escapeHtml(me.name)}</strong> · RM ${money(me.balance)}<br/>` +
-                    `<span class="score-stat-line">${escapeHtml(formatStats(me, txs))}</span>`;
+                    `<strong style="color:${window.getStateColor?.(me.stateId) || "#38bdf8"}">#${myTeamRank} ${escapeHtml(myTeam?.name || me.name)}</strong> · 队库 RM ${money(S.teamBalance(room, me.teamId))}<br/>` +
+                    `<span class="score-stat-line">个人贡献 RM ${money(earned)}</span>`;
                 $("endedYou").classList.remove("hidden");
                 $("endedYou").classList.add("visible");
             }

@@ -1,66 +1,88 @@
 /**
- * Currency Safe — room API facade (localStorage or Firebase)
+ * Currency Safe — room API facade (WebSocket server | localStorage fallback)
  */
 (function () {
-    const cfg = window.CURRENCY_SAFE_FIREBASE || {};
+    const serverCfg = window.CURRENCY_SAFE_SERVER || { enabled: true, wsUrl: "auto" };
     let backend = window.CurrencySafeRoomLocal;
     let ready = Promise.resolve();
 
-    function useFirebase() {
-        return !!(cfg.enabled && cfg.apiKey && cfg.databaseURL);
+    function useWs() {
+        if (!window.CurrencySafeRoomWs) return false;
+        const cfg = window.CURRENCY_SAFE_SERVER || { enabled: true, wsUrl: "auto" };
+        if (cfg.enabled === false) return false;
+        return true;
     }
 
-    function loadScript(src) {
-        return new Promise((resolve, reject) => {
-            const s = document.createElement("script");
-            s.src = src;
-            s.onload = resolve;
-            s.onerror = reject;
-            document.head.appendChild(s);
+    async function initWsBackend(wsBackend, attempts) {
+        const n = attempts || 4;
+        let lastErr;
+        for (let i = 0; i < n; i++) {
+            try {
+                await wsBackend.init();
+                return wsBackend;
+            } catch (err) {
+                lastErr = err;
+                if (i < n - 1) await new Promise(r => setTimeout(r, 2000));
+            }
+        }
+        throw lastErr;
+    }
+
+    if (useWs()) {
+        backend = window.CurrencySafeRoomWs;
+        ready = initWsBackend(backend).then(() => {
+            console.log("Currency Safe: WebSocket 服务器同步已启用", backend.getActiveWsUrl?.() || "");
+        }).catch(err => {
+            window.CURRENCY_SAFE_WS_ERROR = err?.message || String(err);
+            console.warn("WebSocket 连接失败，回退本机同步：", err);
+            backend = window.CurrencySafeRoomLocal;
         });
     }
 
-    if (useFirebase()) {
-        ready = loadScript("https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js")
-            .then(() => loadScript("https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"))
-            .then(() => {
-                window.CurrencySafeRoomFirebase.init(cfg);
-                backend = window.CurrencySafeRoomFirebase;
-                console.log("Currency Safe: Firebase Realtime Database 已启用");
-            })
-            .catch(err => {
-                console.warn("Firebase 加载失败，回退 localStorage：", err);
-                backend = window.CurrencySafeRoomLocal;
-            });
-    }
+    const SYNC_METHODS = new Set([
+        "getClientId", "getRoom", "getSessionRoom", "getSessionRole",
+        "isHost", "canWrite", "getRoomSettings", "getMaxDeployPerTarget",
+        "getTeamDeployCountRoom", "getConnectionStatus", "onConnectionChange",
+        "subscribe"
+    ]);
 
     const METHODS = [
-        "getClientId", "createRoom", "getRoom", "saveRoom", "joinRoom", "reconnectRoom",
-        "joinRoomAsPlayer", "joinRoomAsSpectator", "setRoomMode", "shufflePlayers",
-        "startGame", "endGame", "kickPlayer", "kickSpectator", "leaveRoom", "getSessionRoom", "getSessionRole",
+        "getClientId", "createRoom", "getRoom", "saveRoom", "joinRoom", "reconnectRoom", "ensureRoom",
+        "joinRoomAsPlayer", "joinRoomAsSpectator", "setRoomMode", "shufflePlayers", "shuffleStatesOnly",
+        "setRoomJoinPassword",
+        "startGame", "endGame", "beginLaunchCountdown", "cancelLaunchCountdown",
+        "kickPlayer", "kickSpectator", "leaveRoom", "getSessionRoom", "getSessionRole",
         "isHost", "canWrite", "coordsFromState", "updatePlayerInRoom", "updatePlayerProgress",
-        "getRoomSettings", "logActivity", "applyBreach", "applyTransfer", "getMaxDeployPerTarget",
-        "claimTargetDeploy", "subscribe", "exportRoomCsv", "exportRoomReport",
-        "setMatchDuration", "autoEndGameIfExpired", "touchLobbyPresence"
+        "getRoomSettings", "logActivity", "applyBreach", "applyTransfer", "applyBankTransfer",
+        "beginBankBonus", "completeBankBonus", "getMaxDeployPerTarget",
+        "claimTargetDeploy", "claimTeamDeploy", "shuffleTeamGroups", "assignPlayerToTeam", "createTeam",
+        "getTeamDeployCountRoom", "subscribe", "exportRoomCsv", "exportRoomReport",
+        "setMatchDuration", "autoEndGameIfExpired", "touchLobbyPresence",
+        "getConnectionStatus", "onConnectionChange"
     ];
 
     const api = {
         SK: window.CurrencySafeRoomShared.SK,
         ready,
-        isOnline: () => backend.backendName === "firebase",
+        isOnline: () => backend.backendName === "ws",
         getBackend: () => backend.backendName || "local"
     };
 
     METHODS.forEach(name => {
         api[name] = function (...args) {
-            return backend[name](...args);
+            if (SYNC_METHODS.has(name)) {
+                return backend[name](...args);
+            }
+            return ready.then(() => backend[name](...args));
         };
     });
 
     api.pushActivity = function (room, type, message) {
-        if (backend.logActivity) {
-            return backend.logActivity(room.id || room, type, message);
-        }
+        return ready.then(() => {
+            if (backend.logActivity) {
+                return backend.logActivity(room.id || room, type, message);
+            }
+        });
     };
 
     window.CurrencySafeRoom = api;

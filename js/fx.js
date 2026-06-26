@@ -2,7 +2,7 @@
  * Shared visual FX — confetti zones, balance animation, delays
  */
 (function () {
-    const COLORS = ["#5aff9a", "#71ffe8", "#ffd65a", "#ff6e79", "#a78bfa"];
+    const COLORS = ["#38bdf8", "#22d3ee", "#ffd65a", "#ff6e79", "#a78bfa"];
 
     function delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
@@ -76,6 +76,19 @@
         return Number(n || 0).toLocaleString("en-MY");
     }
 
+    /** 500–900ms by delta; large amounts cap at 1200ms */
+    function balanceAnimDuration(fromN, toN) {
+        const delta = Math.abs((Number(toN) || 0) - (Number(fromN) || 0));
+        if (delta >= 50000) return 1200;
+        if (delta >= 10000) return 900;
+        if (delta >= 2000) return 700;
+        return 500;
+    }
+
+    function easeOutCubic(p) {
+        return 1 - Math.pow(1 - p, 3);
+    }
+
     function animateHudBalance(from, to, opts) {
         opts = opts || {};
         const pill = document.getElementById(opts.pillId || "hudBalancePill");
@@ -87,27 +100,41 @@
             el.textContent = money(toN);
             return Promise.resolve();
         }
-        if (pill) pill.classList.add("pill-credit");
         const delta = toN - fromN;
-        let floater = null;
-        if (delta > 0 && pill) {
-            floater = document.createElement("span");
-            floater.className = "balance-delta";
-            floater.textContent = "+RM " + money(delta);
-            pill.appendChild(floater);
-            setTimeout(() => floater?.remove(), 900);
+        const duration = opts.duration || balanceAnimDuration(fromN, toN);
+        if (delta > 0 && pill) pill.classList.add("pill-credit");
+        if (delta < 0 && pill) {
+            pill.classList.add("pill-debit");
+            if (opts.shake !== false) {
+                pill.animate([
+                    { transform: "translateX(0)" },
+                    { transform: "translateX(-6px)" },
+                    { transform: "translateX(6px)" },
+                    { transform: "translateX(0)" }
+                ], { duration: 280 });
+            }
         }
-        const duration = opts.duration || 800;
+        let floater = null;
+        if (delta !== 0 && pill) {
+            floater = document.createElement("span");
+            floater.className = delta > 0 ? "balance-delta balance-delta-credit" : "balance-delta balance-delta-debit";
+            floater.textContent = (delta > 0 ? "+RM " : "-RM ") + money(Math.abs(delta));
+            pill.style.position = pill.style.position || "relative";
+            pill.appendChild(floater);
+            setTimeout(() => floater?.remove(), 950);
+        }
         const t0 = performance.now();
         return new Promise(resolve => {
             function frame(now) {
                 const p = Math.min(1, (now - t0) / duration);
-                const eased = 1 - Math.pow(1 - p, 3);
+                const eased = easeOutCubic(p);
                 el.textContent = money(Math.round(fromN + (toN - fromN) * eased));
                 if (p < 1) requestAnimationFrame(frame);
                 else {
                     if (pill) {
-                        setTimeout(() => pill.classList.remove("pill-credit"), 400);
+                        setTimeout(() => {
+                            pill.classList.remove("pill-credit", "pill-debit");
+                        }, 400);
                     }
                     resolve();
                 }
@@ -117,6 +144,7 @@
     }
 
     window.CurrencySafeFx = {
-        delay, confetti, startConfettiLoop, stopConfettiLoop, animateHudBalance, money
+        delay, confetti, startConfettiLoop, stopConfettiLoop,
+        animateHudBalance, balanceAnimDuration, money
     };
 })();

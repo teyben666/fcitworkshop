@@ -1,0 +1,20 @@
+{
+  "name": "currency-safe-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Currency Safe — WebSocket room backend",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "qa": "node scripts/b5-smoke-test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "pg": "^8.13.1",
+    "ws": "^8.18.0"
+  }
+}

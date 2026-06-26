@@ -2,7 +2,11 @@
  * Read-only Malaysia map preview (lobby + spectator) with state-colored attack lines.
  */
 (function () {
-    const MAP = { w: 643, h: 316, image: "malaysia.png" };
+    const MAP = {
+        w: 643, h: 316,
+        image: "malaysia.png",
+        imageFallback: "malaysia-map.svg"
+    };
 
     function computeLayout(wrapW, wrapH) {
         const scale = Math.min(wrapW / MAP.w, wrapH / MAP.h);
@@ -34,7 +38,7 @@
     }
 
     function stateColor(stateId) {
-        return window.getStateColor?.(stateId) || "#5aff9a";
+        return window.getStateColor?.(stateId) || "#38bdf8";
     }
 
     function stopAttackAnim(container) {
@@ -86,6 +90,15 @@
         const attackCanvas = container.querySelector(".map-preview-attacks");
         const attackCtx = attackCanvas.getContext("2d");
         const img = container.querySelector(".map-preview-img");
+        let fallbackStep = 0;
+        img.onerror = function onMapImgError() {
+            if (fallbackStep === 0 && MAP.imageFallback && img.src.indexOf(MAP.imageFallback) === -1) {
+                fallbackStep = 1;
+                img.src = MAP.imageFallback;
+                return;
+            }
+            img.onerror = null;
+        };
         let playersRef = players || [];
 
         function placeMarkers() {
@@ -105,18 +118,22 @@
                 if (mapX == null || mapY == null) return;
                 const pos = mapXYToPercent(mapX, mapY, layout);
                 const el = document.createElement("div");
-                el.className = "map-preview-marker";
+                const isGhost = !!p._ghost;
+                el.className = "map-preview-marker" + (isGhost ? " ghost" : "");
                 el.style.left = pos.x + "%";
                 el.style.top = pos.y + "%";
                 const label = p.state ? ` · ${p.state}` : "";
                 const dotColor = stateColor(p.stateId);
-                const labelColor = stateColor(p.stateId);
+                const labelColor = isGhost ? "var(--muted, #8ba4be)" : stateColor(p.stateId);
                 const bal = Number(p.balance || 0).toLocaleString("en-MY");
+                const pinName = isGhost
+                    ? `${escapeHtml(p.name || "空")} · 待进驻`
+                    : `${escapeHtml(p.icon || "🧑")} ${escapeHtml(p.name || "Player")}${escapeHtml(label)}`;
+                const pinBal = isGhost ? "" : `<span class="pin-line pin-balance">RM ${bal}</span>`;
                 el.innerHTML =
-                    `<span class="map-preview-dot" style="background:${dotColor};box-shadow:0 0 12px ${dotColor}99"></span>` +
-                    `<span class="map-preview-label" style="color:${labelColor}">` +
-                    `<span class="pin-line pin-name">${escapeHtml(p.icon || "🧑")} ${escapeHtml(p.name || "Player")}${escapeHtml(label)}</span>` +
-                    `<span class="pin-line pin-balance">RM ${bal}</span></span>`;
+                    `<span class="map-preview-dot" style="background:${dotColor};box-shadow:0 0 12px ${dotColor}${isGhost ? "44" : "99"};${isGhost ? "opacity:0.45;" : ""}"></span>` +
+                    `<span class="map-preview-label" style="color:${labelColor};${isGhost ? "opacity:0.7;" : ""}">` +
+                    `<span class="pin-line pin-name">${pinName}</span>${pinBal}</span>`;
                 if (options.highlightId && p.id === options.highlightId) {
                     el.classList.add("highlight");
                 }
@@ -132,9 +149,11 @@
         if (img.complete) placeMarkers();
         else img.onload = placeMarkers;
 
-        if (!container._mapResizeObs) {
-            container._mapResizeObs = new ResizeObserver(() => placeMarkers());
-            container._mapResizeObs.observe(inner);
+        if (!container._mapResizeObs && typeof ResizeObserver !== "undefined") {
+            try {
+                container._mapResizeObs = new ResizeObserver(() => placeMarkers());
+                container._mapResizeObs.observe(inner);
+            } catch (_) { /* ignore */ }
         }
         container._mapPlaceMarkers = placeMarkers;
         container._mapSetPlayers = (next) => {

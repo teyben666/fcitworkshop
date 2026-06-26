@@ -4,114 +4,247 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Currency Safe</title>
+    <link rel="icon" href="fcitlogo.png" type="image/png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,700;14..32,900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,700;14..32,900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/shared.css" />
-    <link rel="stylesheet" href="css/lobby-hud.css" />
-    <script src="js/i18n.js"></script>
+    <link rel="stylesheet" href="css/lobby-hud.css?v=20260624b" />
+    <link rel="stylesheet" href="css/home-portal.css?v=20260624b" />
+    <script src="js/i18n.js?v=20260624b"></script>
 </head>
-<body class="lobby-page" data-i18n-page-title="pageTitleHome">
-    <main class="portal">
-        <div class="portal-logo"><img src="logo-dark.png" alt="Currency Safe" /></div>
-        <h1 data-i18n="gameTitle">Currency Safe: 金库行动</h1>
-        <p class="subtitle" data-i18n="homeSubtitle">马来西亚金库行动 · 真人互攻 · 创建或加入房间开始</p>
+<body class="lobby-page home-page" data-i18n-page-title="pageTitleHome">
+    <div class="home-dot-grid" aria-hidden="true"></div>
+    <div class="lobby-hud-overlay" aria-hidden="true"></div>
 
-        <div class="hud-panel">
-            <div class="btn-row">
-                <button type="button" class="primary" id="createRoomBtn" data-i18n="createRoom">创建房间</button>
-                <button type="button" class="cyan" id="showJoinBtn" data-i18n="joinRoom">加入房间</button>
+    <main class="portal home-shell">
+        <div class="home-hero">
+            <div class="home-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>Federal Security Network</span>
             </div>
-            <div class="btn-row" style="margin-top:4px">
-                <button type="button" class="secondary" id="singlePlayerBtn" data-i18n="singlePlayerBtn" style="flex:1">单人练习</button>
-            </div>
-
-            <div id="joinPanel" class="hidden">
-                <label for="roomCodeInput" data-i18n="roomCode">房间码</label>
-                <input id="roomCodeInput" maxlength="6" data-i18n-placeholder="roomCodePlaceholder" placeholder="例如 AB12" autocomplete="off" />
-                <div class="btn-row">
-                    <button type="button" class="primary" id="joinRoomBtn" data-i18n="enterRoom">进入房间</button>
-                    <button type="button" class="secondary" id="cancelJoinBtn" data-i18n="cancel">取消</button>
-                </div>
-            </div>
-
-            <div id="homeNotice" class="notice hidden"></div>
+            <h1>
+                <span data-i18n="gameTitlePrefix">Currency Safe:</span>
+                <span class="gradient-text" data-i18n="gameTitleSuffix">金库行动</span>
+            </h1>
+            <p class="subtitle" data-i18n="homeSubtitle">金库行动 · 真人互攻或单人练习 · 创建/加入房间</p>
         </div>
 
-        <p class="subtitle" style="font-size: 0.82rem; margin-top: 24px;" id="syncStatus" data-i18n="syncLocal">
-            同步：localStorage 演示 · 配置 Firebase 后支持多设备（见 DEPLOY.md）
-        </p>
+        <div class="home-sync-row home-toolbar">
+            <div class="home-lang-slot" id="homeLangSlot" aria-label="Language"></div>
+            <button type="button" class="home-sync-pill home-sound-btn" id="homeSoundToggle" aria-pressed="true" title="音效开关">🔊</button>
+            <span class="home-sync-pill" id="syncStatus" data-i18n="syncLocal">同步：localStorage</span>
+            <a href="history.html" class="home-sync-pill home-toolbar-link">📜 历史赛局</a>
+            <a href="BACKEND_ROADMAP.md" class="home-sync-pill home-toolbar-link" id="cloudSetupLink">📡 服务器说明</a>
+        </div>
+
+        <div class="home-cards">
+            <article class="glass-panel home-card create" id="createRoomCard" tabindex="0" role="button">
+                <div>
+                    <div class="home-card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                    </div>
+                    <h3 data-i18n="createRoom">创建房间</h3>
+                    <p data-i18n="homeCreateDesc">作为 HOST 房主开房，可 Shuffle 分队、设置比赛模式与时长。</p>
+                </div>
+                <span class="home-card-cta" data-i18n="homeCreateCta">进入作战室 →</span>
+            </article>
+
+            <article class="glass-panel home-card join" id="joinRoomCard" tabindex="0" role="button">
+                <div>
+                    <div class="home-card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <h3 data-i18n="joinRoom">加入房间</h3>
+                    <p data-i18n="homeJoinDesc">输入房间码进入对战大厅，代号与州属在厅内登记。</p>
+                </div>
+                <span class="home-card-cta" id="joinCardCta" data-i18n="homeJoinCta">展开加入表单 →</span>
+            </article>
+
+            <article class="glass-panel home-card solo" id="soloCard" tabindex="0" role="button">
+                <div>
+                    <div class="home-card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg>
+                    </div>
+                    <h3 data-i18n="singlePlayerBtn">单人练习</h3>
+                    <p data-i18n="singlePlayerDesc">离线训练营，AI 战队部署于地图各州，规则同练习模式。</p>
+                </div>
+                <span class="home-card-cta" data-i18n="homeSoloCta">启动训练模拟 →</span>
+            </article>
+        </div>
+
+        <div class="glass-panel home-join-panel hidden" id="homeJoinPanel">
+            <h4>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--cyan)"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>
+                <span data-i18n="homeJoinFormTitle">输入房间码</span>
+            </h4>
+            <div class="home-join-grid">
+                <div>
+                    <label for="homeRoomCode" data-i18n="roomCode">房间码</label>
+                    <input id="homeRoomCode" maxlength="6" data-i18n-placeholder="roomCodePlaceholder" placeholder="例如 AB12" autocomplete="off" />
+                </div>
+                <div>
+                    <label for="homeRoomPassword" data-i18n="roomTokenOptional">进房令牌（若房主已开启）</label>
+                    <input id="homeRoomPassword" maxlength="32" autocomplete="off" data-i18n-placeholder="roomTokenPlaceholder" placeholder="房主提供的令牌" />
+                </div>
+            </div>
+            <div class="join-actions" style="margin-top:1rem">
+                <button type="button" class="lobby-btn start" id="homeJoinConfirm" data-i18n="homeJoinConfirm">进入大厅</button>
+            </div>
+        </div>
+
+        <div class="home-guide">
+            <strong data-i18n="homeGuideLabel">💡 演练指引：</strong>
+            <span data-i18n="homeGuideBody">一队一州，每队 1～4 人共享部署与种子。开赛前可用 Shuffle 自动分队。央行金库初始 RM 50,000，全队可攻。</span>
+        </div>
     </main>
 
-    <script src="js/malaysia-states.js"></script>
-    <script src="js/firebase-config.js"></script>
+    <div id="homeToast" class="home-toast hidden" role="status"></div>
+
+    <script src="js/server-config.js?v=20260626"></script>
+    <script src="js/join-token.js"></script>
     <script src="js/room-shared.js"></script>
     <script src="js/room-local.js"></script>
-    <script src="js/room-firebase.js"></script>
-    <script src="js/room.js"></script>
+    <script src="js/room-ws.js?v=20260626"></script>
+    <script src="js/room.js?v=20260626"></script>
     <script>
         const $ = (id) => document.getElementById(id);
         const t = (k) => CurrencySafeI18n.t(k);
-        const notice = $("homeNotice");
 
         CurrencySafeI18n.mountLangBar({
-            onChange: () => refreshSyncStatus()
+            onChange: () => {
+                CurrencySafeI18n.applyToDocument();
+                refreshSyncStatus();
+                updateSoundBtn();
+            }
         });
+        const homeLangSlot = $("homeLangSlot");
+        const langBar = document.getElementById("csLangBar");
+        if (homeLangSlot && langBar) {
+            langBar.classList.add("lang-bar--inline");
+            homeLangSlot.appendChild(langBar);
+        }
 
-        function showNotice(msg, isError) {
-            notice.textContent = msg;
-            notice.className = "notice " + (isError ? "error" : "success");
-            notice.classList.remove("hidden");
+        let soundOn = localStorage.getItem("csSound") !== "off";
+        function updateSoundBtn() {
+            const btn = $("homeSoundToggle");
+            if (!btn) return;
+            btn.setAttribute("aria-pressed", soundOn ? "true" : "false");
+            btn.textContent = soundOn ? "🔊" : "🔇";
+            btn.classList.toggle("is-muted", !soundOn);
+            btn.title = soundOn ? "音效开（点击静音）" : "音效关（点击开启）";
+        }
+        $("homeSoundToggle")?.addEventListener("click", () => {
+            soundOn = !soundOn;
+            localStorage.setItem("csSound", soundOn ? "on" : "off");
+            updateSoundBtn();
+        });
+        updateSoundBtn();
+
+        function showToast(msg, isError) {
+            const el = $("homeToast");
+            el.textContent = msg;
+            el.className = "home-toast " + (isError ? "error" : "success");
+            clearTimeout(showToast._t);
+            showToast._t = setTimeout(() => el.classList.add("hidden"), 4000);
         }
 
         function refreshSyncStatus() {
-            $("syncStatus").textContent = CurrencySafeRoom.isOnline()
-                ? t("syncFirebase")
-                : t("syncLocal");
+            const backend = CurrencySafeRoom.getBackend();
+            const el = $("syncStatus");
+            if (window.CURRENCY_SAFE_WS_ERROR && (window.CURRENCY_SAFE_SERVER?.enabled !== false)) {
+                el.textContent = "⚠ 未连上游戏服务器（域名需 Tunnel → :8787）";
+                el.style.borderColor = "rgba(248,113,113,.5)";
+                el.style.color = "#fca5a5";
+                el.title = window.CURRENCY_SAFE_WS_ERROR;
+            } else if (backend === "ws") {
+                const wsSt = CurrencySafeRoom.getConnectionStatus?.() || {};
+                if (wsSt.status === "reconnecting") {
+                    el.textContent = "↻ WebSocket 重连中…";
+                    el.style.borderColor = "rgba(251,191,36,.5)";
+                    el.style.color = "#fcd34d";
+                } else {
+                    el.textContent = t("syncWs");
+                    el.style.borderColor = "";
+                    el.style.color = "";
+                }
+            } else {
+                el.textContent = t("syncLocal");
+                el.style.borderColor = "";
+                el.style.color = "";
+            }
+            const link = $("cloudSetupLink");
+            if (link) {
+                link.style.display = backend === "ws" ? "none" : "";
+                if (window.CURRENCY_SAFE_WS_ERROR) {
+                    link.textContent = "📡 启动说明";
+                    link.href = "BACKEND_ROADMAP.md";
+                }
+            }
         }
 
-        CurrencySafeRoom.ready.then(refreshSyncStatus);
-
-        $("createRoomBtn").onclick = () => {
+        function goJoinRoom() {
+            const code = ($("homeRoomCode")?.value || "").trim().toUpperCase();
+            if (!code) { showToast(t("enterCode"), true); return; }
+            const password = ($("homeRoomPassword")?.value || "").trim();
             sessionStorage.removeItem("csGameMode");
-            Promise.resolve(CurrencySafeRoom.createRoom()).then(room => {
-                location.href = "lobby.html?room=" + encodeURIComponent(room.id);
-            }).catch(() => showNotice(t("createFailed"), true));
-        };
-
-        $("showJoinBtn").onclick = () => {
-            $("joinPanel").classList.remove("hidden");
-            $("roomCodeInput").focus();
-        };
-
-        $("cancelJoinBtn").onclick = () => {
-            $("joinPanel").classList.add("hidden");
-            notice.classList.add("hidden");
-        };
-
-        $("joinRoomBtn").onclick = () => {
-            const code = $("roomCodeInput").value.trim().toUpperCase();
-            if (!code) {
-                showNotice(t("enterCode"), true);
-                return;
-            }
-            sessionStorage.removeItem("csGameMode");
-            Promise.resolve(CurrencySafeRoom.joinRoom(code)).then(res => {
+            sessionStorage.removeItem("csJustCreatedRoom");
+            sessionStorage.removeItem("csPendingJoinName");
+            sessionStorage.removeItem("csPendingJoinState");
+            CurrencySafeRoom.ready.then(() => CurrencySafeRoom.joinRoom(code, password)).then(res => {
                 if (!res.ok) {
-                    showNotice(res.error, true);
+                    if (res.needsPassword) showToast(t("roomTokenWrong"), true);
+                    else showToast(res.error, true);
                     return;
                 }
+                if (password) sessionStorage.setItem(CurrencySafeRoom.SK.roomJoinPassword, password);
                 location.href = "lobby.html?room=" + encodeURIComponent(res.room.id);
-            });
-        };
+            }).catch(() => showToast(t("createFailed"), true));
+        }
+        function goCreateRoom() {
+            sessionStorage.removeItem("csGameMode");
+            CurrencySafeRoom.ready.then(() => CurrencySafeRoom.createRoom()).then(room => {
+                if (!room?.id) { showToast(t("createFailed"), true); return; }
+                sessionStorage.setItem("csJustCreatedRoom", room.id);
+                showToast(t("homeRoomCreated") + room.id, false);
+                setTimeout(() => {
+                    location.href = "lobby.html?room=" + encodeURIComponent(room.id);
+                }, 400);
+            }).catch(() => showToast(t("createFailed"), true));
+        }
 
-        $("roomCodeInput").addEventListener("keydown", (e) => {
-            if (e.key === "Enter") $("joinRoomBtn").click();
+        function toggleJoinPanel() {
+            const panel = $("homeJoinPanel");
+            const card = $("joinRoomCard");
+            const open = panel.classList.toggle("hidden") === false;
+            card.classList.toggle("active", open);
+            $("joinCardCta").textContent = open ? t("homeJoinCtaClose") : t("homeJoinCta");
+            if (open) $("homeRoomCode").focus();
+        }
+
+        CurrencySafeRoom.ready.then(() => {
+            refreshSyncStatus();
+            CurrencySafeI18n.applyToDocument();
+            CurrencySafeRoom.onConnectionChange?.(() => refreshSyncStatus());
         });
 
-        $("singlePlayerBtn").onclick = () => {
+        $("createRoomCard").onclick = goCreateRoom;
+        $("createRoomCard").onkeydown = (e) => { if (e.key === "Enter") goCreateRoom(); };
+
+        $("joinRoomCard").onclick = toggleJoinPanel;
+        $("joinRoomCard").onkeydown = (e) => { if (e.key === "Enter") toggleJoinPanel(); };
+
+        $("soloCard").onclick = () => {
             sessionStorage.setItem("csGameMode", "single");
             location.href = "singleplayer.html";
         };
+        $("soloCard").onkeydown = (e) => {
+            if (e.key === "Enter") { sessionStorage.setItem("csGameMode", "single"); location.href = "singleplayer.html"; }
+        };
+
+        $("homeJoinConfirm").onclick = goJoinRoom;
+        $("homeRoomCode").addEventListener("keydown", (e) => {
+            if (e.key === "Enter") goJoinRoom();
+        });
     </script>
 </body>
 </html>

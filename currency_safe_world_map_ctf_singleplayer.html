@@ -761,7 +761,7 @@
             margin-top: 10px;
             padding: 10px 12px;
             border-radius: 12px;
-            border: 1px dashed rgba(255, 214, 90, 0.35);
+            border: none;
             background: rgba(255, 214, 90, 0.06);
             color: #fff6d0;
             font-weight: 900;
@@ -944,23 +944,6 @@
         }
         .typing-progress span.done { color: var(--green); }
         .typing-progress span.cur { color: var(--amber); font-weight: 900; }
-        .arc-bar-wrap {
-            height: 10px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--line);
-            overflow: hidden;
-            margin: 10px 0;
-        }
-        .arc-bar-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--red), var(--amber));
-            transition: width .12s linear;
-        }
-        .arc-bar-fill.safe {
-            background: linear-gradient(90deg, var(--green-2), var(--cyan));
-        }
         .signal-warn {
             animation: signal-flash .45s ease 2;
         }
@@ -1249,7 +1232,7 @@
             margin-top: 10px;
             padding: 14px;
             border-radius: 14px;
-            border: 1px dashed rgba(77, 255, 166, 0.35);
+            border: none;
             background: rgba(4, 20, 14, 0.6);
             text-align: center;
         }
@@ -1266,7 +1249,7 @@
             margin-top: 10px;
             padding: 10px;
             border-radius: 12px;
-            border: 1px dashed rgba(113, 255, 232, 0.35);
+            border: none;
             background: rgba(113, 255, 232, 0.06);
             font-family: SFMono-Regular, Consolas, monospace;
             font-size: 1.2rem;
@@ -1492,7 +1475,7 @@
                         <input id="teamPassword" maxlength="9" placeholder="例如：SAFE2024" />
                         <label>特工等级</label>
                         <select id="agentRank">
-                            <option value="trainee" selected>见习特工（推荐 · 慢弧线 · 2 次容错 · 固定激光）</option>
+                            <option value="trainee" selected>见习特工（推荐 · 2 次容错 · 固定激光）</option>
                             <option value="elite">精英特工（更快 · 更少容错 · 无提示）</option>
                         </select>
                         <label>金库所在州属</label>
@@ -1642,9 +1625,6 @@
         window.__mapLayout = { wrapW: 0, wrapH: 0, offsetX: 0, offsetY: 0, drawW: 0, drawH: 0, scale: 1 };
         const GAME_CONFIG = {
             typingKeywordLen: 6,
-            arcRetreatPerChar: 0.055,
-            arcFailBackoffChars: 2,
-            arcGraceMs: 3000,
             saveDebounceMs: 2000
         };
         const MALAYSIA_STATES = window.MALAYSIA_STATES;
@@ -1897,11 +1877,11 @@
         const cityPool = MALAYSIA_CITIES;
 
         const TRAINEE_CFG = {
-            arcDurationMs: 22000, mistakes: 2, dialHint: "lesson",
+            mistakes: 2, dialHint: "lesson",
             laserMoveMs: 0, roundMs: 12 * 60 * 1000, showWholeWord: false
         };
         const ELITE_CFG = {
-            arcDurationMs: 14000, mistakes: 0, dialHint: false,
+            mistakes: 0, dialHint: false,
             laserMoveMs: 2500, roundMs: 5 * 60 * 1000, showWholeWord: true
         };
 
@@ -1910,8 +1890,6 @@
         const mapWrap = $("mapWrap");
         const routeLayer = $("routeLayer");
         let routeTimer = null;
-        let typingArcTimer = null;
-        let typingArcStart = 0;
         let gridScoutTimer = null;
         let gridMeltdownTimer = null;
         let gridScanTimeout = null;
@@ -2119,9 +2097,7 @@
             }
             const dial = games.find(g => g.kind === "dial");
             if (dial) {
-                const wheels = dial.wheels?.filter(isDialWheelRotatable).length || 1;
-                const extra = Math.max(0, (dial.spinCount || 0) - wheels * 4);
-                score -= Math.min(20, Math.round(extra * 1.5));
+                /* dial 转盘操作不计入单人练习表现扣分（与多人攻坚规则一致） */
             }
             const grid = games.find(g => g.kind === "grid");
             if (grid) {
@@ -2317,8 +2293,6 @@
                 keyword,
                 typedIndex: 0,
                 mistakesLeft: cfg.mistakes,
-                arcProgress: 0,
-                arcGraceUntil: null,
                 interceptEnergy: 0,
                 originLabel: originLabel || "瑞士银行",
                 targetTeam,
@@ -2529,12 +2503,6 @@
             }
             saveStateNow();
             render();
-            typingArcStart = Date.now();
-            if (currentIntel?.games?.[0]) {
-                currentIntel.games[0].arcProgress = 0;
-                currentIntel.games[0].arcGraceUntil = null;
-            }
-            startTypingArcIfNeeded();
             startGridScoutIfNeeded();
             showTab("attack");
             scrollToMission(0);
@@ -2717,18 +2685,14 @@
         }
 
         // --- 游戏1：拦截转账码 ---
-        function stopTypingArc() {
-            if (typingArcTimer) { clearInterval(typingArcTimer); typingArcTimer = null; }
-        }
+        function stopTypingArc() {}
 
         function updateTypingUI() {
             const game = currentIntel?.games?.[0];
             if (!game || game.kind !== "typing") return;
-            const fill = document.getElementById("typingArcFill");
             const energyFill = document.getElementById("interceptEnergyFill");
             const giant = document.getElementById("typingGiantChar");
             const prog = document.getElementById("typingProgress");
-            if (fill) fill.style.width = (game.arcProgress * 100).toFixed(0) + "%";
             if (energyFill) energyFill.style.width = (game.interceptEnergy * 100).toFixed(0) + "%";
             if (giant && !game.solved) giant.textContent = game.keyword[game.typedIndex] || "✓";
             if (prog) {
@@ -2739,39 +2703,6 @@
             }
         }
 
-        function startTypingArcIfNeeded() {
-            if (typingArcTimer) return;
-            const game = currentIntel?.games?.[0];
-            if (!game || game.kind !== "typing" || game.solved) return;
-            const cfg = getAgentCfg();
-            typingArcStart = Date.now();
-            typingArcTimer = setInterval(() => {
-                if (!currentIntel?.games?.[0] || currentIntel.games[0].solved) {
-                    stopTypingArc();
-                    return;
-                }
-                const g = currentIntel.games[0];
-                const elapsed = Date.now() - typingArcStart;
-                g.arcProgress = Math.min(1, elapsed / cfg.arcDurationMs);
-                updateTypingUI();
-                if (g.arcProgress >= 1) {
-                    if (!g.arcGraceUntil) {
-                        g.arcGraceUntil = Date.now() + GAME_CONFIG.arcGraceMs;
-                        showToast("密钥即将被截走！3 秒内快敲！");
-                        playAlarmSound();
-                    } else if (Date.now() > g.arcGraceUntil) {
-                        g.arcGraceUntil = null;
-                        g.typedIndex = Math.max(0, g.typedIndex - GAME_CONFIG.arcFailBackoffChars);
-                        g.arcProgress = Math.max(0, g.arcProgress - 0.2);
-                        typingArcStart = Date.now();
-                        state.missionStats.typingFails = (state.missionStats.typingFails || 0) + 1;
-                        showToast("敌方用了更长密钥，下次盯紧大字母！进度倒退 2 字。");
-                        saveState();
-                    }
-                }
-            }, 80);
-        }
-
         function submitTypingChar(key) {
             const game = currentIntel?.games?.[0];
             if (!game || game.kind !== "typing" || game.solved || !isGameUnlocked(0)) return;
@@ -2779,15 +2710,11 @@
             if (key === expected) {
                 game.typedIndex++;
                 game.interceptEnergy = game.typedIndex / game.keyword.length;
-                game.arcProgress = Math.max(0, game.arcProgress - GAME_CONFIG.arcRetreatPerChar);
-                typingArcStart += GAME_CONFIG.arcRetreatPerChar * getAgentCfg().arcDurationMs;
-                game.arcGraceUntil = null;
                 playCoinSound();
                 if (game.typedIndex >= game.keyword.length) {
                     game.solved = true;
                     game.interceptEnergy = 1;
                     currentIntel.fragments[0] = game.reveal;
-                    stopTypingArc();
                     confetti();
                     playSuccessSound();
                     showToast("转账密钥截获成功！片段 1 已到手！");
@@ -2815,7 +2742,6 @@
                     showToast("拦截失败！密钥飘走了，重来！");
                     game.typedIndex = Math.max(0, game.typedIndex - 1);
                     game.mistakesLeft = getAgentCfg().mistakes;
-                    typingArcStart = Date.now();
                 }
                 updateTypingUI();
                 saveState();
@@ -2843,7 +2769,7 @@
             return `
                 <div class="mini-game-card ${game.solved ? "solved" : ""} ${locked ? "locked" : ""}" id="miniGame0">
                     <h3>${game.solved ? "✅" : "💰"} ${game.title}</h3>
-                    <p class="muted">从 <strong>${escapeHtml(game.originLabel)}</strong> 飞向你的基地的转账密钥正在传输！在光点到达前逐字截获。</p>
+                    <p class="muted">从 <strong>${escapeHtml(game.originLabel)}</strong> 发往你基地的转账密钥正在传输，逐字截获即可。</p>
                     ${eliteWord}
                     ${game.solved ? `<div class="reveal">密钥片段：<strong>${escapeHtml(game.reveal)}</strong></div>
                     <div class="agent-note">${escapeHtml(game.agentNote || "")}</div>` : `
@@ -2855,8 +2781,7 @@
                             <small>拦截能量（满格解锁片段，不再中途刷金币）</small>
                             <div class="intercept-energy-bar"><div class="intercept-energy-fill" id="interceptEnergyFill" style="width:${(game.interceptEnergy*100).toFixed(0)}%"></div></div>
                         </div>
-                        <div class="arc-bar-wrap"><div class="arc-bar-fill" id="typingArcFill" style="width:${(game.arcProgress*100).toFixed(0)}%"></div></div>
-                        <p class="muted" style="font-size:.82rem">容错剩余：${game.mistakesLeft} 次 · 敲对一字弧线会回退 · 请用键盘输入</p>
+                        <p class="muted" style="font-size:.82rem">容错剩余：${game.mistakesLeft} 次 · 请用键盘输入</p>
                         <input id="typingFocusTrap" style="opacity:0;position:absolute;width:1px;height:1px" autocomplete="off" />
                     </div>`}
                 </div>`;
@@ -3623,7 +3548,6 @@
             drawRoute(target, player);
             saveState();
             render();
-            startTypingArcIfNeeded();
             startGridScoutIfNeeded();
             confetti();
             showToast(`RM ${amount} 已从 ${target.name} 转入 ${player.name}。目标密码已轮换。`);
@@ -3757,9 +3681,6 @@
             renderScoreboard();
             renderTransactions();
             if (window.updateTeamMarkers3D) window.updateTeamMarkers3D();
-            if (currentIntel?.games?.[0] && !currentIntel.games[0].solved && isGameUnlocked(0)) {
-                startTypingArcIfNeeded();
-            }
         }
 
         // --- 绑定事件 ---
@@ -3810,7 +3731,6 @@
         initStateSelect();
         render();
         if (currentIntel) {
-            startTypingArcIfNeeded();
             startGridScoutIfNeeded();
         }
 

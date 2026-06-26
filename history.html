@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Currency Safe · 历史赛局</title>
+    <link rel="icon" href="fcitlogo.png" type="image/png" />
+    <link rel="stylesheet" href="css/shared.css" />
+    <link rel="stylesheet" href="css/lobby-hud.css" />
+    <style>
+        .history-page { max-width: 920px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+        .history-head { margin-bottom: 1.5rem; }
+        .history-head h1 { margin: 0 0 .35rem; font-size: 1.6rem; }
+        .history-head p { color: var(--muted); margin: 0; }
+        .history-table { display: grid; gap: 10px; }
+        .history-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 12px;
+            align-items: center;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,.03);
+        }
+        .history-row b { display: block; }
+        .history-row span { color: var(--muted); font-size: .85rem; }
+        .history-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .history-empty { color: var(--muted); padding: 2rem; text-align: center; }
+        @media (max-width: 640px) {
+            .history-row { grid-template-columns: 1fr; }
+        }
+    </style>
+    <script src="js/i18n.js"></script>
+</head>
+<body class="lobby-page">
+    <main class="history-page glass-panel" style="margin-top:2rem">
+        <div class="history-head">
+            <h1 data-i18n="matchHistory">历史赛局</h1>
+            <p data-i18n="matchHistoryDesc">已结束比赛的归档记录（服务器 /api/history）</p>
+        </div>
+        <div id="historyList" class="history-table">
+            <div class="history-empty" data-i18n="historyLoading">加载中…</div>
+        </div>
+        <div style="margin-top:1.5rem">
+            <a href="index.html" class="lobby-btn secondary" data-i18n="backHome">返回首页</a>
+        </div>
+    </main>
+    <script>
+        const t = (k) => CurrencySafeI18n.t(k);
+        CurrencySafeI18n.mountLangBar();
+        CurrencySafeI18n.unlockLang();
+
+        function escapeHtml(text) {
+            const d = document.createElement("div");
+            d.textContent = text;
+            return d.innerHTML;
+        }
+
+        function money(n) {
+            return Number(n || 0).toLocaleString("en-MY");
+        }
+
+        function formatDate(ms) {
+            if (!ms) return "—";
+            return new Date(ms).toLocaleString();
+        }
+
+        function topTeamLabel(match) {
+            const teams = match.teams || [];
+            if (!teams.length) return "—";
+            const top = [...teams].sort((a, b) => (b.vaultBalance || 0) - (a.vaultBalance || 0))[0];
+            return `${top.name || top.state || "队伍"} · RM ${money(top.vaultBalance)}`;
+        }
+
+        async function loadHistory() {
+            const box = document.getElementById("historyList");
+            try {
+                const res = await fetch("/api/history?limit=50");
+                const data = await res.json();
+                if (!data.ok || !data.matches?.length) {
+                    box.innerHTML = `<div class="history-empty">${t("historyEmpty")}</div>`;
+                    return;
+                }
+                box.innerHTML = "";
+                data.matches.forEach(m => {
+                    const row = document.createElement("div");
+                    row.className = "history-row";
+                    const mode = m.mode === "competitive" ? t("modeCompetitiveBtn") : t("modePracticeBtn");
+                    row.innerHTML =
+                        `<div><b>${escapeHtml(m.roomId)}</b>` +
+                        `<span>${mode} · ${m.playerCount || 0} ${t("historyPlayers")} · ${m.teamCount || 0} ${t("historyTeams")}</span>` +
+                        `<span>${formatDate(m.endedAt)} · ${escapeHtml(topTeamLabel(m))}</span></div>` +
+                        `<div class="history-actions">` +
+                        `<a class="lobby-btn secondary" href="/api/history/${encodeURIComponent(m.roomId)}/${m.endedAt}" download>JSON</a>` +
+                        `<button type="button" class="lobby-btn secondary" data-room="${escapeHtml(m.roomId)}" data-ended="${m.endedAt}">${t("historyView")}</button>` +
+                        `</div>`;
+                    box.appendChild(row);
+                });
+                box.querySelectorAll("button[data-room]").forEach(btn => {
+                    btn.onclick = async () => {
+                        const roomId = btn.dataset.room;
+                        const endedAt = btn.dataset.ended;
+                        const r = await fetch(`/api/history/${encodeURIComponent(roomId)}/${endedAt}`);
+                        const j = await r.json();
+                        if (!j.ok) { alert(j.error || "加载失败"); return; }
+                        const blob = new Blob([JSON.stringify(j.match, null, 2)], { type: "application/json" });
+                        const url = URL.createObjectURL(blob);
+                        window.open(url, "_blank");
+                        setTimeout(() => URL.revokeObjectURL(url), 60000);
+                    };
+                });
+            } catch (err) {
+                box.innerHTML = `<div class="history-empty">${t("historyError")}: ${escapeHtml(err.message)}</div>`;
+            }
+        }
+
+        loadHistory();
+        CurrencySafeI18n.applyToDocument();
+    </script>
+</body>
+</html>

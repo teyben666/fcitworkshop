@@ -27,15 +27,29 @@
     color: var(--amber);
     text-shadow: 0 0 12px rgba(255, 214, 90, 0.45);
 }
+.pill-debit {
+    animation: hud-pulse-debit 0.55s ease-out 2;
+    border-color: rgba(255, 110, 121, 0.75) !important;
+}
+.pill-debit #hudBalance {
+    color: #ff8a93;
+    text-shadow: 0 0 12px rgba(255, 110, 121, 0.45);
+}
 .balance-delta {
     position: absolute;
     right: 8px;
     top: -6px;
     font-size: 0.72rem;
     font-weight: 800;
+    pointer-events: none;
+}
+.balance-delta-credit {
     color: var(--amber);
     animation: balance-delta-rise 0.85s ease-out forwards;
-    pointer-events: none;
+}
+.balance-delta-debit {
+    color: #ff8a93;
+    animation: balance-delta-fall 0.85s ease-out forwards;
 }
 @keyframes cs-confetti-fall {
     to {
@@ -47,9 +61,17 @@
     0%, 100% { box-shadow: var(--glow, 0 0 20px rgba(255, 214, 90, 0.1)); }
     50% { box-shadow: 0 0 22px rgba(255, 214, 90, 0.45); }
 }
+@keyframes hud-pulse-debit {
+    0%, 100% { box-shadow: var(--glow, 0 0 20px rgba(255, 110, 121, 0.08)); }
+    50% { box-shadow: 0 0 22px rgba(255, 110, 121, 0.45); }
+}
 @keyframes balance-delta-rise {
     0% { opacity: 1; transform: translateY(0); }
     100% { opacity: 0; transform: translateY(-18px); }
+}
+@keyframes balance-delta-fall {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(14px); }
 }
 
 /* Pin label — always visible, two lines */
@@ -79,3 +101,74 @@
     color: var(--muted);
     margin-top: 2px;
 }
+
+/* Raid activity + transaction highlights */
+.raid-activity-feed {
+    margin: 0 0 10px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 110, 121, 0.25);
+    background: rgba(255, 110, 121, 0.06);
+    max-height: 120px;
+    overflow-y: auto;
+    font-size: 0.72rem;
+    line-height: 1.4;
+}
+.raid-activity-feed.hidden { display: none; }
+.raid-activity-feed .raid-act-item {
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--muted);
+}
+.raid-activity-feed .raid-act-item:last-child { border-bottom: none; }
+.raid-activity-feed .raid-act-item strong { color: #ff8a93; font-weight: 700; }
+.raid-activity-feed .raid-act-item[data-type="transfer"] strong { color: #ffd65a; }
+.activity-feed-game {
+    display: grid;
+    gap: 6px;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 12px;
+}
+.activity-feed-game .act-item {
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.4;
+}
+.activity-feed-game .act-item .act-tag {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-right: 6px;
+    background: rgba(56, 189, 248, 0.12);
+    color: #7dd3fc;
+}
+.activity-feed-game .act-item[data-type="transfer"] .act-tag,
+.activity-feed-game .act-item[data-type="vault_breach"] .act-tag {
+    background: rgba(255, 214, 90, 0.12);
+    color: #ffd65a;
+}
+.tx.tx-robbed {
+    border-color: rgba(255, 110, 121, 0.45);
+    background: rgba(255, 110, 121, 0.08);
+}
+.tx.tx-earned {
+    border-color: rgba(56, 189, 248, 0.35);
+    background: rgba(56, 189, 248, 0.06);
+}
+.tx-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+}
+.tx-badge.robbed { background: rgba(255, 110, 121, 0.2); color: #ff8a93; }
+.tx-badge.earned { background: rgba(56, 189, 248, 0.15); color: #7dd3fc; }
