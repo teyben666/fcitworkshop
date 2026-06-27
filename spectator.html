@@ -14,53 +14,53 @@
     <main class="spectator-dashboard">
         <header class="spectator-top">
             <div>
-                <h1>观战模式</h1>
+                <h1 data-i18n="specTitle">观战模式</h1>
                 <p class="subtitle">
-                    房间 <span class="room-code" id="roomCodeDisplay">----</span>
-                    · <span class="mode-badge practice" id="modeBadge">练习</span>
-                    · 剩余 <span id="matchTimeLabel">—</span>
+                    <span data-i18n="specRoom">房间</span> <span class="room-code" id="roomCodeDisplay">----</span>
+                    · <span class="mode-badge practice" id="modeBadge" data-i18n="specModePractice">练习</span>
+                    · <span data-i18n="specRemaining">剩余</span> <span id="matchTimeLabel">—</span>
                 </p>
             </div>
             <div class="spectator-top-actions">
-                <a href="index.html" class="btn secondary">首页</a>
+                <a href="index.html" class="btn secondary" data-i18n="specHome">首页</a>
             </div>
         </header>
 
         <div class="spectator-main">
             <section class="spectator-left">
                 <div class="card spectator-map-card">
-                    <h2>马来西亚威胁地图 <span class="tag">只读 · 州色攻击线</span></h2>
+                    <h2><span data-i18n="specMapTitle">马来西亚威胁地图</span> <span class="tag" data-i18n="specMapTag">只读 · 州色攻击线</span></h2>
                     <div class="spectator-map-outer" id="spectatorMapOuter">
                         <div class="map-preview-wrap" id="spectatorMap"></div>
                         <div class="bank-bonus-pin spectator-pin hidden" id="spectatorBankBonus" data-phase="hidden">
                             <span class="bank-bonus-ring"></span>
                             <span class="bank-bonus-dot">🏦</span>
-                            <span class="bank-bonus-label">央行 Bonus</span>
+                            <span class="bank-bonus-label" data-i18n="bankBonusLabel">央行 Bonus</span>
                             <span class="bank-bonus-phase"></span>
                         </div>
                     </div>
                 </div>
                 <div class="card spectator-activity-card">
-                    <h2>Activity 动态 <span class="tag">最新在上</span></h2>
+                    <h2><span data-i18n="specActivityTitle">Activity 动态</span> <span class="tag" data-i18n="specActivityTag">最新在上</span></h2>
                     <div class="activity-feed" id="activityFeed"></div>
                 </div>
             </section>
 
             <aside class="card spectator-right">
-                <h2>排行榜 <span class="tag" id="leaderboardLockTag"></span></h2>
+                <h2><span data-i18n="specLeaderboard">排行榜</span> <span class="tag" id="leaderboardLockTag"></span></h2>
                 <div class="spec-leaderboard-wrap">
                     <table class="spec-leaderboard">
                         <thead>
                             <tr>
-                                <th>排名</th>
-                                <th>名字</th>
-                                <th>队伍</th>
-                                <th>州</th>
-                                <th>目标</th>
-                                <th>三关</th>
-                                <th>余额</th>
-                                <th>盗</th>
-                                <th>被盗</th>
+                                <th data-i18n="specColRank">排名</th>
+                                <th data-i18n="specColName">名字</th>
+                                <th data-i18n="specColTeam">队伍</th>
+                                <th data-i18n="specColState">州</th>
+                                <th data-i18n="specColTarget">目标</th>
+                                <th data-i18n="specColLevels">三关</th>
+                                <th data-i18n="specColBalance">余额</th>
+                                <th data-i18n="specColSteal">盗</th>
+                                <th data-i18n="specColRobbed">被盗</th>
                             </tr>
                         </thead>
                         <tbody id="leaderboardBody"></tbody>
@@ -78,35 +78,46 @@
     <script src="js/room-local.js"></script>
     <script src="js/room-ws.js?v=20260626"></script>
     <script src="js/room.js?v=20260626"></script>
+    <script src="js/i18n.js"></script>
     <script src="js/bank-bonus-scheduler.js"></script>
     <script>
         const $ = (id) => document.getElementById(id);
+        const t = (key) => CurrencySafeI18n.t(key);
+        const tr = (msg) => CurrencySafeI18n.trError(msg);
+        const stateLabel = (id) => window.getStateLabel?.(id) ?? id;
         const roomId = (new URLSearchParams(location.search).get("room")
             || sessionStorage.getItem(CurrencySafeRoom.SK.roomId) || "").toUpperCase();
 
         if (!roomId) location.href = "index.html";
 
         const ACTIVITY_LABELS = {
-            player_join: "加入",
-            player_leave: "离开",
-            spectator_join: "观战",
-            game_start: "开赛",
-            shuffle_teams: "Shuffle",
-            mode_change: "模式",
-            target_selected: "选目标",
-            mission_deployed: "部署",
-            level_complete: "过关",
-            level_fail: "失误",
-            password_rotated: "换密码",
-            password_expired: "过期",
-            vault_breach: "破解",
-            transfer: "转账",
-            bank_transfer: "央行",
-            bank_bonus: "央行闪灯",
-            bank_bonus_complete: "阅读Bonus",
-            game_end: "结束",
-            room_created: "建房"
+            player_join: "activityPlayerJoin",
+            player_leave: "activityPlayerLeave",
+            spectator_join: "activitySpectatorJoin",
+            game_start: "activityGameStart",
+            shuffle_teams: "activityShuffle",
+            shuffle_states: "activityShuffleStates",
+            mode_change: "activityModeChange",
+            target_selected: "activityMissionDeploy",
+            mission_deployed: "activityMissionDeploy",
+            level_complete: "activityLevelClear",
+            level_fail: "activityLevelClear",
+            password_rotated: "activitySettings",
+            password_expired: "activitySettings",
+            vault_breach: "activityVaultBreach",
+            transfer: "activityTransfer",
+            bank_transfer: "activityBankBonus",
+            bank_bonus: "activityBankBonus",
+            bank_bonus_complete: "activityBankBonus",
+            game_end: "activityGameEnd",
+            room_created: "activityGameStart",
+            settings: "activitySettings"
         };
+
+        function activityTag(type) {
+            const key = ACTIVITY_LABELS[type];
+            return key ? t(key) : type;
+        }
 
         function escapeHtml(t) {
             const d = document.createElement("div");
@@ -197,8 +208,9 @@
             const S = CurrencySafeRoomShared;
             $("roomCodeDisplay").textContent = room.id;
             const isComp = room.mode === "competitive";
-            $("modeBadge").textContent = isComp ? "竞赛" : "练习";
-            $("modeBadge").className = "mode-badge " + (isComp ? "competitive" : "practice");
+            const modeBadge = $("modeBadge");
+            modeBadge.textContent = isComp ? t("specModeCompetitive") : t("specModePractice");
+            modeBadge.className = "mode-badge " + (isComp ? "competitive" : "practice");
             const rem = S.getMatchRemainingMs(room);
             $("matchTimeLabel").textContent = rem != null ? formatRemaining(rem) : "—";
 
@@ -213,7 +225,7 @@
             }
             updateSpectatorBankBonus(room);
 
-            $("leaderboardLockTag").textContent = room.leaderboardLocked ? "队库排序已锁定" : "";
+            $("leaderboardLockTag").textContent = room.leaderboardLocked ? t("specLeaderboardLocked") : "";
 
             const txs = room.transactions || [];
 
@@ -232,34 +244,40 @@
                     const target = prog?.targetName ? escapeHtml(prog.targetName) : "—";
                     const nameColor = window.getStateColor?.(p.stateId) || "#38bdf8";
                     const st = CurrencySafeRoomShared.transferStatsForPlayer(p, txs);
+                    const teamState = (() => {
+                        const team = (room.teams || []).find(tm => tm.id === p.teamId);
+                        return team?.stateId
+                            ? stateLabel(team.stateId)
+                            : (window.formatStoredStateLabel?.(team) || team?.name || "—");
+                    })();
+                    const playerState = p.stateId
+                        ? stateLabel(p.stateId)
+                        : (window.formatStoredStateLabel?.(p) || "—");
                     return `<tr>
                         <td class="col-rank">#${i + 1}</td>
                         <td class="col-name"><strong style="color:${nameColor}">${escapeHtml(p.name)}</strong></td>
-                        <td>${(() => {
-                            const team = (room.teams || []).find(t => t.id === p.teamId);
-                            return escapeHtml(team?.state || team?.name || "—");
-                        })()}</td>
-                        <td style="color:${nameColor}">${escapeHtml(p.state || "—")}</td>
+                        <td>${escapeHtml(teamState)}</td>
+                        <td style="color:${nameColor}">${escapeHtml(playerState)}</td>
                         <td>${target}</td>
                         <td>${dots}</td>
                         <td class="col-bal">RM ${S.playerVaultBalance(room, p.id).toLocaleString()}</td>
-                        <td class="col-stat">${st.stealCount}次<br/><span class="stat-amt">RM ${st.stealTotal.toLocaleString()}</span></td>
-                        <td class="col-stat">${st.robbedCount}次<br/><span class="stat-amt">RM ${st.robbedTotal.toLocaleString()}</span></td>
+                        <td class="col-stat">${st.stealCount}${t("statTimes")}<br/><span class="stat-amt">RM ${st.stealTotal.toLocaleString()}</span></td>
+                        <td class="col-stat">${st.robbedCount}${t("statTimes")}<br/><span class="stat-amt">RM ${st.robbedTotal.toLocaleString()}</span></td>
                     </tr>`;
                 }).join("")
-                : `<tr><td colspan="9" class="empty-row">暂无玩家</td></tr>`;
+                : `<tr><td colspan="9" class="empty-row">${escapeHtml(t("specEmptyPlayers"))}</td></tr>`;
 
             const feed = room.activity || [];
             $("activityFeed").innerHTML = feed.length
                 ? feed.map(a => {
-                    const label = ACTIVITY_LABELS[a.type] || a.type;
+                    const label = activityTag(a.type);
                     return `<div class="item" data-type="${escapeHtml(a.type || "")}">
                         <strong>${new Date(a.at).toLocaleTimeString()}</strong>
                         <span class="tag">[${escapeHtml(label)}]</span>
                         ${escapeHtml(a.message)}
                     </div>`;
                 }).join("")
-                : `<div class="item">暂无动态</div>`;
+                : `<div class="item">${escapeHtml(t("specEmptyActivity"))}</div>`;
         }
 
         const HOST_END_HOLD_MS = 10000;
@@ -304,6 +322,14 @@
 
         CurrencySafeRoom.ready.then(() => Promise.resolve(CurrencySafeRoom.reconnectRoom(roomId)))
             .then(() => {
+                CurrencySafeI18n.mountLangBar({
+                    onChange: () => {
+                        CurrencySafeI18n.applyToDocument();
+                        const room = CurrencySafeRoom.getRoom(roomId);
+                        if (room) render(room);
+                    }
+                });
+                CurrencySafeI18n.applyToDocument();
                 bindHostLongPressEnd();
                 CurrencySafeRoom.subscribe(roomId, render);
                 setInterval(() => {

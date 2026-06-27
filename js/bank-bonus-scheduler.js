@@ -105,10 +105,11 @@
 
     function phaseLabel(status) {
         if (!status || status.phase === "hidden") return "";
+        const t = global.CurrencySafeI18n?.t;
         const map = {
-            arrive: "闪灯进场",
-            breathe: "可点击参与",
-            depart: "闪灯离场"
+            arrive: t?.("bonusPhaseArrive") ?? "闪灯进场",
+            breathe: t?.("bonusPhaseBreathe") ?? "可点击参与",
+            depart: t?.("bonusPhaseDepart") ?? "闪灯离场"
         };
         return map[status.phase] || "";
     }

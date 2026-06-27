@@ -318,7 +318,7 @@ const BONUS_LOOT = {
 | 9.2 | finale 熔炉 | `js/mission-finale.js` | 种子随机目标颜色序、逐字上色、ink 按种子重建 | ✅ |
 | 9.3 | Bonus 陷阱 | `data/intel-briefings.json`, `mission-intelread.js` | 4 套陷阱简报、ATTENTION 标签、答错 Toast | ✅ |
 | 9.4 | dial | `game.html` | 匹配震动/弹动、距离点、▲▼、坐标遮蔽 | ✅ |
-| 9.5 | cvfilter | `js/mission-cvfilter.js` | 滤镜反馈与教学提示加强 | ✅ |
+| 9.5 | cvfilter | — | 已移除（移出随机池） | ✅ |
 | 9.6 | typing | `game.html` | 焦点陷阱与错题统计口径复核 | ✅ |
 | 9.7 | grid | `game.html` | 侦察/扫描节奏与口播对齐 | ✅ |
 | 9.8 | mastermind | `js/mission-mastermind.js`, `game.html` | 六色可见、行数用尽提示与灯泡动效 | ✅ |

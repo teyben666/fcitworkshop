@@ -70,6 +70,17 @@
                 </div>
                 <span class="home-card-cta" data-i18n="homeSoloCta">启动训练模拟 →</span>
             </article>
+
+            <article class="glass-panel home-card tutorial" id="tutorialCard" tabindex="0" role="button">
+                <div>
+                    <div class="home-card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg>
+                    </div>
+                    <h3 data-i18n="tutorialBtn">训练营</h3>
+                    <p data-i18n="tutorialDesc">按关卡直接开玩，适合课堂演示与孩子自由加练。</p>
+                </div>
+                <span class="home-card-cta" data-i18n="tutorialCta">进入训练营 →</span>
+            </article>
         </div>
 
         <div class="glass-panel home-join-panel hidden" id="homeJoinPanel">
@@ -240,6 +251,13 @@
         $("soloCard").onkeydown = (e) => {
             if (e.key === "Enter") { sessionStorage.setItem("csGameMode", "single"); location.href = "singleplayer.html"; }
         };
+
+        function goTutorial() {
+            sessionStorage.removeItem("csGameMode");
+            location.href = "tutorial.html";
+        }
+        $("tutorialCard").onclick = goTutorial;
+        $("tutorialCard").onkeydown = (e) => { if (e.key === "Enter") goTutorial(); };
 
         $("homeJoinConfirm").onclick = goJoinRoom;
         $("homeRoomCode").addEventListener("keydown", (e) => {

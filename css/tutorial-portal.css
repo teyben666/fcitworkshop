@@ -1,0 +1,113 @@
+/* Tutorial sandbox picker — extends home portal */
+
+body.tutorial-page .portal {
+    width: min(52rem, 94vw);
+}
+
+.tutorial-back-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.tutorial-back-link {
+    font-size: 0.8rem;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    color: var(--muted);
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.65rem;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.tutorial-back-link:hover {
+    color: #e2e8f0;
+    border-color: rgba(56, 189, 248, 0.35);
+}
+
+.tutorial-section {
+    margin-bottom: 2rem;
+}
+
+.tutorial-section h2 {
+    margin: 0 0 0.35rem;
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+}
+
+.tutorial-section .section-hint {
+    margin: 0 0 1rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+
+.tutorial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
+    gap: 0.85rem;
+}
+
+.tutorial-card {
+    border-radius: 1rem;
+    padding: 1rem 1rem 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(3, 12, 20, 0.72);
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    transition: border-color 0.18s, transform 0.12s, box-shadow 0.18s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-height: 7.5rem;
+}
+
+.tutorial-card:hover {
+    border-color: rgba(56, 189, 248, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.tutorial-card:active {
+    transform: translateY(0);
+}
+
+.tutorial-card .tc-icon {
+    font-size: 1.65rem;
+    line-height: 1;
+}
+
+.tutorial-card .tc-title {
+    font-weight: 800;
+    font-size: 0.92rem;
+    line-height: 1.25;
+}
+
+.tutorial-card .tc-desc {
+    font-size: 0.72rem;
+    color: var(--muted);
+    line-height: 1.35;
+    flex: 1;
+}
+
+.tutorial-card .tc-cta {
+    font-size: 0.65rem;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    color: var(--green);
+    letter-spacing: 0.06em;
+    margin-top: 0.25rem;
+}
+
+.tutorial-empty {
+    text-align: center;
+    padding: 2rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+}

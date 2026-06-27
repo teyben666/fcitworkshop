@@ -1,6 +1,7 @@
 /**
  * Mission game pool — enabled toggles, random pick (practice) / seeded pick (competitive).
  * Generators are registered from game.html via MissionGames.setGenerators().
+ * Enabled pool games also appear on tutorial.html (see js/tutorial-catalog.js).
  */
 (function (global) {
     const SLOT_COUNT = 3;
@@ -60,14 +61,6 @@
             enabled: true,
             icon: "⚛️",
             shortLabel: "量子同步",
-            modes: ["solo", "mp"],
-            weight: 1
-        },
-        cvfilter: {
-            id: "cvfilter",
-            enabled: true,
-            icon: "🛰️",
-            shortLabel: "滤镜显影",
             modes: ["solo", "mp"],
             weight: 1
         },
@@ -229,7 +222,15 @@
         intel.games.forEach((g, i) => {
             g.slotIndex = i;
             if (!g.kind && intel.pickedKinds[i]) g.kind = intel.pickedKinds[i];
+            if (g.kind === "cvfilter") {
+                g.solved = true;
+                if (!g.reveal) g.reveal = intel.fragments?.[i] || "";
+                if (intel.fragments) intel.fragments[i] = g.reveal;
+            }
         });
+        if (intel.pickedKinds) {
+            intel.pickedKinds = intel.pickedKinds.map(k => (k === "cvfilter" ? "dial" : k));
+        }
         return intel;
     }
 

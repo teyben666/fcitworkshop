@@ -2,16 +2,26 @@
  * Post-mission finale — classic fragment order OR Stroop ink-color order.
  */
 (function (global) {
+    function mT(k, v) {
+        return global.MissionI18n?.mT?.(k, v) ?? k;
+    }
+
     const BADGES = ["①", "②", "③"];
     const FINALE_MODES = ["classic", "stroop"];
 
     const INK_COLORS = [
-        { id: "yellow", label: "黄", hex: "#eab308" },
-        { id: "red", label: "红", hex: "#ef4444" },
-        { id: "green", label: "绿", hex: "#22c55e" }
+        { id: "yellow", hex: "#eab308" },
+        { id: "red", hex: "#ef4444" },
+        { id: "green", hex: "#22c55e" }
     ];
 
-    const WORD_LABELS = ["红", "黄", "绿"];
+    function inkLabel(id) {
+        return mT(`mission.color.${id}`);
+    }
+
+    function wordLabels() {
+        return INK_COLORS.map(c => inkLabel(c.id));
+    }
 
     function hashSeed(str) {
         return global.MissionGames?.hashSeed?.(str) ?? 1;
@@ -41,7 +51,8 @@
         const texts = (segments || []).slice(0, 3);
         while (texts.length < 3) texts.push("?");
         const inkPool = seededShuffle([...INK_COLORS], hashSeed(`${seedStr}|ink`));
-        const wordPool = seededShuffle([...WORD_LABELS], hashSeed(`${seedStr}|word`));
+        const words = wordLabels();
+        const wordPool = seededShuffle([...words], hashSeed(`${seedStr}|word`));
         return texts.map((text, id) => ({
             id,
             badge: BADGES[id],
@@ -66,20 +77,30 @@
     }
 
     function targetSequenceLabel(seq) {
-        return (seq || []).map(i => i.label).join(" → ");
+        return (seq || []).map(i => inkLabel(i.id)).join(" → ");
     }
 
     function targetSequenceLabelHtml(seq, arrowHtml) {
         const arrow = arrowHtml || '<span class="fs-stroop-arrow">→</span>';
         return (seq || []).map((i, idx) => {
             const sep = idx > 0 ? ` ${arrow} ` : "";
-            return `${sep}<span class="fs-stroop-target-label" style="color:${i.hex}">${i.label}</span>`;
+            return `${sep}<span class="fs-stroop-target-label" style="color:${i.hex}">${inkLabel(i.id)}</span>`;
         }).join("");
     }
 
     function create(segments, seedStr) {
         const seed = seedStr || "finale";
         const mode = pickFinaleMode(seed);
+        return buildFinaleState(segments, seed, mode);
+    }
+
+    function createForced(segments, seedStr, forcedMode) {
+        const seed = seedStr || "finale";
+        const mode = forcedMode === "stroop" ? "stroop" : "classic";
+        return buildFinaleState(segments, seed, mode);
+    }
+
+    function buildFinaleState(segments, seed, mode) {
         const targetSequence = mode === "stroop" ? buildTargetSequence(seed) : null;
         const cards = mode === "stroop"
             ? buildStroopCards(segments, seed)
@@ -213,13 +234,13 @@
         }).join("");
         return `
             <div class="mini-game-card finale-card" id="miniGameFinale">
-                <h3>${finale.solved ? "✅" : "🔐"} 组合金库密钥</h3>
-                <p class="muted">三段情报已截获。拖动片段，让角标从左到右为 <strong>① ② ③</strong>，然后确认组合。</p>
+                <h3>${finale.solved ? "✅" : "🔐"} ${mT("mission.finale.classicTitle")}</h3>
+                <p class="muted">${mT("mission.finale.classicDesc")}</p>
                 <div class="fs-row" data-finale-row="1">${cardsHtml}</div>
                 ${!finale.solved ? `<div class="fs-actions">
-                    <button type="button" class="green" data-finale-lock="1">确认组合 · 解锁金库</button>
-                    <span class="muted">失误 ${finale.mistakes || 0} 次${finale.hintShown ? " · 已提示①位置" : ""}</span>
-                </div>` : `<p class="notice success">密钥已合成，金库已解锁。</p>`}
+                    <button type="button" class="green" data-finale-lock="1">${mT("mission.finale.classicLockBtn")}</button>
+                    <span class="muted">${mT("mission.finale.mistakesMeta", { n: finale.mistakes || 0 })}${finale.hintShown ? ` · ${mT("mission.finale.classicHint")}` : ""}</span>
+                </div>` : `<p class="notice success">${mT("mission.finale.classicSuccess")}</p>`}
             </div>`;
     }
 
@@ -227,12 +248,12 @@
         const { escapeHtml } = helpers;
         const seq = finale.targetSequence || INK_COLORS;
         const seqHtml = targetSequenceLabelHtml(seq);
-        const firstInk = seq[0]?.label || "黄";
+        const firstInk = seq[0] ? inkLabel(seq[0].id) : inkLabel("yellow");
         const cardsHtml = finale.order.map((cardId, pos) => {
             const card = finale.cards[cardId];
             const hintClass = finale.hintShown && card.ink?.id === seq[0]?.id ? " fs-hint" : "";
             const ink = card.ink || INK_COLORS[0];
-            const congruent = card.word === ink.label;
+            const congruent = card.word === inkLabel(ink.id);
             return `<div class="fs-card stroop-card${hintClass}${congruent ? " stroop-congruent" : ""}" draggable="${!finale.solved}" data-finale-pos="${pos}">
                 <div class="fs-stroop-word" style="color:${ink.hex}">${escapeHtml(card.word || "?")}</div>
                 <div class="fs-text fs-frag">${escapeHtml(card.text)}</div>
@@ -240,15 +261,15 @@
         }).join("");
         return `
             <div class="mini-game-card finale-card stroop-finale" id="miniGameFinale">
-                <h3>${finale.solved ? "✅" : "🔥"} 数据熔炉 · 抗干扰校验</h3>
-                <p class="muted">字是诱饵！<strong>别看字写什么</strong>，只看<strong>字体颜色</strong>，本局从左到右排成：</p>
+                <h3>${finale.solved ? "✅" : "🔥"} ${mT("mission.finale.stroopTitle")}</h3>
+                <p class="muted">${mT("mission.finale.stroopDesc")}</p>
                 <p class="fs-stroop-target"><strong>${seqHtml}</strong></p>
-                <p class="muted fs-stroop-example">例：字写「红」但字体是黄色 → 这一格算<strong>黄</strong>。字和颜色一样时仍按颜色排，别偷懒读字。</p>
+                <p class="muted fs-stroop-example">${mT("mission.finale.stroopExample")}</p>
                 <div class="fs-row" data-finale-row="1">${cardsHtml}</div>
                 ${!finale.solved ? `<div class="fs-actions">
-                    <button type="button" class="green" data-finale-lock="1">确认颜色顺序 · 解锁金库</button>
-                    <span class="muted">失误 ${finale.mistakes || 0} 次${finale.hintShown ? ` · 已提示第一格（${firstInk}）` : ""}</span>
-                </div>` : `<p class="notice success">熔炉校验通过：①②③ 片段已合成，金库已解锁。</p>`}
+                    <button type="button" class="green" data-finale-lock="1">${mT("mission.finale.stroopLockBtn")}</button>
+                    <span class="muted">${mT("mission.finale.mistakesMeta", { n: finale.mistakes || 0 })}${finale.hintShown ? ` · ${mT("mission.finale.stroopHint", { color: firstInk })}` : ""}</span>
+                </div>` : `<p class="notice success">${mT("mission.finale.stroopSuccess")}</p>`}
             </div>`;
     }
 
@@ -263,6 +284,7 @@
         FINALE_MODES,
         INK_COLORS,
         create,
+        createForced,
         migrate,
         isCorrectOrder,
         getCombinedPassword,

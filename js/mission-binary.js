@@ -2,6 +2,10 @@
  * Binary bulb mini-game — 4 bulbs (0–15), 3 correct rounds to pass.
  */
 (function (global) {
+    function mT(k, v) {
+        return global.MissionI18n?.mT?.(k, v) ?? k;
+    }
+
     function hashSeed(str) {
         return global.MissionGames?.hashSeed?.(str) ?? 1;
     }
@@ -44,7 +48,7 @@
         const seedStr = `${ctx?.password || ""}|${fragment}|binary|${ctx?.target?.id || ""}`;
         const game = {
             kind: "binary",
-            title: "机器人密语 · 二进制灯泡",
+            title: mT("mission.binary.title"),
             solved: false,
             mistakes: 0,
             round: 0,
@@ -53,7 +57,7 @@
             bulbs: [0, 0, 0, 0],
             choices: [],
             reveal: fragment,
-            agentNote: "特工笔记：亮灯=1，灭灯=0。四位灯泡合起来就是 0～15 的数字，机器人只懂这种语言！"
+            agentNote: mT("mission.binary.agentNote")
         };
         nextRound(game, seedStr);
         game._seedStr = seedStr;
@@ -65,6 +69,8 @@
         if (typeof game.round !== "number") game.round = 0;
         if (typeof game.mistakes !== "number") game.mistakes = 0;
         if (!Array.isArray(game.bulbs)) game.bulbs = toBulbs(game.value || 0);
+        game.title = mT("mission.binary.title");
+        game.agentNote = mT("mission.binary.agentNote");
     }
 
     function pickAnswer(game, choice) {
@@ -101,15 +107,15 @@
         return `
             <div class="mini-game-card ${game.solved ? "solved" : ""} ${locked ? "locked" : ""}" id="miniGame${idx}">
                 <h3>${game.solved ? "✅" : "🤖"} ${escapeHtml(game.title)}</h3>
-                <p class="muted">老式机器人守卫只懂灯泡语言：亮=1，灭=0。读出四位二进制对应的数字（0～15）。</p>
+                <p class="muted">${mT("mission.binary.desc")}</p>
                 ${game.solved
-                    ? `<div class="reveal">密钥片段：<strong>${escapeHtml(game.reveal)}</strong></div>
-                       <div class="agent-note">${escapeHtml(game.agentNote || "")}</div>`
-                    : locked ? `<p class="muted">完成上一关后解锁。</p>` : `
+                    ? `<div class="reveal">${mT("mission.common.keyFragment")}<strong>${escapeHtml(game.reveal)}</strong></div>
+                       <details class="agent-note-fold"><summary>${mT("mission.common.agentNote")}</summary><div class="agent-note">${escapeHtml(game.agentNote || "")}</div></details>`
+                    : locked ? `<p class="muted">${mT("mission.common.lockedPrev")}</p>` : `
                 <div class="binary-bulb-row">${renderBulbs(game.bulbs)}</div>
-                <p class="binary-hint muted">从左到右读：${game.bulbs.join("")} → 选下方正确数字 · 进度 ${prog}</p>
+                <p class="binary-hint muted">${mT("mission.binary.hint", { bits: game.bulbs.join(""), prog })}</p>
                 <div class="binary-choices">${choicesHtml}</div>
-                <p class="muted" style="font-size:.78rem;margin-top:.5rem">失误 ${game.mistakes || 0} 次</p>`}
+                <p class="muted" style="font-size:.78rem;margin-top:.5rem">${mT("mission.binary.meta", { mistakes: game.mistakes || 0 })}</p>`}
             </div>`;
     }
 

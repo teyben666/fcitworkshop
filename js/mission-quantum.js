@@ -11,6 +11,10 @@
         "#2dd4bf", "#f87171", "#94a3b8"
     ];
 
+    function mT(key, vars) {
+        return global.MissionI18n?.mT?.(key, vars) ?? key;
+    }
+
     function hashSeed(str) {
         return global.MissionGames?.hashSeed?.(str) ?? 1;
     }
@@ -35,7 +39,7 @@
         );
         return {
             kind: "quantum",
-            title: "量子纠缠 · 同步复制",
+            title: mT("mission.quantum.title"),
             solved: false,
             mistakes: 0,
             round: 0,
@@ -46,7 +50,7 @@
             countdown: 3,
             _seedStr: seedStr,
             reveal: fragment || "",
-            agentNote: "特工笔记：亮灯顺序就是量子密钥脉冲——闪烁结束后，在你的矩阵里按同样顺序点击。文字会骗人，序列不会。"
+            agentNote: mT("mission.quantum.agentNote")
         };
     }
 
@@ -60,6 +64,8 @@
         if (typeof game.mistakes !== "number") game.mistakes = 0;
         if (!game.phase) game.phase = "ready";
         if (typeof game.inputIndex !== "number") game.inputIndex = 0;
+        game.title = mT("mission.quantum.title");
+        game.agentNote = mT("mission.quantum.agentNote");
     }
 
     function currentSequence(game) {
@@ -119,8 +125,9 @@
                 inputPhase ? "qx-input" : ""
             ].filter(Boolean).join(" ");
             const style = lit ? ` style="background:${color}"` : "";
+            const aria = mT("mission.quantum.nodeAria", { n: i + 1 });
             html += `<div class="${cls}" data-qx-cell="${i}" data-qx-color="${color}" role="button"`
-                + ` tabindex="${inputPhase ? "0" : "-1"}" aria-label="节点 ${i + 1}"`
+                + ` tabindex="${inputPhase ? "0" : "-1"}" aria-label="${aria}"`
                 + ` aria-disabled="${inputPhase ? "false" : "true"}"${style}></div>`;
         }
         return `<div class="qx-grid">${html}</div>`;
@@ -140,6 +147,7 @@
         cellEl.style.background = lit ? color : "#0a0a0a";
         cellEl.tabIndex = inputPhase ? 0 : -1;
         cellEl.setAttribute("aria-disabled", inputPhase ? "false" : "true");
+        cellEl.setAttribute("aria-label", mT("mission.quantum.nodeAria", { n: cellIdx + 1 }));
     }
 
     function syncGridElement(gridRoot, game) {
@@ -155,34 +163,48 @@
 
     function phaseLabel(game) {
         if (game.solved) return "";
-        if (game.phase === "ready" || game.phase === "countdown") return "量子信号传输入侵…准备镜像复制";
-        if (game.phase === "show") return "记住亮灯顺序！";
-        if (game.phase === "input") return `镜像复制：${game.inputIndex}/${currentSequence(game).length}`;
-        if (game.phase === "wrong") return "序列错误！再看一遍…";
-        if (game.phase === "round_done") return `第 ${game.round} 轮同步成功！`;
+        if (game.phase === "ready" || game.phase === "countdown") return mT("mission.quantum.phaseReady");
+        if (game.phase === "show") return mT("mission.quantum.phaseShow");
+        if (game.phase === "input") {
+            return mT("mission.quantum.phaseInput", {
+                i: game.inputIndex,
+                len: currentSequence(game).length
+            });
+        }
+        if (game.phase === "wrong") return mT("mission.quantum.phaseWrong");
+        if (game.phase === "round_done") return mT("mission.quantum.roundDone", { n: game.round });
         return "";
     }
 
     function render(game, idx, locked, helpers) {
         migrate(game);
         const { escapeHtml } = helpers;
-        const roundLabel = game.solved ? "完成" : `第 ${game.round + 1}/${ROUND_LENGTHS.length} 轮 · ${ROUND_LENGTHS[game.round]} 节点`;
+        const roundLabel = game.solved
+            ? mT("mission.common.complete")
+            : mT("mission.quantum.roundLabel", {
+                cur: game.round + 1,
+                total: ROUND_LENGTHS.length,
+                nodes: ROUND_LENGTHS[game.round]
+            });
 
         return `
             <div class="mini-game-card ${game.solved ? "solved" : ""} ${locked ? "locked" : ""}" id="miniGame${idx}">
                 <h3>${game.solved ? "✅" : "⚛️"} ${escapeHtml(game.title)}</h3>
-                <p class="muted">3×3 量子矩阵会依次闪烁。结束后按<strong>相同顺序</strong>点击——${roundLabel}。</p>
+                <p class="muted">${mT("mission.quantum.desc", { roundLabel })}</p>
                 ${game.solved
-                    ? `<div class="reveal">密钥片段：<strong>${escapeHtml(game.reveal)}</strong></div>
-                       <div class="agent-note">${escapeHtml(game.agentNote || "")}</div>`
-                    : locked ? `<p class="muted">完成上一关后解锁。</p>` : `
+                    ? `<div class="reveal">${mT("mission.common.keyFragment")}<strong>${escapeHtml(game.reveal)}</strong></div>
+                       <details class="agent-note-fold"><summary>${mT("mission.common.agentNote")}</summary><div class="agent-note">${escapeHtml(game.agentNote || "")}</div></details>`
+                    : locked ? `<p class="muted">${mT("mission.common.lockedPrev")}</p>` : `
                 <p class="qx-phase" id="qxPhase${idx}">${escapeHtml(phaseLabel(game))}</p>
                 ${renderGrid(game, locked)}
                 <div class="qx-actions">
                     ${game.phase === "ready" || game.phase === "wrong" || game.phase === "round_done"
-                        ? `<button type="button" class="green" data-qx-start="${idx}">▶ 开始同步</button>` : ""}
+                        ? `<button type="button" class="green" data-qx-start="${idx}">${mT("mission.quantum.startBtn")}</button>` : ""}
                 </div>
-                <p class="muted qx-meta">失误 ${game.mistakes || 0} 次 · 进度 ${Math.min(game.round, 3)}/3 轮</p>`}
+                <p class="muted qx-meta">${mT("mission.quantum.meta", {
+                    mistakes: game.mistakes || 0,
+                    cur: Math.min(game.round + (game.phase === "round_done" ? 1 : 0), ROUND_LENGTHS.length)
+                })}</p>`}
             </div>`;
     }
 

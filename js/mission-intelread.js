@@ -3,6 +3,10 @@
  * Terminal UI with left-to-right decryption scramble.
  */
 (function (global) {
+    function mT(k, v) {
+        return global.MissionI18n?.mT?.(k, v) ?? k;
+    }
+
     const LINE_DECODE_MS = 320;
     const SCRAMBLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
     const SCRAMBLE_CURSORS = ["░", "▒", "▓", "█"];
@@ -65,27 +69,30 @@
             : EMBEDDED_BRIEFINGS);
     });
 
-    const TRAP_LABELS = {
-        ordinal: "序数陷阱",
-        route: "站点陷阱",
-        time: "时间变更",
-        negation: "否定陷阱"
+    const TRAP_LABEL_KEYS = {
+        ordinal: "mission.intel.trapOrdinal",
+        route: "mission.intel.trapRoute",
+        time: "mission.intel.trapTime",
+        negation: "mission.intel.trapNegation"
     };
 
-    const DEFAULT_TRAP_HINTS = {
-        ordinal: "题目问的是第几站/第几个——别看成第一站！",
-        route: "看清每一站的职责，别张冠李戴。",
-        time: "注意「改至」「推迟」——以最新时间为准。",
-        negation: "题目问「不是」——别选成允许项！"
+    const TRAP_HINT_KEYS = {
+        ordinal: "mission.intel.trapHintOrdinal",
+        route: "mission.intel.trapHintRoute",
+        time: "mission.intel.trapHintTime",
+        negation: "mission.intel.trapHintNegation"
     };
 
     function trapTagLabel(trap) {
-        return TRAP_LABELS[trap] || "注意力陷阱";
+        const key = TRAP_LABEL_KEYS[trap];
+        return key ? mT(key) : mT("mission.intel.trapDefault");
     }
 
     function trapHintFor(q) {
         if (!q?.trap) return null;
-        return q.trapHint || DEFAULT_TRAP_HINTS[q.trap] || "仔细读题，别被诱饵带走。";
+        if (q.trapHint) return q.trapHint;
+        const key = TRAP_HINT_KEYS[q.trap];
+        return key ? mT(key) : mT("mission.intel.trapHintDefault");
     }
 
     function hashSeed(str) {
@@ -95,6 +102,9 @@
     }
 
     function listBriefings() {
+        if (global.CurrencySafeI18n?.getLang?.() === "en" && global.INTEL_BRIEFINGS_EN?.length) {
+            return global.INTEL_BRIEFINGS_EN;
+        }
         return briefings?.length ? briefings : EMBEDDED_BRIEFINGS;
     }
 
@@ -273,16 +283,19 @@
         const q = session.briefing.questions[session.currentQ];
         if (!q) return "";
         const tag = q.trap
-            ? `<p class="ir-quiz-tag ir-quiz-tag-trap">ATTENTION · ${escape(trapTagLabel(q.trap))}</p>`
-            : `<p class="ir-quiz-tag">EXTRACT · 细节验证</p>`;
+            ? `<p class="ir-quiz-tag ir-quiz-tag-trap">${escape(mT("mission.intel.tagAttention", { trap: trapTagLabel(q.trap) }))}</p>`
+            : `<p class="ir-quiz-tag">${escape(mT("mission.intel.tagExtract"))}</p>`;
         const wrongHint = session.lastWrongQ === session.currentQ
-            ? `<p class="ir-wrong">${escape(session.lastTrapHint || "答错了 · 奖金 −RM 200 · 请再选一次")}</p>` : "";
+            ? `<p class="ir-wrong">${escape(session.lastTrapHint || mT("mission.intel.wrongDefault"))}</p>` : "";
         const choices = q.choices.map((c, i) =>
             `<button type="button" class="ir-choice" data-ir-choice="${i}">${escape(c)}</button>`
         ).join("");
         return `
             ${tag}
-            <p class="ir-quiz-progress">细节题 ${session.currentQ + 1} / ${session.briefing.questions.length}</p>
+            <p class="ir-quiz-progress">${escape(mT("mission.intel.quizProgress", {
+                cur: session.currentQ + 1,
+                total: session.briefing.questions.length
+            }))}</p>
             <p class="ir-quiz-prompt">${escape(q.prompt)}</p>
             ${wrongHint}
             <div class="ir-choices">${choices}</div>`;
@@ -291,13 +304,13 @@
     function renderDone(session, helpers) {
         const remain = computeRemainder(session);
         const mode = session.practiceOnly
-            ? "练习模式 · 无奖金入账"
-            : `预计入账 RM ${helpers.money(remain)}`;
+            ? mT("mission.intel.donePractice")
+            : mT("mission.intel.donePayout", { amount: helpers.money(remain) });
         return `
             <div class="ir-done">
-                <p class="ir-done-title">✅ 三题全对</p>
+                <p class="ir-done-title">${mT("mission.intel.doneTitle")}</p>
                 <p class="ir-done-sub">${mode}</p>
-                ${session.wrongCount ? `<p class="ir-done-meta">答错 ${session.wrongCount} 次</p>` : ""}
+                ${session.wrongCount ? `<p class="ir-done-meta">${mT("mission.intel.doneWrongMeta", { n: session.wrongCount })}</p>` : ""}
             </div>`;
     }
 
@@ -309,12 +322,12 @@
 
     function renderTerminal(session) {
         const decrypting = session.step === "read";
-        const status = decrypting ? "DECRYPTING..." : "LOCKED";
+        const status = decrypting ? mT("mission.intel.statusDecrypting") : mT("mission.intel.statusLocked");
         const dim = session.step === "quiz" || session.step === "done";
         return `
             <div class="ir-terminal ${dim ? "ir-terminal-dim" : ""}">
                 <div class="ir-terminal-chrome">
-                    <span class="ir-terminal-host">root@bnm-intercept</span>
+                    <span class="ir-terminal-host">${mT("mission.intel.terminalHost")}</span>
                     <span class="ir-terminal-file">${escape(session.briefing.title)}</span>
                     <span class="ir-terminal-status">${status}</span>
                 </div>
@@ -330,30 +343,51 @@
             (global.CurrencySafeRoomShared?.BONUS_LOOT?.graceMs || 20000)
             - (Date.now() - session.startedAt));
         const graceLabel = graceLeft > 0
-            ? `宽限 ${Math.ceil(graceLeft / 1000)}s`
-            : "计时扣款中";
+            ? mT("mission.intel.graceCounting", { n: Math.ceil(graceLeft / 1000) })
+            : mT("mission.intel.graceDeducting");
 
         let afterTerminal = "";
         if (session.step === "read") {
             afterTerminal = `
-                <p class="ir-hint muted">情报解密中 · 完成后自动进入答题</p>
-                <button type="button" class="secondary ir-skip-read">跳过解密</button>`;
+                <p class="ir-hint muted">${mT("mission.intel.decryptHint")}</p>
+                <button type="button" class="secondary ir-skip-read">${mT("mission.intel.skipDecrypt")}</button>`;
         } else if (session.step === "quiz") {
             afterTerminal = `<div class="ir-quiz-panel">${renderQuiz(session)}</div>`;
         } else if (session.step === "done") {
             afterTerminal = `<div class="ir-quiz-panel ir-done-panel">${renderDone(session, { money })}</div>`;
         }
 
+        const wrongMeta = session.wrongCount
+            ? ` · ${mT("mission.intel.wrongPenalty", { n: session.wrongCount })}`
+            : "";
+
         return `
             <div class="intel-read-panel">
                 <div class="ir-pool-bar ${session.practiceOnly ? "practice" : ""}">
-                    <span class="ir-pool-label">${session.practiceOnly ? "练习" : "奖金池"}</span>
+                    <span class="ir-pool-label">${session.practiceOnly ? mT("mission.intel.poolPractice") : mT("mission.intel.poolLabel")}</span>
                     <span class="ir-pool-amount" id="irPoolAmount">RM ${money(remain)}</span>
-                    <span class="ir-pool-meta">${graceLabel}${session.wrongCount ? ` · 答错 −${session.wrongCount}×200` : ""}</span>
+                    <span class="ir-pool-meta">${graceLabel}${wrongMeta}</span>
                 </div>
                 ${renderTerminal(session)}
                 ${afterTerminal}
             </div>`;
+    }
+
+    function refreshBriefingLocale(session) {
+        if (!session) return;
+        const seed = session.briefingSeed || "bonus";
+        const step = session.step;
+        const curQ = session.currentQ || 0;
+        session.briefing = pickBriefing(seed);
+        if (step === "quiz") {
+            session.currentQ = Math.min(curQ, (session.briefing.questions?.length || 1) - 1);
+            session.displayedLines = [...(session.briefing.lines || [])];
+        } else if (step === "read") {
+            session.displayedLines = [];
+            session.decodeStartedAt = Date.now();
+        } else if (step === "done") {
+            session.displayedLines = [...(session.briefing.lines || [])];
+        }
     }
 
     global.MissionIntelread = {
@@ -365,9 +399,10 @@
         submitAnswer,
         computeRemainder,
         render,
+        refreshBriefingLocale,
         trapTagLabel,
         trapHintFor,
-        TRAP_LABELS,
+        TRAP_LABEL_KEYS,
         DECODE_MS: LINE_DECODE_MS,
         LINE_DECODE_MS,
         SCRAMBLE_CURSORS,

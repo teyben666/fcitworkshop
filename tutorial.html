@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Currency Safe · 训练营</title>
+    <link rel="icon" href="fcitlogo.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,700;14..32,900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/shared.css" />
+    <link rel="stylesheet" href="css/lobby-hud.css?v=20260624b" />
+    <link rel="stylesheet" href="css/home-portal.css?v=20260624b" />
+    <link rel="stylesheet" href="css/tutorial-portal.css?v=20260626" />
+    <script src="js/i18n.js?v=20260626"></script>
+    <script src="js/i18n-missions-catalog.js?v=20260626"></script>
+    <script src="js/mission-i18n.js?v=20260626"></script>
+    <script src="js/mission-games.js?v=20260626"></script>
+    <script src="js/tutorial-catalog.js?v=20260626"></script>
+</head>
+<body class="lobby-page home-page tutorial-page" data-i18n-page-title="tutorialPageTitle">
+    <div class="home-dot-grid" aria-hidden="true"></div>
+    <div class="lobby-hud-overlay" aria-hidden="true"></div>
+
+    <main class="portal home-shell">
+        <div class="tutorial-back-row">
+            <a href="index.html" class="tutorial-back-link" data-i18n="tutorialBackHome">← 返回首页</a>
+            <div class="home-lang-slot" id="tutorialLangSlot" aria-label="Language"></div>
+        </div>
+
+        <div class="home-hero" style="margin-bottom: 1.75rem">
+            <div class="home-badge">
+                <span>🎯</span>
+                <span data-i18n="tutorialBadge">Training Sandbox</span>
+            </div>
+            <h1>
+                <span data-i18n="tutorialTitle">训练营</span>
+            </h1>
+            <p class="subtitle" data-i18n="tutorialSubtitle">点选关卡直接开玩 · 适合课堂演示与自由加练</p>
+        </div>
+
+        <div id="tutorialSections"></div>
+    </main>
+
+    <script>
+        const $ = (id) => document.getElementById(id);
+        const t = (k) => CurrencySafeI18n.t(k);
+        const mT = (k) => window.MissionI18n?.mT?.(k) ?? t(k);
+
+        function labelFor(item) {
+            if (item.titleKey.startsWith("mission.")) return mT(item.titleKey);
+            return t(item.titleKey);
+        }
+
+        function descFor(item) {
+            if (item.descKey?.startsWith("mission.")) return mT(item.descKey);
+            return t(item.descKey || "");
+        }
+
+        function renderSections() {
+            const host = $("tutorialSections");
+            if (!host || !window.TutorialCatalog) return;
+            const sections = TutorialCatalog.getSections();
+            if (!sections.length) {
+                host.innerHTML = `<p class="tutorial-empty">${t("tutorialEmpty")}</p>`;
+                return;
+            }
+            host.innerHTML = sections.map((sec) => `
+                <section class="tutorial-section" aria-labelledby="tut-sec-${sec.id}">
+                    <h2 id="tut-sec-${sec.id}">${t(sec.titleKey)}</h2>
+                    <p class="section-hint">${t("tutorialSectionHint")}</p>
+                    <div class="tutorial-grid" role="list">
+                        ${sec.items.map((item) => `
+                            <button type="button" class="tutorial-card" role="listitem"
+                                data-kind="${item.id}"
+                                aria-label="${labelFor(item)}">
+                                <span class="tc-icon">${item.icon}</span>
+                                <span class="tc-title">${labelFor(item)}</span>
+                                <span class="tc-desc">${descFor(item)}</span>
+                                <span class="tc-cta">${t("tutorialPlayCta")}</span>
+                            </button>
+                        `).join("")}
+                    </div>
+                </section>
+            `).join("");
+
+            host.querySelectorAll(".tutorial-card").forEach((btn) => {
+                btn.onclick = () => {
+                    const kind = btn.dataset.kind;
+                    if (!kind) return;
+                    sessionStorage.removeItem("csGameMode");
+                    sessionStorage.setItem("csTutorialKind", kind);
+                    location.href = TutorialCatalog.launchUrl(kind);
+                };
+            });
+        }
+
+        CurrencySafeI18n.mountLangBar({
+            onChange: () => {
+                CurrencySafeI18n.applyToDocument();
+                renderSections();
+            }
+        });
+        const langSlot = $("tutorialLangSlot");
+        const langBar = document.getElementById("csLangBar");
+        if (langSlot && langBar) {
+            langBar.classList.add("lang-bar--inline");
+            langSlot.appendChild(langBar);
+        }
+
+        CurrencySafeI18n.applyToDocument();
+        renderSections();
+    </script>
+</body>
+</html>

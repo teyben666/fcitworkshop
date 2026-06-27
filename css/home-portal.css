@@ -182,7 +182,13 @@ body.home-page .portal {
 
 @media (min-width: 768px) {
     .home-cards {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1100px) {
+    .home-cards {
+        grid-template-columns: repeat(4, 1fr);
     }
 }
 
@@ -219,6 +225,14 @@ body.home-page .portal {
 
 .home-card.solo::before {
     background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(255, 214, 90, 0.1), transparent 55%);
+}
+
+.home-card.tutorial::before {
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(167, 139, 250, 0.12), transparent 55%);
+}
+
+.home-card.tutorial:hover {
+    border-color: rgba(167, 139, 250, 0.45);
 }
 
 .home-card:hover {

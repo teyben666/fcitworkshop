@@ -369,6 +369,47 @@
         body.mode-single .panel-title .tag.solo-only { display: inline-block !important; }
         body.mode-single select.solo-only { display: block !important; width: 100%; }
         body.mode-single #registerBtn { display: none !important; }
+        body.mode-tutorial .map-card { display: none !important; }
+        body.mode-tutorial .layout {
+            grid-template-columns: 1fr;
+            max-width: 920px;
+        }
+        body.mode-tutorial .tab[data-tab="register"],
+        body.mode-tutorial .tab[data-tab="score"],
+        body.mode-tutorial #scorePanel,
+        body.mode-tutorial .section#register { display: none !important; }
+        body.mode-tutorial.tutorial-single-slot .mission-step:nth-child(n+2) { display: none !important; }
+        body.mode-tutorial.tutorial-single-slot [id^="miniGame"]:not(#miniGame0):not(#miniGameFinale) { display: none !important; }
+        body.mode-tutorial #transferPanel { display: none !important; }
+        body.mode-tutorial #breachManualUi { display: none !important; }
+        body.mode-tutorial #selectTargetBtn,
+        body.mode-tutorial #refreshIntelBtn,
+        body.mode-tutorial #targetTeamSelect,
+        body.mode-tutorial label[for="targetTeamSelect"] { display: none !important; }
+        body.mode-tutorial .pill-match,
+        body.mode-tutorial #hudTargetPill { display: none !important; }
+        .tutorial-sandbox-bar {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.75rem;
+            padding: 0.55rem 0.85rem;
+            border-radius: 12px;
+            border: 1px solid rgba(167, 139, 250, 0.35);
+            background: rgba(88, 28, 135, 0.12);
+            font-size: 0.82rem;
+        }
+        body.mode-tutorial .tutorial-sandbox-bar { display: flex; }
+        .tutorial-sandbox-bar strong { color: #e9d5ff; }
+        .tutorial-sandbox-bar a {
+            color: var(--cyan);
+            text-decoration: none;
+            font-family: "JetBrains Mono", ui-monospace, monospace;
+            font-size: 0.72rem;
+        }
+        .tutorial-sandbox-bar a:hover { text-decoration: underline; }
         .lang-bar {
             position: fixed;
             top: 14px;
@@ -1695,11 +1736,20 @@
             50% { opacity: 1; transform: translateY(-3px); }
         }
         .agent-note {
-            margin-top: 10px; padding: 10px 12px; border-radius: 12px;
+            margin-top: 8px; padding: 8px 10px; border-radius: 10px;
             border: 1px solid rgba(113, 255, 232, 0.25);
             background: rgba(113, 255, 232, 0.06); color: #c8fff5;
-            font-size: .86rem; line-height: 1.5;
+            font-size: .78rem; line-height: 1.45;
         }
+        details.agent-note-fold {
+            margin-top: 8px; font-size: .78rem; color: var(--muted);
+        }
+        details.agent-note-fold summary {
+            cursor: pointer; color: #9ee7ff; list-style: none;
+            padding: 4px 0; user-select: none;
+        }
+        details.agent-note-fold summary::-webkit-details-marker { display: none; }
+        details.agent-note-fold .agent-note { margin-top: 6px; }
         /* Mastermind */
         .mm-pick-row, .mm-palette { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 12px 0; }
         .mm-slot {
@@ -1818,67 +1868,6 @@
         .qx-phase { text-align: center; font-weight: 800; color: #7dd3fc; min-height: 1.4em; }
         .qx-actions { text-align: center; margin-top: 8px; }
         .qx-meta { text-align: center; font-size: .78rem; }
-        .cv-viewport {
-            position: relative; border-radius: 12px; overflow: hidden;
-            border: 1px solid rgba(56, 189, 248, .25); margin: 10px 0;
-            background: #0a1218;
-        }
-        .cv-map { width: 100%; display: block; max-height: 160px; object-fit: cover; transition: filter .35s ease; }
-        .cv-viewport.cv-glitch .cv-map { animation: cv-glitch .45s ease; }
-        @keyframes cv-glitch {
-            0%, 100% { transform: translate(0); filter: inherit; }
-            20% { transform: translate(-3px, 1px); }
-            40% { transform: translate(3px, -1px); }
-            60% { transform: translate(-2px, 2px); }
-        }
-        .cv-viewport.cv-step-ok .cv-map { animation: cv-step-ok .35s ease; }
-        @keyframes cv-step-ok {
-            0% { box-shadow: inset 0 0 0 0 rgba(56,189,248,0); }
-            50% { box-shadow: inset 0 0 40px rgba(56,189,248,.25); }
-            100% { box-shadow: none; }
-        }
-        .cv-tutorial {
-            margin: 8px 0 10px; padding: 8px 10px; border-radius: 8px;
-            border: 1px solid rgba(148,163,184,.2); background: rgba(8,16,12,.6);
-            font-size: .78rem;
-        }
-        .cv-tutorial summary { cursor: pointer; color: #9ee7ff; font-weight: 700; }
-        .cv-tutorial-list { margin: 8px 0 4px; padding-left: 18px; line-height: 1.45; }
-        .cv-tutorial-foot { margin: 4px 0 0; font-size: .72rem; }
-        .cv-pipeline {
-            display: flex; align-items: center; justify-content: center; gap: 6px;
-            margin: 8px 0; flex-wrap: wrap;
-        }
-        .cv-pipe-step {
-            font-size: .72rem; padding: 4px 8px; border-radius: 6px;
-            border: 1px solid rgba(148,163,184,.25); color: var(--muted);
-        }
-        .cv-pipe-active { border-color: #ffd65a; color: #ffd65a; }
-        .cv-pipe-done { border-color: #4ade80; color: #4ade80; background: rgba(74,222,128,.08); }
-        .cv-pipe-arrow { color: var(--muted); font-size: .7rem; }
-        .cv-filter-btn.cv-hint-glow { box-shadow: 0 0 12px rgba(255,214,90,.35); border-color: #ffd65a; }
-        .cv-hint-live { opacity: 1; transform: none; position: static; margin-top: 8px; text-align: center; }
-        .cv-clue {
-            position: absolute; bottom: 8px; right: 8px; left: 8px;
-            padding: 6px 10px; border-radius: 8px; text-align: center;
-            font-family: ui-monospace, monospace; font-weight: 800; font-size: .85rem;
-            color: #ffd65a; background: rgba(0,0,0,.72); opacity: 0; transform: translateY(6px);
-            transition: opacity .4s, transform .4s;
-        }
-        .cv-clue-show { opacity: 1; transform: translateY(0); }
-        .cv-hint {
-            position: absolute; top: 8px; left: 8px; font-size: .72rem;
-            color: #9ee7ff; background: rgba(0,0,0,.55); padding: 4px 8px; border-radius: 6px;
-        }
-        .cv-filters { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-        .cv-filter-btn {
-            display: inline-flex; align-items: center; gap: 6px; padding: 10px 12px;
-            border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.04);
-            color: var(--text); font-weight: 800; cursor: pointer;
-        }
-        .cv-filter-btn:hover:not(:disabled) { border-color: var(--cyan); background: rgba(56,189,248,.1); }
-        .cv-filter-btn.cv-used { opacity: .45; cursor: default; }
-        .cv-meta { text-align: center; font-size: .78rem; margin-top: 6px; }
         .mission-step.clickable { cursor: pointer; }
         .mission-step.clickable:hover { filter: brightness(1.15); }
         .mission-step.locked-step { opacity: .5; cursor: default; }
@@ -1931,7 +1920,7 @@
         .overlay-modal.show { display: grid; }
         .bank-bonus-box {
             text-align: left;
-            max-width: min(96vw, 560px);
+            max-width: min(96vw, 920px);
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
@@ -2205,7 +2194,7 @@
                         <span>🟡 <span data-i18n="legendYou">你</span></span>
                         <span>🔴 <span data-i18n="legendTarget">选中目标</span></span>
                         <span>🟢 <span data-i18n="legendOthers">其他玩家</span></span>
-                        <span class="mp-only">🏦 <span>央行 Bonus</span></span>
+                        <span class="mp-only">🏦 <span data-i18n="bankBonusLabel">央行 Bonus</span></span>
                     </div>
                 </div>
                 <div class="map-wrap" id="mapWrap">
@@ -2217,7 +2206,7 @@
                         <div class="bank-bonus-pin hidden" id="bankBonusPin" data-phase="hidden">
                             <span class="bank-bonus-ring"></span>
                             <span class="bank-bonus-dot">🏦</span>
-                            <span class="bank-bonus-label">央行 Bonus</span>
+                            <span class="bank-bonus-label" data-i18n="bankBonusLabel">央行 Bonus</span>
                             <span class="bank-bonus-phase"></span>
                         </div>
                     </div>
@@ -2239,7 +2228,7 @@
                         <div class="stat-mini"><b id="totalTransfers">0</b><span data-i18n="mapStatTransfers">成功转账</span></div>
                         <div class="stat-mini"><b id="currentTarget">—</b><span data-i18n="mapStatTarget">当前目标</span></div>
                         <div class="stat-mini"><b id="missionReward">—</b><span data-i18n="mapStatMissionReward">本次夺取</span></div>
-                        <div class="stat-mini mp-only" id="bankBonusStatWrap"><b id="bankBonusCountdown" class="bonus-cd">—</b><span>央行 Bonus</span></div>
+                        <div class="stat-mini mp-only" id="bankBonusStatWrap"><b id="bankBonusCountdown" class="bonus-cd">—</b><span data-i18n="bankBonusLabel">央行 Bonus</span></div>
                     </div>
                 </div>
             </section>
@@ -2256,7 +2245,7 @@
                         <button class="tab" data-tab="score" data-i18n="tabScore">战绩</button>
                         <div id="raidLivePanel" class="raid-live-panel raid-live-inline hidden">
                             <div class="raid-live-head">
-                                <strong>实拿预估</strong>
+                                <strong data-i18n="lootEst">实拿预估</strong>
                                 <span id="raidLiveTarget">—</span>
                             </div>
                             <div class="raid-live-amount" id="raidLiveAmount">RM —</div>
@@ -2265,6 +2254,10 @@
                     </div>
 
                     <div class="mission-scroll">
+                    <div class="tutorial-sandbox-bar" id="tutorialSandboxBar">
+                        <strong id="tutorialSandboxLabel">训练营</strong>
+                        <a href="tutorial.html" id="tutorialBackPick" data-i18n="tutorialBackPick">← 返回选关</a>
+                    </div>
                     <!-- Register -->
                     <div class="section" id="register">
                         <div class="panel-title">
@@ -2386,58 +2379,58 @@
     <div class="toast" id="toast"></div>
     <div class="modal" id="howModal">
         <div class="modal-box">
-            <h2>特工任务简报</h2>
-            <p><strong>安全提醒：</strong>这是课堂模拟。请勿使用真实银行密码或攻击真实网站。</p>
+            <h2 data-i18n="howTitle">特工任务简报</h2>
+            <p data-i18n="howSafety">安全提醒：这是课堂模拟。请勿使用真实银行密码或攻击真实网站。</p>
             <ol>
-                <li>登记特工代号与金库密码（6–9 位大写字母/数字）。</li>
-                <li>5 支敌方金库出现在威胁地图上，点击标记选择目标。</li>
-                <li><strong>游戏1 拦截转账码：</strong>在密钥飘到终点前，按屏幕提示逐字敲出转账密钥。允许错 2 次。</li>
-                <li><strong>游戏2 破译坐标：</strong>拖动老虎机转轮或滚轮破解密电，找出能量核心所在城市。</li>
-                <li><strong>游戏3 潜入网格：</strong>先「开牌」记住 5×5 安全走廊（2 秒），再从左上角摸黑走到右下角宝石。3 次护盾容错；热感扫描亮灯 1 秒，只显示换位后的激光。</li>
-                <li>三段密钥组合后破解金库，把模拟资金转入你的账户。</li>
-                <li>见习特工敌方密码 <strong>12 分钟</strong>轮换；闯关进行中会自动暂停轮换。</li>
-                <li>刷新页面会<strong>保留</strong>当前三关进度（已自动存档）。</li>
+                <li data-i18n="howItem1">登记特工代号与金库密码（6–9 位大写字母/数字）。</li>
+                <li data-i18n="howItem2">5 支敌方金库出现在威胁地图上，点击标记选择目标。</li>
+                <li data-i18n="howItem3">游戏1 拦截转账码：在密钥飘到终点前，按屏幕提示逐字敲出转账密钥。允许错 2 次。</li>
+                <li data-i18n="howItem4">游戏2 破译坐标：拖动老虎机转轮或滚轮破解密电，找出能量核心所在城市。</li>
+                <li data-i18n="howItem5">游戏3 潜入网格：先「开牌」记住 5×5 安全走廊（2 秒），再从左上角摸黑走到右下角宝石。3 次护盾容错；热感扫描亮灯 1 秒，只显示换位后的激光。</li>
+                <li data-i18n="howItem6">三段密钥组合后破解金库，把模拟资金转入你的账户。</li>
+                <li data-i18n="howItem7">见习特工敌方密码 12 分钟轮换；闯关进行中会自动暂停轮换。</li>
+                <li data-i18n="howItem8">刷新页面会保留当前三关进度（已自动存档）。</li>
             </ol>
-            <div class="notice warning">重新部署任务会重置当前目标的三关。敌方轮换时已完成关卡的情报会保留。</div>
-            <div class="buttons"><button id="closeHowBtn">出发！</button></div>
+            <div class="notice warning" data-i18n="howWarning">重新部署任务会重置当前目标的三关。敌方轮换时已完成关卡的情报会保留。</div>
+            <div class="buttons"><button id="closeHowBtn" data-i18n="howGoBtn">出发！</button></div>
         </div>
     </div>
 
     <div class="overlay-modal" id="alertUpgradeModal">
         <div class="overlay-box">
-            <h2>🚨 警报升级！</h2>
-            <p>敌方启动了<strong>动态红外线</strong>！激光会缓慢移动，注意黄灯预警。</p>
+            <h2 data-i18n="alertUpgradeTitle">🚨 警报升级！</h2>
+            <p data-i18n="alertUpgradeBody">敌方启动了动态红外线！激光会缓慢移动，注意黄灯预警。</p>
             <div class="buttons" style="justify-content:center;margin-top:16px">
-                <button id="closeAlertUpgrade">继续潜入</button>
+                <button id="closeAlertUpgrade" data-i18n="alertUpgradeBtn">继续潜入</button>
             </div>
         </div>
     </div>
     <div class="overlay-modal" id="vaultDoorModal">
         <div class="overlay-box">
             <div class="vault-door-icon">🏦🔓</div>
-            <h2>三段密钥已集齐！</h2>
-            <p>金库大门已解开。组合密钥后点击「破解金库门锁」。</p>
+            <h2 data-i18n="vaultDoorTitle">三段密钥已集齐！</h2>
+            <p data-i18n="vaultDoorBody">金库大门已解开。组合密钥后点击「破解金库门锁」。</p>
             <div class="buttons" style="justify-content:center;margin-top:16px">
-                <button class="green" id="closeVaultDoor">破解门锁</button>
+                <button class="green" id="closeVaultDoor" data-i18n="vaultDoorBtn">破解门锁</button>
             </div>
         </div>
     </div>
     <div class="overlay-modal" id="soloEndModal">
         <div class="overlay-box">
-            <h2>⏱️ 练习结束</h2>
-            <p id="soloEndMessage">本次单人练习已结束。</p>
+            <h2 data-i18n="soloEndTitle">⏱️ 练习结束</h2>
+            <p id="soloEndMessage" data-i18n="soloEndDefaultMsg">本次单人练习已结束。</p>
             <div class="buttons" style="justify-content:center;margin-top:16px;gap:10px">
-                <button type="button" class="secondary" id="soloEndExportBtn">导出报告</button>
-                <button type="button" class="primary" id="soloReplayBtn">再玩一次</button>
-                <button type="button" class="secondary" id="soloEndHomeBtn">返回首页</button>
+                <button type="button" class="secondary" id="soloEndExportBtn" data-i18n="exportReport">导出报告</button>
+                <button type="button" class="primary" id="soloReplayBtn" data-i18n="soloReplayBtn">再玩一次</button>
+                <button type="button" class="secondary" id="soloEndHomeBtn" data-i18n="backHome">返回首页</button>
             </div>
         </div>
     </div>
     <div class="overlay-modal" id="bankBonusModal">
         <div class="overlay-box bank-bonus-box">
             <div class="bank-bonus-modal-head">
-                <h2>🏦 阅读情报 Bonus</h2>
-                <button type="button" class="secondary" id="closeBankBonusBtn">关闭</button>
+                <h2 data-i18n="bankBonusTitle">🏦 阅读情报 Bonus</h2>
+                <button type="button" class="secondary" id="closeBankBonusBtn" data-i18n="bankBonusClose">关闭</button>
             </div>
             <div id="bankBonusBody"></div>
         </div>
@@ -2455,12 +2448,15 @@
     <script src="js/room.js?v=20260626"></script>
     <script src="js/fx.js"></script>
     <script src="js/i18n.js"></script>
+    <script src="js/i18n-missions-catalog.js"></script>
+    <script src="js/mission-i18n.js"></script>
+    <script src="js/intel-briefings-en-data.js"></script>
     <script src="js/mission-games.js"></script>
+    <script src="js/tutorial-catalog.js"></script>
     <script src="js/mission-mastermind.js"></script>
     <script src="js/mission-fragsort.js"></script>
     <script src="js/mission-binary.js"></script>
     <script src="js/mission-quantum.js"></script>
-    <script src="js/mission-cvfilter.js"></script>
     <script src="js/mission-finale.js"></script>
     <script src="js/bank-bonus-scheduler.js"></script>
     <script src="js/intel-briefings-data.js"></script>
@@ -2471,28 +2467,49 @@
         // Currency Safe — 多人房间 / 单人练习
         // ==========================================================
         const roomParams = new URLSearchParams(location.search);
-        const isSinglePlayer = roomParams.get("mode") === "single"
-            || (!roomParams.get("room") && sessionStorage.getItem("csGameMode") === "single");
+        const tutorialKind = (roomParams.get("kind") || sessionStorage.getItem("csTutorialKind") || "").trim();
+        const isTutorialMode = roomParams.get("mode") === "tutorial" && !!tutorialKind;
+        if (roomParams.get("mode") === "tutorial" && !tutorialKind) {
+            location.href = "tutorial.html";
+        }
+        const isSinglePlayer = !isTutorialMode && (
+            roomParams.get("mode") === "single"
+            || (!roomParams.get("room") && sessionStorage.getItem("csGameMode") === "single")
+        );
         if (isSinglePlayer) sessionStorage.setItem("csGameMode", "single");
+        if (isTutorialMode) {
+            sessionStorage.removeItem("csGameMode");
+            sessionStorage.setItem("csTutorialKind", tutorialKind);
+        }
+        const isOfflineSandbox = isSinglePlayer || isTutorialMode;
+        const TUTORIAL_TARGET_PASSWORD = "DEMOKEY1";
 
         let roomId;
-        if (isSinglePlayer) {
+        if (isTutorialMode) {
+            roomId = "TUTORIAL";
+        } else if (isSinglePlayer) {
             roomId = "SOLO";
         } else {
             roomId = (roomParams.get("room") || sessionStorage.getItem(CurrencySafeRoom.SK.roomId) || "").toUpperCase();
             if (!roomId) location.href = "index.html";
             sessionStorage.setItem(CurrencySafeRoom.SK.roomId, roomId);
         }
-        const csClientId = isSinglePlayer ? (sessionStorage.getItem("csSoloClientId") || (() => {
-            const id = "S" + Math.random().toString(36).slice(2, 10).toUpperCase();
-            sessionStorage.setItem("csSoloClientId", id);
+        const csClientId = isOfflineSandbox ? (sessionStorage.getItem(isTutorialMode ? "csTutorialClientId" : "csSoloClientId") || (() => {
+            const id = (isTutorialMode ? "T" : "S") + Math.random().toString(36).slice(2, 10).toUpperCase();
+            sessionStorage.setItem(isTutorialMode ? "csTutorialClientId" : "csSoloClientId", id);
             return id;
         })()) : CurrencySafeRoom.getClientId();
         const t = (key) => CurrencySafeI18n.t(key);
+        const tReplace = (key, vars) => CurrencySafeI18n.tReplace(key, vars);
+        const tr = (msg) => CurrencySafeI18n.trError(msg);
+        const mT = (key, vars) => window.MissionI18n?.mT?.(key, vars) ?? key;
+        const stateLabel = (id) => window.getStateLabel?.(id) ?? id;
         let soundMuted = sessionStorage.getItem("csMuted") === "1";
         let lastAlertKey = "";
 
-        const storageKey = isSinglePlayer ? "currencySafeSingle" : ("currencySafeGame_" + roomId);
+        const storageKey = isTutorialMode
+            ? ("currencySafeTutorial_" + tutorialKind)
+            : isSinglePlayer ? "currencySafeSingle" : ("currencySafeGame_" + roomId);
         const MAP_CONFIG = {
             w: 643,
             h: 316,
@@ -2705,6 +2722,13 @@
 
         function getMalaysiaState(id) {
             return window.getMalaysiaStateById(id);
+        }
+
+        function formatStoredStateLabel(teamLike) {
+            if (!teamLike) return "";
+            const id = teamLike.stateId || "";
+            if (id) return stateLabel(id);
+            return teamLike.state || teamLike.city || "";
         }
 
         const ROOM_SHARED = window.CurrencySafeRoomShared;
@@ -2972,13 +2996,13 @@
             });
             breachUnlocked = false;
             $("passwordGuess").value = "";
-            showToast(`${target.name} 轮换了密码，已完成关卡的情报已保留。`);
+            showToast(tReplace("passwordRotatedIntel", { name: target.name }));
             saveStateNow();
             render();
         }
 
         function syncFromRoom() {
-            if (isSinglePlayer) return false;
+            if (isOfflineSandbox) return false;
             syncOpponentsFromRoom();
             const selfChanged = syncSelfFromRoom();
             detectOpponentPasswordChange();
@@ -3004,7 +3028,7 @@
         }
 
         function getDeployCount(targetId) {
-            if (isSinglePlayer) return state.deployCounts?.[targetId] || 0;
+            if (isOfflineSandbox) return state.deployCounts?.[targetId] || 0;
             const room = CurrencySafeRoom.getRoom(roomId);
             const teamId = getMyTeamId();
             if (teamId && room) return ROOM_SHARED.getTeamDeployCount(room, teamId, targetId);
@@ -3012,12 +3036,12 @@
         }
 
         function getMaxDeploy() {
-            if (isSinglePlayer) return 999;
+            if (isOfflineSandbox) return 999;
             return CurrencySafeRoom.getMaxDeployPerTarget(roomId);
         }
 
         function isPracticeMode() {
-            if (isSinglePlayer) return true;
+            if (isOfflineSandbox) return true;
             return CurrencySafeRoom.getRoom(roomId)?.mode === "practice";
         }
 
@@ -3085,7 +3109,7 @@
                     if (res.wrong) {
                         host.classList.add("ir-shake");
                         setTimeout(() => host.classList.remove("ir-shake"), 400);
-                        showToast(res.trapHint || "答错了 · 奖金 −RM 200");
+                        showToast(res.trapHint || t("bonusWrong"));
                     }
                     renderBankBonusPanel();
                     updateBankBonusPoolDisplay();
@@ -3117,7 +3141,7 @@
             if (!session || session._settled) return;
             session._settled = true;
             if (session.practiceOnly) {
-                showToast("练习完成 · 无奖金入账");
+                showToast(isTutorialMode ? t("tutorialLevelDone") : t("practiceBonusDone"));
                 setTimeout(closeBankBonusModal, 2200);
                 return;
             }
@@ -3128,7 +3152,7 @@
                 startedAt: session.startedAt
             })).then(res => {
                 if (!res.ok) {
-                    showToast(res.error);
+                    showToast(tr(res.error));
                     setTimeout(closeBankBonusModal, 1500);
                     return;
                 }
@@ -3138,7 +3162,7 @@
                 }
                 render();
                 applyMoneyGainFx(oldBal, player?.balance ?? oldBal,
-                    `央行 Bonus +RM ${money(res.amount)} 已入队库！`, { confetti: true });
+                    tReplace("bonusCredited", { amount: money(res.amount) }), { confetti: true });
                 setTimeout(closeBankBonusModal, 2800);
             });
         }
@@ -3154,7 +3178,7 @@
         }
 
         function updateBankBonusPin() {
-            if (isSinglePlayer) return;
+            if (isOfflineSandbox) return;
             const pin = document.getElementById("bankBonusPin");
             if (!pin || !window.BankBonusScheduler) return;
             const room = CurrencySafeRoom.getRoom(roomId);
@@ -3184,7 +3208,7 @@
                 if (!room || room.status !== "playing") {
                     cdEl.textContent = "—";
                 } else if (status.phase === "breathe") {
-                    cdEl.textContent = "可点击";
+                    cdEl.textContent = t("bonusClickableShort");
                     cdEl.classList.add("bonus-cd-live");
                 } else if (status.phase === "arrive" || status.phase === "depart") {
                     cdEl.textContent = BankBonusScheduler.phaseLabel(status);
@@ -3200,7 +3224,7 @@
                 && status.waveIndex !== lastBankBonusWaveLogged
                 && room && CurrencySafeRoom.isHost(room)) {
                 lastBankBonusWaveLogged = status.waveIndex;
-                logGameActivity("bank_bonus", `央行 Bonus 闪灯 · 第 ${status.waveIndex + 1} 波`);
+                logGameActivity("bank_bonus", tReplace("deployActivity", { n: status.waveIndex + 1 }));
             }
         }
 
@@ -3231,13 +3255,13 @@
 
         function onBankBonusPinClick(e) {
             e.stopPropagation();
-            if (isSinglePlayer) return;
+            if (isOfflineSandbox) return;
             const room = CurrencySafeRoom.getRoom(roomId);
             const status = BankBonusScheduler.computePhase(room, Date.now());
             if (status.phase !== "breathe") {
                 showToast(status.phase === "hidden"
                     ? "央行 Bonus 尚未闪灯，请等待海域图钉出现。"
-                    : "请在「可点击参与」阶段点击进入。");
+                    : t("bonusJoinHint"));
                 return;
             }
             const abandoned = abandonMissionForBonus();
@@ -3245,24 +3269,24 @@
                 .then(() => CurrencySafeRoom.beginBankBonus(roomId, status.waveIndex))
                 .then(res => {
                     if (!res?.ok) {
-                        showToast(res?.error || "无法开始 Bonus。");
+                        showToast(tr(res?.error) || t("bonusBeginFail"));
                         return;
                     }
                     if (abandoned) {
-                        showToast("有舍有得：当前攻坚进度已放弃，转攻央行 Bonus。");
+                        showToast(t("bonusAbandonRaid"));
                     } else if (res.practiceOnly) {
-                        showToast("本波已用过有钱尝试，本次为练习模式。");
+                        showToast(t("bonusPracticeMode"));
                     }
                     const opened = openBankBonusModal(res);
                     if (!opened) {
-                        showToast("情报面板加载失败，请刷新后重试。未消耗本波有偿次数。");
+                        showToast(t("bonusPanelFail"));
                         return;
                     }
                     if (!res.practiceOnly) {
                         Promise.resolve(CurrencySafeRoom.confirmBankBonusOpen(roomId, status.waveIndex))
                             .then(confirmRes => {
                                 if (confirmRes?.ok === false) {
-                                    showToast(confirmRes.error || "无法锁定本波尝试。");
+                                    showToast(tr(confirmRes.error) || t("bonusLockFail"));
                                 }
                             });
                     }
@@ -3402,7 +3426,7 @@
             }
             const st = getMalaysiaState(me.stateId || "selangor");
             const disp = $("playerStateDisplay");
-            if (disp) disp.textContent = me.state || st?.label || me.stateId || "—";
+            if (disp) disp.textContent = stateLabel(me.stateId) || me.state || st?.label || me.stateId || "—";
             applyMapVisualMode(room);
         }
 
@@ -3454,24 +3478,13 @@
             const sel = $("playerState");
             if (!sel) return;
             sel.innerHTML = MALAYSIA_STATES.map(s =>
-                `<option value="${s.id}">${s.label}</option>`
+                `<option value="${s.id}">${stateLabel(s.id)}</option>`
             ).join("");
             sel.value = "selangor";
         }
         const pinIcons = ["💻", "🔐", "💾", "🛰️", "💰", "🏦", "⚙️", "📡"];
         const kidPasswordRegex = /^[A-Z0-9]{6,9}$/;
         const passwordSymbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-        const AGENT_NOTES = {
-            typing: "特工笔记：转账验证码有效期很短，所以要快准狠——就像真正的 2FA 拦截。",
-            dial: "特工笔记：凯撒密码把字母整体移位。坐标城市只是掩护，真正的情报是密电片段。",
-            grid: "特工笔记：先记住安全走廊，再摸黑潜入——就像真实特工的「开牌记忆」训练。",
-            mastermind: "特工笔记：热力传感器用绿/黄点反馈——绿=完全命中，黄=颜色对但位置错。",
-            fragsort: "特工笔记：碎片角标是真实序号，按 ①→⑤ 排好才能拼出密钥段。",
-            binary: "特工笔记：亮灯=1，灭灯=0。四位灯泡从左到右读成二进制，就是机器人认识的数字。",
-            quantum: "特工笔记：量子脉冲按时间顺序传输——闪几下、亮哪格，就得原样复制。读字会分心！",
-            cvfilter: "特工笔记：底片要经反转→色彩→锐化管线才能读出坐标，就像计算机视觉的预处理。"
-        };
 
         const cityPool = MALAYSIA_CITIES;
 
@@ -3702,10 +3715,20 @@
             return state.player ? [state.player, ...state.opponents] : [...state.opponents];
         }
 
+        function getOccupiedTeams(room) {
+            if (!room?.teams?.length) return [];
+            const players = room.players || [];
+            return room.teams.filter(tm => {
+                const ids = ROOM_SHARED.memberIdList(tm.memberIds);
+                if (ids.length) return true;
+                return players.some(p => p.teamId === tm.id);
+            });
+        }
+
         function getLeaderboardTeams() {
             if (isSinglePlayer) return getAllTeams();
             const room = CurrencySafeRoom.getRoom(roomId);
-            const entries = (room?.teams || []).map(tm => ({
+            return (getOccupiedTeams(room) || []).map(tm => ({
                 id: tm.id,
                 name: tm.name || tm.state || "队伍",
                 state: tm.state,
@@ -3717,7 +3740,6 @@
                 lat: tm.lat,
                 lon: tm.lon
             }));
-            return entries;
         }
 
         function getThreatMapMarkers() {
@@ -3727,7 +3749,7 @@
             ROOM_SHARED.ensureTeamsAndBank(room);
             const myTeamId = getMyTeamId();
             const markers = [];
-            (room.teams || []).forEach(tm => {
+            getOccupiedTeams(room).forEach(tm => {
                 const leadIds = ROOM_SHARED.memberIdList(tm.memberIds);
                 const lead = leadIds
                     .map(id => room.players.find(p => p.id === id))
@@ -3736,7 +3758,7 @@
                 const entity = {
                     id: repId,
                     teamId: tm.id,
-                    name: tm.name || lead?.name || tm.state || "队伍",
+                    name: lead?.name || tm.name || tm.state || "队伍",
                     state: tm.state || lead?.state,
                     stateId: tm.stateId || lead?.stateId,
                     city: tm.state || lead?.state,
@@ -3832,17 +3854,17 @@
                 saveStateNow();
                 render();
                 playLevelCompleteSound();
-                showToast(`金库破解成功：${target.name} 已解锁！请确认转账。`);
+                showToast(tReplace("vaultBreachSuccess", { name: target.name }));
                 return;
             }
             Promise.resolve(CurrencySafeRoom.applyBreach(roomId, target.id)).then(res => {
-                if (!res.ok) { showToast(res.error); return; }
+                if (!res.ok) { showToast(tr(res.error)); return; }
                 breachUnlocked = true;
                 syncFromRoom();
                 syncProgressToRoom();
                 render();
                 playLevelCompleteSound();
-                showToast(`金库破解成功：${target.name} 已解锁！`);
+                showToast(tReplace("vaultBreachSuccess", { name: target.name }));
             });
         }
 
@@ -3859,6 +3881,13 @@
             const seed = getFinaleSeed(currentIntel, target);
             const res = MissionFinale.lockOrder(finale, seed);
             if (res.win) {
+                if (isTutorialMode) {
+                    finale.solved = true;
+                    notifyTutorialLevelDone();
+                    renderMiniGames();
+                    saveStateNow();
+                    return;
+                }
                 finale.solved = true;
                 const pwd = res.password || MissionFinale.getCombinedPassword(finale, seed);
                 applyFinaleUnlock(pwd);
@@ -3982,6 +4011,7 @@
         }
 
         function sumIntelMistakes(intel) {
+            if (isTutorialMode) return 0;
             if (!intel?.games) return 0;
             let total = 0;
             intel.games.forEach(g => {
@@ -4060,7 +4090,6 @@
                 else if (g.kind === "fragsort") score -= Math.min(3, m);
                 else if (g.kind === "binary") score -= Math.min(3, m);
                 else if (g.kind === "quantum") score -= Math.min(4, m);
-                else if (g.kind === "cvfilter") score -= Math.min(3, m);
             });
             if (intel.finale?.mistakes) score -= Math.min(3, intel.finale.mistakes);
             return Math.max(10, Math.min(25, Math.round(score)));
@@ -4151,13 +4180,14 @@
         }
 
         function onMissionMistake() {
+            if (isTutorialMode) return;
             const target = getOpponent(state.targetId);
             if (!currentIntel || !target || breachUnlocked) return;
             const prev = computeLiveLootPreview(currentIntel, target);
             updateRaidLivePreview();
             const next = computeLiveLootPreview(currentIntel, target);
             if (prev && next && next.amount < prev.amount) {
-                showToast(`失误！实拿预估 RM ${money(next.amount)}（−RM ${money(prev.amount - next.amount)}）`);
+                showToast(tReplace("mistakeLoot", { amt: money(next.amount), delta: money(prev.amount - next.amount) }));
             }
         }
 
@@ -4239,17 +4269,30 @@
             renderFragments();
             renderMissionSteps();
             renderMiniGames();
+            if (isTutorialMode && currentIntel?.tutorialSingleKind) {
+                saveStateNow();
+                return;
+            }
             const next = slotIdx + 1;
             if (next < currentIntel.games.length) {
                 scrollToMission(next);
                 const meta = MissionGames.getKindMeta(currentIntel.pickedKinds?.[next]);
-                if (meta) showToast(`下一项已解锁：${meta.icon} ${meta.shortLabel}`);
+                if (meta) showToast(tReplace("nextUnlocked", { icon: meta.icon, label: meta.shortLabel }));
             }
             saveStateNow();
         }
 
         function onLevelComplete(idx) {
             trackMissionStat("levelsDone", 1);
+            if (isTutorialMode) {
+                if (currentIntel?.tutorialSingleKind && idx === 0) {
+                    notifyTutorialLevelDone();
+                } else if (currentIntel?.tutorialFinaleOnly) {
+                    /* finale handled separately */
+                }
+                saveStateNow();
+                return;
+            }
             const player = getPlayer();
             const target = getOpponent(state.targetId);
             const kindId = currentIntel?.pickedKinds?.[idx];
@@ -4268,7 +4311,7 @@
                 playLevelCompleteSound();
                 const target = getOpponent(state.targetId);
                 if (target) ensureIntelFinale(currentIntel, target);
-                showToast("三关任务完成！请完成最终密钥校验并解锁金库。");
+                showToast(t("threeLevelsDone"));
                 renderMiniGames();
             }
             saveStateNow();
@@ -4281,15 +4324,16 @@
         }
 
         function registerPlayer() {
+            if (isTutorialMode) return;
             if (isSinglePlayer) return registerPlayerSingle();
             const room = CurrencySafeRoom.getRoom(roomId);
             const me = room?.players.find(p => p.id === csClientId);
-            if (!me) { showToast("请先在房间大厅以 Player 加入。"); return; }
+            if (!me) { showToast(t("joinLobbyFirst")); return; }
             const name = me.name;
             const password = cleanPassword($("teamPassword").value).toUpperCase();
             const agentRank = $("agentRank").value || "trainee";
             if (!kidPasswordRegex.test(password)) {
-                showToast("密码需 6–9 位大写字母或数字。");
+                showToast(t("invalidPassword"));
                 shake($("teamPassword"));
                 return;
             }
@@ -4341,7 +4385,7 @@
             render();
             showTab("attack");
             CurrencySafeI18n.lockLang();
-            showToast(`马来西亚行动已启动！你的金库在${homeState.label}。点击地图上的敌方金库选择目标。`);
+            showToast(tReplace("mpStarted", { state: homeState.label }));
         }
 
         function registerPlayerSingle() {
@@ -4479,18 +4523,18 @@
             const cfg = getAgentCfg();
             return {
                 kind: "typing",
-                title: "游戏1 · 拦截转账验证码",
+                title: mT("mission.typing.title"),
                 solved: false,
                 keyword,
                 typedIndex: 0,
                 mistakesLeft: cfg.mistakes,
                 mistakes: 0,
                 interceptEnergy: 0,
-                originLabel: originLabel || "瑞士银行",
+                originLabel: originLabel || t("teamDefault"),
                 targetTeam,
                 playerTeam,
                 reveal: fragment,
-                agentNote: AGENT_NOTES.typing
+                agentNote: mT("mission.typing.agentNote")
             };
         }
 
@@ -4522,7 +4566,7 @@
             else if (cfg.dialHint === "lesson" || cfg.dialHint === true) hintMode = "shift";
             return {
                 kind: "dial",
-                title: "游戏2 · 破译特工坐标密语",
+                title: mT("mission.dial.title"),
                 solved: false,
                 shift,
                 wheels,
@@ -4539,7 +4583,7 @@
                 reveal: fragment,
                 hintMode,
                 spinCount: 0,
-                agentNote: AGENT_NOTES.dial
+                agentNote: mT("mission.dial.agentNote")
             };
         }
 
@@ -4594,7 +4638,7 @@
             const grid = buildVaultGridLayout(size, start, end, randomInt(6, 9));
             return {
                 kind: "grid",
-                title: "游戏3 · 潜入核金库安保网格",
+                title: mT("mission.grid.title"),
                 solved: false,
                 phase: "ready",
                 scoutCountdown: GRID_SCOUT_SEC,
@@ -4610,7 +4654,7 @@
                 meltdownSec: 0,
                 footprint: "",
                 reveal: fragment,
-                agentNote: AGENT_NOTES.grid
+                agentNote: mT("mission.grid.agentNote")
             };
         }
 
@@ -4667,18 +4711,23 @@
             mastermind: (frag, ctx) => MissionMastermind.generate(frag, ctx),
             fragsort: (frag, ctx) => MissionFragsort.generate(frag, ctx),
             binary: (frag, ctx) => MissionBinary.generate(frag, ctx),
-            quantum: (frag, ctx) => MissionQuantum.generate(frag, ctx),
-            cvfilter: (frag, ctx) => MissionCvfilter.generate(frag, ctx)
+            quantum: (frag, ctx) => MissionQuantum.generate(frag, ctx)
         });
 
         if (currentIntel?.games) {
-            currentIntel.games.forEach(g => {
+            const cvTarget = refreshOpponentFromRoom(currentIntel.targetId) || getOpponent(currentIntel.targetId);
+            const cvFrags = cvTarget ? splitPassword(cvTarget.password) : [];
+            currentIntel.games.forEach((g, i) => {
                 if (g.kind === "grid") migrateGridGame(g);
                 if (g.kind === "mastermind") MissionMastermind.migrate(g);
                 if (g.kind === "fragsort") MissionFragsort.migrate(g);
                 if (g.kind === "binary") MissionBinary.migrate(g);
                 if (g.kind === "quantum") MissionQuantum.migrate(g);
-                if (g.kind === "cvfilter") MissionCvfilter.migrate(g);
+                if (g.kind === "cvfilter") {
+                    g.solved = true;
+                    g.reveal = g.reveal || currentIntel.fragments?.[i] || cvFrags[i] || "";
+                    if (currentIntel.fragments) currentIntel.fragments[i] = g.reveal;
+                }
             });
             if (currentIntel?.finale) {
                 const finTeam = refreshOpponentFromRoom(currentIntel.targetId) || getOpponent(currentIntel.targetId);
@@ -4695,6 +4744,197 @@
             if (!room) return false;
             const raid = CurrencySafeRoomShared.getTargetRaid(room, target.teamId);
             return !!raid && CurrencySafeRoomShared.shouldStartNewRaid(raid);
+        }
+
+        function buildTutorialIntel(team, kind) {
+            if (!team) return null;
+            const frags = splitPassword(team.password);
+            const city = randomPick(cityPool);
+            const origin = `${city.label}（${team.name}）`;
+            const player = getPlayer();
+            const gameCtx = {
+                password: team.password,
+                target: team,
+                player,
+                origin,
+                competitive: false
+            };
+            const base = {
+                targetId: team.id,
+                startedAt: Date.now(),
+                deploySeq: 0,
+                tutorialMode: true,
+                tutorialKind: kind
+            };
+
+            if (TutorialCatalog?.isBonusKind?.(kind)) {
+                return null;
+            }
+
+            if (TutorialCatalog?.isFinaleKind?.(kind)) {
+                const forcedMode = TutorialCatalog.finaleModeForKind(kind);
+                const padKinds = ["typing", "dial", "grid"];
+                const games = padKinds.map((kid, slotIdx) => {
+                    const game = MissionGames.createMissionGame(kid, frags[slotIdx] || "", gameCtx);
+                    game.slotIndex = slotIdx;
+                    game.kind = kid;
+                    game.solved = true;
+                    game.reveal = frags[slotIdx] || "";
+                    game._tutorialPad = true;
+                    return game;
+                });
+                const seed = `tutorial|${forcedMode}|${team.password}|${team.id}`;
+                return {
+                    ...base,
+                    pickedKinds: padKinds,
+                    fragments: [...frags],
+                    games,
+                    finale: MissionFinale.createForced(frags, seed, forcedMode),
+                    tutorialFinaleOnly: true
+                };
+            }
+
+            const game = MissionGames.createMissionGame(kind, frags[0] || "", gameCtx);
+            game.slotIndex = 0;
+            game.kind = kind;
+            const padKinds = ["typing", "dial", "grid"];
+            const games = [game];
+            for (let i = 1; i < MissionGames.SLOT_COUNT; i++) {
+                const kid = padKinds[i] || "dial";
+                const pad = MissionGames.createMissionGame(kid, frags[i] || "", gameCtx);
+                pad.slotIndex = i;
+                pad.kind = kid;
+                pad.solved = true;
+                pad.reveal = frags[i] || "";
+                pad._tutorialPad = true;
+                games.push(pad);
+            }
+            return {
+                ...base,
+                tutorialSingleKind: kind,
+                pickedKinds: [kind, padKinds[1], padKinds[2]],
+                fragments: [null, frags[1] || null, frags[2] || null],
+                games,
+                finale: null
+            };
+        }
+
+        function applyTutorialBodyClasses() {
+            if (!isTutorialMode) return;
+            document.body.classList.add("mode-tutorial", "mode-single");
+            const singleSlot = !!(currentIntel?.tutorialSingleKind && !currentIntel?.tutorialFinaleOnly);
+            document.body.classList.toggle("tutorial-single-slot", singleSlot);
+            const label = $("tutorialSandboxLabel");
+            if (label) {
+                const kind = tutorialKind;
+                let name = missionKindLabel(kind);
+                if (TutorialCatalog?.isFinaleKind?.(kind)) {
+                    name = kind === "finale-stroop" ? mT("mission.finale.stroopTitle") : mT("mission.finale.classicTitle");
+                } else if (TutorialCatalog?.isBonusKind?.(kind)) {
+                    name = t("tutorialIntelTitle");
+                } else {
+                    name = mT(`mission.${kind}.title`) || name;
+                }
+                label.textContent = `${t("tutorialBarLabel")} · ${name}`;
+            }
+        }
+
+        function setupTutorialSandbox() {
+            const known = TutorialCatalog?.isBonusKind?.(tutorialKind)
+                || TutorialCatalog?.isFinaleKind?.(tutorialKind)
+                || MissionGames.REGISTRY[tutorialKind]?.enabled;
+            if (!known) {
+                showToast(t("tutorialEmpty"), true);
+                setTimeout(() => { location.href = "tutorial.html"; }, 1200);
+                return false;
+            }
+            const homeState = getMalaysiaState("selangor");
+            const playerCoords = teamCoordsFromState(homeState, true);
+            const dummyState = getMalaysiaState("penang");
+            const targetCoords = teamCoordsFromState(dummyState, false);
+            state.player = {
+                id: csClientId,
+                name: t("tutorialAgentName"),
+                password: "TRAIN01",
+                balance: 1000,
+                x: playerCoords.x,
+                y: playerCoords.y,
+                mapX: playerCoords.mapX,
+                mapY: playerCoords.mapY,
+                lat: playerCoords.lat,
+                lon: playerCoords.lon,
+                state: playerCoords.state,
+                stateId: playerCoords.stateId,
+                city: playerCoords.state,
+                icon: "🧑",
+                passwordUpdatedAt: Date.now(),
+                wins: 0,
+                losses: 0,
+                isOpponent: false,
+                isAI: false,
+                agentRank: "trainee"
+            };
+            state.opponents = [{
+                id: "TUTORIAL_TARGET",
+                name: t("tutorialDummyTarget"),
+                password: TUTORIAL_TARGET_PASSWORD,
+                balance: 5000,
+                x: targetCoords.x,
+                y: targetCoords.y,
+                mapX: targetCoords.mapX,
+                mapY: targetCoords.mapY,
+                lat: targetCoords.lat,
+                lon: targetCoords.lon,
+                state: targetCoords.state,
+                stateId: targetCoords.stateId,
+                city: targetCoords.state,
+                icon: "🤖",
+                passwordUpdatedAt: Date.now(),
+                vaultReady: true,
+                isOpponent: true,
+                isAI: true
+            }];
+            state.targetId = state.opponents[0].id;
+            state.transactions = state.transactions || [];
+            if (!state.missionStats) state.missionStats = defaultMissionStats();
+            state.matchStartedAt = Date.now();
+            missionStartedAt = Date.now();
+            breachUnlocked = false;
+            $("passwordGuess").value = "";
+
+            if (TutorialCatalog?.isBonusKind?.(tutorialKind)) {
+                currentIntel = null;
+            } else {
+                currentIntel = buildTutorialIntel(state.opponents[0], tutorialKind);
+                if (!currentIntel) {
+                    showToast(t("tutorialEmpty"), true);
+                    setTimeout(() => { location.href = "tutorial.html"; }, 1200);
+                    return false;
+                }
+            }
+            state._syncSnapshot = {
+                balance: state.player.balance,
+                password: state.player.password,
+                passwordUpdatedAt: state.player.passwordUpdatedAt
+            };
+            saveStateNow();
+            return true;
+        }
+
+        function openTutorialBonusDrill() {
+            if (!window.MissionIntelread) return false;
+            return openBankBonusModal({
+                practiceOnly: true,
+                briefingSeed: `tutorial|${tutorialKind}`,
+                pool: 0,
+                waveIndex: 0,
+                startedAt: Date.now()
+            });
+        }
+
+        function notifyTutorialLevelDone() {
+            playLevelCompleteSound();
+            showToast(t("tutorialLevelDone"));
         }
 
         function buildIntelForTarget(team, options = {}) {
@@ -4718,7 +4958,7 @@
             if (!pickedKinds || pickedKinds.length !== MissionGames.SLOT_COUNT) {
                 const pick = MissionGames.pickMissionKindIds(pickCtx);
                 if (!pick.ok) {
-                    showToast(pick.error);
+                    showToast(tr(pick.error));
                     return null;
                 }
                 pickedKinds = pick.kinds;
@@ -4753,14 +4993,14 @@
             syncFromRoom();
             const tid = $("targetTeamSelect").value || state.targetId;
             const target = refreshOpponentFromRoom(tid) || getOpponent(tid);
-            if (!state.player) { showToast("请先进入战场。"); return false; }
+            if (!state.player) { showToast(t("enterBattlefield")); return false; }
             if (!isSinglePlayer && isBankTarget(tid)) {
-                showToast("央行攻击已改为海域闪灯 Bonus，请等待地图图钉闪灯。");
+                showToast(t("bankBonusMapOnly"));
                 return false;
             }
-            if (!target) { showToast("请选择目标金库。"); return false; }
+            if (!target) { showToast(t("selectTargetFirst")); return false; }
             if (!isSinglePlayer && (!target.vaultReady || !target.password)) {
-                showToast(`${target.name} 金库尚未就绪，请稍后重试。`);
+                showToast(tReplace("targetNoPassword", { name: target.name }));
                 return false;
             }
             ensurePlayerVaultFresh();
@@ -4774,7 +5014,7 @@
                     const used = getDeployCount(target.id);
                     const max = getMaxDeploy();
                     if (used >= max) {
-                        showToast(`对 ${target.name} 的部署次数已用完（${max} 次/目标）。`);
+                        showToast(t("deployLimitReached"));
                         return false;
                     }
                     state.deployCounts[target.id] = used + 1;
@@ -4825,7 +5065,7 @@
                     ? `任务已部署：${target.name}${pickLabel ? " · " + pickLabel : ""}`
                     : `继续任务：${target.name}`);
                 if (raidInfo && raidInfo.poolRemaining === 0) {
-                    setTimeout(() => showToast("该州攻坚奖池已抽空，完成关卡也无法再分到队库。可换目标或等待对方开启新池。"), 400);
+                    setTimeout(() => showToast(t("poolExhausted")), 400);
                 }
                 return true;
             }
@@ -4841,7 +5081,7 @@
                 return abandonPrevRaid().then(() =>
                     Promise.resolve(CurrencySafeRoom.claimTeamDeploy(roomId, target.id))
                 ).then(res => {
-                    if (!res.ok) { showToast(res.error); return false; }
+                    if (!res.ok) { showToast(tr(res.error)); return false; }
                     state.deployCounts[target.id] = res.deploySeq;
                     return finishDeploy(res.deploySeq, res.raid);
                 });
@@ -4860,7 +5100,9 @@
             const room = CurrencySafeRoom.getRoom(roomId);
             const matchEl = $("hudMatchTime");
             if (matchEl) {
-                if (isSinglePlayer) {
+                if (isTutorialMode) {
+                    matchEl.textContent = "—";
+                } else if (isSinglePlayer) {
                     matchEl.textContent = formatRemaining(getSoloMatchRemainingMs());
                 } else {
                     const rem = CurrencySafeRoomShared.getMatchRemainingMs(room);
@@ -4876,7 +5118,9 @@
             $("hudTargetName").textContent = target ? target.name : t("noTarget");
             if ($("hudMoreRoom")) $("hudMoreRoom").textContent = roomId;
             if ($("hudMoreMode")) {
-                $("hudMoreMode").textContent = isSinglePlayer
+                $("hudMoreMode").textContent = isTutorialMode
+                    ? t("tutorialModeHud")
+                    : isSinglePlayer
                     ? t("modeSolo")
                     : (room?.mode === "competitive" ? t("modeCompetitive") : t("modePractice"));
             }
@@ -4981,6 +5225,10 @@
         function updateRegisterTabVisibility() {
             const player = getPlayer();
             const regTab = document.querySelector('.tab[data-tab="register"]');
+            if (isTutorialMode) {
+                if (regTab) regTab.classList.add("hidden");
+                return;
+            }
             if (isSinglePlayer) {
                 if (regTab) regTab.classList.toggle("hidden", !!player);
                 return;
@@ -4991,7 +5239,7 @@
         function pickInitialTab() {
             const player = getPlayer();
             updateRegisterTabVisibility();
-            if (isSinglePlayer) {
+            if (isTutorialMode || isSinglePlayer) {
                 showTab(player ? "attack" : "register");
                 return;
             }
@@ -5036,7 +5284,8 @@
             state.opponents.forEach(team => {
                 const opt = document.createElement("option");
                 opt.value = team.id;
-                const stateTag = team.state ? ` · ${team.state}` : "";
+                const place = formatStoredStateLabel(team);
+                const stateTag = place ? ` · ${place}` : "";
                 opt.textContent = `${team.name}${stateTag} · RM ${money(team.balance)}`;
                 $("targetTeamSelect").appendChild(opt);
             });
@@ -5053,10 +5302,23 @@
             const notice = $("attackNotice");
             if (!player) {
                 notice.className = "notice warning";
-                notice.textContent = isSinglePlayer ? t("waitingRegister") : t("pickTargetMap");
+                notice.textContent = isTutorialMode ? t("waitingRegister") : (isSinglePlayer ? t("waitingRegister") : t("pickTargetMap"));
             } else if (!target) {
                 notice.className = "notice";
                 notice.textContent = t("pickTargetMap");
+            } else if (isTutorialMode) {
+                let drillName = missionKindLabel(tutorialKind);
+                if (TutorialCatalog?.isFinaleKind?.(tutorialKind)) {
+                    drillName = tutorialKind === "finale-stroop"
+                        ? mT("mission.finale.stroopTitle")
+                        : mT("mission.finale.classicTitle");
+                } else if (TutorialCatalog?.isBonusKind?.(tutorialKind)) {
+                    drillName = t("tutorialIntelTitle");
+                } else {
+                    drillName = mT(`mission.${tutorialKind}.title`) || drillName;
+                }
+                notice.className = "notice";
+                notice.innerHTML = `<strong>${escapeHtml(t("tutorialBarLabel"))}</strong> · ${escapeHtml(drillName)}`;
             } else {
                 const max = getMaxDeploy();
                 const used = getDeployCount(target.id);
@@ -5189,7 +5451,7 @@
                     game.interceptEnergy = 1;
                     completeMissionSlot(game, {
                         beforeOnLevelComplete: () => { playLevelCompleteSound(); },
-                        toast: "转账密钥截获成功！片段已到手！"
+                        toast: mT("mission.typing.toastWin")
                     });
                     return;
                 }
@@ -5204,12 +5466,12 @@
                     game.mistakesLeft--;
                     const card = document.getElementById("typingGameCard");
                     if (card) { card.classList.add("signal-warn"); setTimeout(() => card.classList.remove("signal-warn"), 500); }
-                    showToast(`敲错了！本关容错剩余 ${game.mistakesLeft} 次（部署失误 +1）`);
+                    showToast(mT("mission.typing.toastWrong", { n: game.mistakesLeft }));
                     onMissionMistake();
                 } else {
                     trackMissionStat("typingFails", 1);
                     logLevelFail("typing");
-                    showToast("拦截失败！密钥飘走，退回一字重来（部署失误 +1）");
+                    showToast(mT("mission.typing.toastFail"));
                     game.typedIndex = Math.max(0, game.typedIndex - 1);
                     game.mistakesLeft = getAgentCfg().mistakes;
                     onMissionMistake();
@@ -5239,24 +5501,26 @@
             const locked = !isGameUnlocked(idx);
             const cfg = getAgentCfg();
             const cur = game.keyword[game.typedIndex] || "✓";
-            const eliteWord = cfg.showWholeWord ? `<p class="cipher">整词传输：${escapeHtml(game.keyword)}</p>` : "";
+            const eliteWord = cfg.showWholeWord
+                ? `<p class="cipher">${escapeHtml(mT("mission.typing.eliteWord", { keyword: game.keyword }))}</p>`
+                : "";
             return `
                 <div class="mini-game-card ${game.solved ? "solved" : ""} ${locked ? "locked" : ""}" id="miniGame${idx}">
-                    <h3>${game.solved ? "✅" : "💰"} ${game.title}</h3>
-                    <p class="muted">从 <strong>${escapeHtml(game.originLabel)}</strong> 发往你基地的转账密钥正在传输，逐字截获即可。</p>
+                    <h3>${game.solved ? "✅" : "💰"} ${mT("mission.typing.title")}</h3>
+                    <p class="muted">${escapeHtml(mT("mission.typing.desc", { origin: game.originLabel }))}</p>
                     ${eliteWord}
-                    ${game.solved ? `<div class="reveal">密钥片段：<strong>${escapeHtml(game.reveal)}</strong></div>
-                    <div class="agent-note">${escapeHtml(game.agentNote || "")}</div>` : `
+                    ${game.solved ? `<div class="reveal">${escapeHtml(mT("mission.common.keyFragment"))}<strong>${escapeHtml(game.reveal)}</strong></div>
+                    ${renderAgentNoteFold(escapeHtml(game.agentNote || ""))}` : `
                     <div class="typing-stage" id="typingGameCard">
-                        <div class="muted">现在敲这个字符 ↓</div>
+                        <div class="muted">${mT("mission.typing.bannerCurChar")}</div>
                         <div class="typing-giant-char" id="typingGiantChar">${escapeHtml(cur)}</div>
                         <div class="typing-progress" id="typingProgress"></div>
                         <div class="intercept-energy-wrap">
-                            <small>拦截能量（满格解锁片段，不再中途刷金币）</small>
+                            <small>${mT("mission.typing.bannerEnergy")}</small>
                             <div class="intercept-energy-bar"><div class="intercept-energy-fill" id="interceptEnergyFill" style="width:${(game.interceptEnergy*100).toFixed(0)}%"></div></div>
                         </div>
-                        <p class="muted" style="font-size:.82rem">本关容错 ${game.mistakesLeft} 次 · 部署失误 ${game.mistakes || 0} 次 · 键盘输入</p>
-                        <input id="typingFocusTrap" type="text" inputmode="none" aria-label="打字拦截输入区"
+                        <p class="muted" style="font-size:.82rem">${escapeHtml(mT("mission.typing.bannerMeta", { left: game.mistakesLeft, mistakes: game.mistakes || 0 }))}</p>
+                        <input id="typingFocusTrap" type="text" inputmode="none" aria-label="${escapeHtml(mT("mission.typing.ariaInput"))}"
                             style="opacity:0;position:absolute;width:1px;height:1px;left:50%;top:50%" autocomplete="off" tabindex="0" />
                     </div>`}
                 </div>`;
@@ -5401,7 +5665,7 @@
                     ? buildSlotDigitStripHtml()
                     : `<span class="slot-cell">${escapeHtml(w.current)}</span>`;
             const stripClass = rotatable ? "slot-reel-strip" : "slot-reel-strip static";
-            const hint = rotatable ? "滚轮/拖动" : (game.solved ? "OK" : "已锁定");
+            const hint = rotatable ? t("dialSlotHint") : (game.solved ? mT("mission.common.complete") : mT("mission.common.lockedLevel"));
             const dist = rotatable && !match ? dialDistanceDots(dialWheelDistance(w)) : "";
             const nudge = rotatable
                 ? `<div class="slot-nudge">
@@ -5588,12 +5852,12 @@
             if (game.solved || !game.hintMode) return "";
             if (game.hintMode === "lesson") {
                 return `<div class="notice">
-                    见习提示：字母和数字会<strong>整体偏移</strong>。看纸条 A→D→G，每个字母都往后排 3 格；数字同理 0→3→6。
+                    ${escapeHtml(mT("mission.dial.hintLesson"))}
                     <div class="cipher-strip"><span>A</span><span>→</span><span>D</span><span>→</span><span>G</span></div>
                 </div>`;
             }
             if (game.hintMode === "shift") {
-                return `<div class="notice">偏移量提示：字母和数字整体移动了 <strong>${game.shift}</strong> 格。试试转轮方向！</div>`;
+                return `<div class="notice">${escapeHtml(mT("mission.dial.hintShift", { shift: game.shift }))}</div>`;
             }
             return "";
         }
@@ -5602,21 +5866,19 @@
             const locked = !isGameUnlocked(idx);
             repairDialGame(game);
             const wheelsHtml = game.wheels.map((w, wi) => renderSlotWheel(w, wi, game, idx)).join("");
-            const coordLabel = game.solved
-                ? `<strong class="dial-coord-reveal">${escapeHtml(game.city.label)}</strong>`
-                : `<span class="dial-coord-mask">███</span>`;
+            const coordText = game.solved ? game.city.label : mT("mission.dial.coordMask");
             return `
                 <div class="mini-game-card ${game.solved ? "solved" : ""} ${locked ? "locked" : ""}" id="miniGame${idx}">
-                    <h3>${game.solved ? "✅" : "🗺️"} ${game.title}</h3>
-                    <p class="muted">总部截获密电（掩护坐标：<span id="dialCoord${idx}">${coordLabel}</span>）：</p>
+                    <h3>${game.solved ? "✅" : "🗺️"} ${mT("mission.dial.title")}</h3>
+                    <p class="muted">${escapeHtml(mT("mission.dial.desc", { coord: coordText }))}</p>
                     <p class="cipher" style="text-align:center">${escapeHtml(game.cipherDisplay)}</p>
                     ${renderDialHint(game)}
-                    <p class="muted">拖动转轮、滚轮或 ▲▼ 调节字母与数字，恢复密钥片段。</p>
+                    <p class="muted">${mT("mission.dial.instructions")}</p>
                     ${!game.solved && !locked ? `<div class="dial-actions"><button type="button" class="secondary dial-reset-btn" data-dial-reset="${idx}" data-i18n="dialReset">恢复初始</button></div>` : ""}
-                    <div class="slot-machine-label">◆ VAULT SLOT ◆</div>
+                    <div class="slot-machine-label">${mT("mission.dial.slotLabel")}</div>
                     <div class="dial-row">${wheelsHtml}</div>
-                    ${game.solved ? `<div class="reveal">密钥片段：<strong>${escapeHtml(game.reveal)}</strong></div>
-                    <div class="agent-note">${escapeHtml(game.agentNote || "")}<br/>密电片段已恢复，坐标 ${escapeHtml(game.city.label)} 只是掩护情报。</div>` : ""}
+                    ${game.solved ? `<div class="reveal">${escapeHtml(mT("mission.common.keyFragment"))}<strong>${escapeHtml(game.reveal)}</strong></div>
+                    ${renderAgentNoteFold(escapeHtml(game.agentNote || "") + "<br/>" + escapeHtml(mT("mission.dial.agentNoteSolved", { city: game.city.label })))}` : ""}
                 </div>`;
         }
 
@@ -5722,11 +5984,12 @@
                 if (!currentIntel?.games?.[idx] || currentIntel.games[idx] !== game || game.solved) return;
                 const phaseEl = document.getElementById("qxPhase" + idx);
                 if (cd > 0) {
-                    if (phaseEl) phaseEl.textContent = `量子信号传输… ${cd}`;
+                    if (phaseEl) phaseEl.textContent = mT("mission.quantum.phaseCountdown", { n: cd });
                     cd -= 1;
                     quantumFlashTimer = setTimeout(tick, 650);
                     return;
                 }
+                MissionQuantum.beginShowPhase(game);
                 if (phaseEl) phaseEl.textContent = MissionQuantum.phaseLabel(game);
                 runQuantumFlashSequence(game, idx);
             };
@@ -5746,14 +6009,14 @@
                 stopQuantumFlash();
                 completeMissionSlot(game, {
                     beforeOnLevelComplete: () => { playLevelCompleteSound(); },
-                    toast: "量子序列同步完成！"
+                    toast: tReplace("quantumWin")
                 });
                 return;
             }
             if (res.wrong) {
                 playTone(110, 0.12, "sawtooth", 0.1);
                 onMissionMistake();
-                showToast("序列错误！自动重播一遍，请盯紧亮灯顺序。");
+                showToast(tReplace("quantumWrong"));
                 game.phase = "wrong";
                 if (!paintQuantumPanel(game, idx)) renderMiniGames();
                 else saveStateNow();
@@ -5770,50 +6033,11 @@
                 }, 140);
             } else if (res.roundComplete) {
                 playLevelCompleteSound();
-                showToast(`第 ${game.round} 轮同步成功！`);
+                showToast(tReplace("quantumRoundOk", { n: game.round }));
                 game.phase = "round_done";
                 quantumFlashTimer = setTimeout(() => startQuantumRound(game, idx), 1000);
             }
             if (!paintQuantumPanel(game, idx)) renderMiniGames();
-            saveStateNow();
-        }
-
-        function onCvFilterPick(game, idx, filterId) {
-            if (!game || game.kind !== "cvfilter" || game.solved || !isGameUnlocked(idx)) return;
-            const res = MissionCvfilter.applyFilter(game, filterId);
-            if (!res.ok) return;
-            const vp = document.getElementById("cvViewport" + idx);
-            if (res.win) {
-                if (vp) vp.classList.add("cv-step-ok");
-                completeMissionSlot(game, {
-                    beforeOnLevelComplete: () => { playLevelCompleteSound(); },
-                    toast: "坐标现形！滤镜管线正确。"
-                });
-                return;
-            }
-            if (res.wrong) {
-                if (vp) {
-                    vp.classList.remove("cv-step-ok");
-                    vp.classList.add("cv-glitch");
-                    shake(vp);
-                    setTimeout(() => vp.classList.remove("cv-glitch"), 480);
-                }
-                playTone(120, 0.1, "sawtooth", 0.1);
-                onMissionMistake();
-                const hint = (game.mistakes || 0) >= 2
-                    ? `顺序错误！下一步应是「${res.expectedLabel}」`
-                    : `「${res.pickedLabel}」不是这一步！画面已重置，读管线说明再试。`;
-                showToast(hint);
-                game.applied = [];
-            } else {
-                if (vp) {
-                    vp.classList.add("cv-step-ok");
-                    setTimeout(() => vp.classList.remove("cv-step-ok"), 400);
-                }
-                playClickSound();
-                showToast(`✓ ${res.appliedLabel || "显影"} — 第 ${game.applied.length}/3 步成功`);
-            }
-            renderMiniGames();
             saveStateNow();
         }
 
@@ -5824,7 +6048,7 @@
             if (res.win) {
                 completeMissionSlot(game, {
                     beforeOnLevelComplete: () => { playLevelCompleteSound(); },
-                    toast: "机器人密语破解成功！"
+                    toast: mT("mission.binary.toastWin")
                 });
                 return;
             }
@@ -5922,28 +6146,28 @@
             if (banner) {
                 banner.classList.remove("scout-tick");
                 if (game.phase === "ready") {
-                    banner.textContent = "阅读任务说明，准备好了再点「开始潜入」。";
+                    banner.textContent = mT("mission.grid.scoutBanner");
                 } else if (game.phase === "scout") {
-                    banner.textContent = `开牌记忆！盯住「入」→💎 绿走廊 · ${game.scoutCountdown} 秒`;
+                    banner.textContent = mT("mission.grid.phaseScout", { sec: game.scoutCountdown });
                     if (game.scoutCountdown <= 2) banner.classList.add("scout-tick");
                 } else if (game.phase === "meltdown") {
-                    banner.textContent = `核冷却触发自毁！${game.meltdownSec} 秒内到达宝石，否则整关重置`;
+                    banner.textContent = mT("mission.grid.phaseMeltdown", { sec: game.meltdownSec });
                 } else if (game.phase === "scan_flash") {
                     const left = game.scanFlashLeft ?? Math.ceil(GRID_SCAN_FLASH_MS / 1000);
-                    banner.textContent = `热感扫描中… ${left}s — 只显示换位后的激光 🚨`;
+                    banner.textContent = mT("mission.grid.phaseScan", { sec: left });
                 } else if (game.solved) {
-                    banner.textContent = "核能宝石已到手，潜入成功！";
+                    banner.textContent = mT("mission.grid.toastWin");
                 } else {
-                    banner.textContent = "关灯潜入：从「入」出发，点相邻格走到 💎（护盾 3 次）";
+                    banner.textContent = mT("mission.grid.phaseDark");
                 }
             }
             const shields = document.getElementById("gridShields");
             if (shields) {
-                shields.textContent = game.shields > 0 ? "❤️".repeat(game.shields) : "🖤 护盾耗尽";
+                shields.textContent = game.shields > 0 ? "❤️".repeat(game.shields) : t("gridShieldGone");
             }
             const scanBtn = document.getElementById("gridScanBtn");
             if (scanBtn) {
-                scanBtn.textContent = `紧急热感扫描（剩余 ${game.scansLeft} 次）`;
+                scanBtn.textContent = mT("mission.grid.scanBtn", { n: game.scansLeft });
                 const disabled = game.scansLeft <= 0 || game.solved ||
                     game.phase === "ready" || game.phase === "scout" || game.phase === "scan_flash" || game.phase === "meltdown";
                 scanBtn.disabled = disabled;
@@ -5965,7 +6189,7 @@
                 if (g.meltdownSec <= 0) {
                     stopGridMeltdownTimer();
                     vaultLevelReset(g);
-                    showToast("自毁程序已重置第三关——前两关情报已保留。");
+                    showToast(t("gridStartFirst"));
                     renderMiniGames();
                     saveStateNow();
                 }
@@ -5977,7 +6201,7 @@
             game.phase = "scout";
             game.scoutCountdown = GRID_SCOUT_SEC;
             playTone(520, 0.12, "sine", 0.1);
-            showToast(`开牌 ${GRID_SCOUT_SEC} 秒！记住绿色安全走廊，从「入」到 💎`);
+            showToast(mT("mission.grid.phaseScout", { sec: GRID_SCOUT_SEC }));
             renderMiniGames();
             startGridScoutIfNeeded();
             saveState();
@@ -6005,7 +6229,7 @@
                     }
                     g.phase = "hidden";
                     playTone(220, 0.2, "sawtooth", 0.08);
-                    showToast("关灯！凭记忆潜入——踩雷扣护盾，用尽触发自毁。");
+                    showToast(mT("mission.grid.phaseDark"));
                     renderMiniGames();
                     saveState();
                 }
@@ -6021,7 +6245,7 @@
             game.phase = "scan_flash";
             game.scanFlashLeft = Math.ceil(GRID_SCAN_FLASH_MS / 1000);
             playTone(880, 0.1, "square", 0.08);
-            showToast("激光阵已换位！热感扫描 1.5 秒——看清新激光位置。");
+            showToast(mT("mission.grid.phaseScan", { sec: Math.ceil(GRID_SCAN_FLASH_MS / 1000) }));
             renderMiniGames();
             saveState();
             if (gridScanTimeout) clearTimeout(gridScanTimeout);
@@ -6045,7 +6269,7 @@
                 if (!g || g.solved) return;
                 g.phase = "hidden";
                 g.scanFlashLeft = 0;
-                showToast("扫描结束！继续摸黑前进。");
+                showToast(mT("mission.grid.phaseDark"));
                 renderMiniGames();
                 saveState();
             }, GRID_SCAN_FLASH_MS);
@@ -6119,7 +6343,7 @@
             if (game.phase === "scout" || game.phase === "scan_flash" || game.phase === "meltdown" || game.phase === "ready") return;
             if (game.playerPos.r === r && game.playerPos.c === c) return;
             if (!isAdjacent(game.playerPos, { r, c })) {
-                showToast("只能走相邻格子！");
+                showToast(t("gridAdjacentOnly"));
                 return;
             }
 
@@ -6144,7 +6368,7 @@
                     saveState();
                     return;
                 }
-                showToast("核冷却系统触发自毁倒计时 5 秒！");
+                showToast(mT("mission.grid.phaseMeltdown", { sec: 5 }));
                 startGridMeltdown(game);
                 saveState();
                 return;
@@ -6165,7 +6389,7 @@
                         stopGridPhaseTimers();
                         playLevelCompleteSound();
                     },
-                    toast: "总部用你的路线生成了密钥片段！"
+                    toast: mT("mission.grid.toastRoute")
                 });
             }
             renderFragments();
@@ -6187,43 +6411,47 @@
             const scanDisabled = game.scansLeft <= 0 || game.solved ||
                 game.phase === "ready" || game.phase === "scout" || game.phase === "scan_flash" || game.phase === "meltdown";
             const phaseHint = game.phase === "ready"
-                ? `准备阶段：点「开始潜入」后全场亮灯 ${GRID_SCOUT_SEC} 秒，记住绿色走廊。`
+                ? mT("mission.grid.phaseReady", { sec: GRID_SCOUT_SEC })
                 : game.phase === "scout"
-                ? `阶段一·开牌（${game.scoutCountdown ?? GRID_SCOUT_SEC}s）：记住从「入」到 💎 的安全路线。`
+                ? mT("mission.grid.phaseScout", { sec: game.scoutCountdown ?? GRID_SCOUT_SEC })
                 : game.phase === "scan_flash"
-                    ? `热感扫描（${game.scanFlashLeft ?? 2}s）：只显示换位后的激光 🚨，抓紧记忆。`
+                    ? mT("mission.grid.phaseScan", { sec: game.scanFlashLeft ?? 2 })
                     : game.phase === "meltdown"
-                        ? `自毁倒计时 ${game.meltdownSec}s：必须赶到 💎，否则整关重置（前两关情报保留）。`
-                    : "阶段二·关灯：点相邻格前进；踩雷扣护盾，护盾用尽再踩雷触发自毁。";
+                        ? mT("mission.grid.phaseMeltdown", { sec: game.meltdownSec })
+                    : mT("mission.grid.phaseDark");
             const startBlock = !locked && !game.solved && game.phase === "ready"
                 ? `<div class="vault-start-wrap">
-                    <p>🟢 绿色 = 安全地板　🔴 红色 = 激光阵　💎 右下角 = 核能宝石<br/>
-                    起点在左上角。开牌时记住「入」到宝石最近的一条绿走廊。</p>
-                    <button class="vault-start-btn" id="gridStartBtn" data-start-grid="${idx}">开始潜入</button>
+                    <p>${mT("mission.grid.legend")}<br/>${mT("mission.grid.legendPath")}</p>
+                    <button class="vault-start-btn" id="gridStartBtn" data-start-grid="${idx}">${mT("mission.grid.startBtn")}</button>
                    </div>`
                 : "";
             return `
                 <div class="mini-game-card ${game.solved ? "solved" : ""} ${locked ? "locked" : ""}" id="miniGame${idx}">
-                    <h3>${game.solved ? "✅" : "🚨"} ${game.title}</h3>
+                    <h3>${game.solved ? "✅" : "🚨"} ${mT("mission.grid.title")}</h3>
                     <div class="vault-hud">
                         <span class="vault-shields" id="gridShields">${"❤️".repeat(game.shields || 0)}</span>
-                        <span class="vault-scout-banner" id="gridScoutBanner">阅读任务说明，准备好了再点「开始潜入」。</span>
+                        <span class="vault-scout-banner" id="gridScoutBanner">${mT("mission.grid.scoutBanner")}</span>
                     </div>
                     <p class="muted">${phaseHint}</p>
                     <div class="vault-grid-wrap" id="vaultGridWrap">${cells}</div>
                     ${startBlock}
                     <button class="vault-scan-btn" id="gridScanBtn" data-scan-grid="${idx}" ${scanDisabled ? "disabled" : ""}>
-                        紧急热感扫描（剩余 ${game.scansLeft} 次）
+                        ${mT("mission.grid.scanBtn", { n: game.scansLeft })}
                     </button>
                     ${game.footprint ? `<div class="footprint-code">${escapeHtml(game.footprint)}</div>
-                    <p class="muted" style="text-align:center;font-size:.82rem">脚印暗号已编码为总部第三段密钥：<strong>${escapeHtml(game.reveal)}</strong></p>` : ""}
-                    ${game.solved ? `<div class="reveal">密钥片段：<strong>${escapeHtml(game.reveal)}</strong></div>
-                    <div class="agent-note">${escapeHtml(game.agentNote || "")}</div>` : ""}
+                    <p class="muted" style="text-align:center;font-size:.82rem">${mT("mission.grid.footprintNote")}<strong>${escapeHtml(game.reveal)}</strong></p>` : ""}
+                    ${game.solved ? `<div class="reveal">${escapeHtml(mT("mission.common.keyFragment"))}<strong>${escapeHtml(game.reveal)}</strong></div>
+                    ${renderAgentNoteFold(escapeHtml(game.agentNote || ""))}` : ""}
                 </div>`;
         }
 
         function getMiniGameRenderHelpers() {
             return { escapeHtml };
+        }
+
+        function renderAgentNoteFold(innerHtml) {
+            if (!innerHtml) return "";
+            return `<details class="agent-note-fold"><summary>${mT("mission.common.agentNote")}</summary><div class="agent-note">${innerHtml}</div></details>`;
         }
 
         function getMissionGameCtx() {
@@ -6241,13 +6469,13 @@
             if (!game || game.kind !== "mastermind" || !isGameUnlocked(idx)) return;
             const res = MissionMastermind.submitGuess(game);
             if (!res.ok) {
-                if (res.reason === "incomplete") showToast("请先选满四色再提交。");
+                if (res.reason === "incomplete") showToast(mT("mission.mastermind.toastIncomplete"));
                 return;
             }
             if (res.win) {
                 completeMissionSlot(game, {
                     beforeOnLevelComplete: () => { playLevelCompleteSound(); },
-                    toast: "四色核密码破解成功！"
+                    toast: mT("mission.mastermind.toastWin")
                 });
                 return;
             }
@@ -6261,7 +6489,7 @@
                     mistakes: nextMistakes
                 });
                 playTone(140, 0.15, "sawtooth", 0.1);
-                showToast("试探行数用尽！密码已重置（部署失误 +1）——绿/黄灯泡帮你缩小范围。");
+                showToast(mT("mission.mastermind.toastExhausted"));
                 onMissionMistake();
                 renderMiniGames();
                 saveStateNow();
@@ -6271,7 +6499,7 @@
             if (card) shake(card);
             if (res.greens) playTone(520 + res.greens * 60, 0.1, "sine", 0.1);
             if (res.yellows) setTimeout(() => playTone(420, 0.08, "sine", 0.08), 80);
-            showToast(`传感器反馈：${res.greens} 绿 · ${res.yellows} 黄`);
+            showToast(mT("mission.mastermind.toastFeedback", { greens: res.greens, yellows: res.yellows }));
             renderMiniGames();
             saveStateNow();
         }
@@ -6282,13 +6510,13 @@
             if (res.win) {
                 completeMissionSlot(game, {
                     beforeOnLevelComplete: () => { playLevelCompleteSound(); },
-                    toast: "碎片顺序正确，密钥段已拼接！"
+                    toast: mT("mission.fragsort.toastWin")
                 });
                 return;
             }
             const card = document.getElementById("miniGame" + idx);
             if (card) shake(card);
-            showToast(res.hint ? "顺序不对！已将 ① 提示到最左侧。" : "顺序不对，继续调整碎片。");
+            showToast(res.hint ? mT("mission.finale.classicHint") : t("transferFailed"));
             onMissionMistake();
             renderMiniGames();
             saveStateNow();
@@ -6385,7 +6613,7 @@
             const grid = $("puzzleGrid");
             grid.innerHTML = "";
             if (!currentIntel) {
-                grid.innerHTML = `<div class="notice">请先加载目标情报。</div>`;
+                grid.innerHTML = `<div class="notice">${t("loadIntelFirst")}</div>`;
                 return;
             }
 
@@ -6400,9 +6628,9 @@
                     return;
                 }
                 if (breachUnlocked) {
-                    grid.innerHTML = `<div class="notice success">三关任务与密钥组合已完成，请在下方确认转账。</div>`;
+                    grid.innerHTML = `<div class="notice success">${t("levelsDoneTransfer")}</div>`;
                 } else {
-                    grid.innerHTML = `<div class="notice">三关已完成，请组合密钥片段。</div>`;
+                    grid.innerHTML = `<div class="notice">${t("levelsDoneCombine")}</div>`;
                 }
                 return;
             }
@@ -6420,7 +6648,6 @@
             else if (game.kind === "fragsort") html = MissionFragsort.render(game, activeIdx, false, miniHelpers);
             else if (game.kind === "binary") html = MissionBinary.render(game, activeIdx, false, miniHelpers);
             else if (game.kind === "quantum") html = MissionQuantum.render(game, activeIdx, false, miniHelpers);
-            else if (game.kind === "cvfilter") html = MissionCvfilter.render(game, activeIdx, false, miniHelpers);
             const wrap = document.createElement("div");
             wrap.innerHTML = html;
             grid.appendChild(wrap.firstElementChild);
@@ -6478,18 +6705,10 @@
                 btn.onclick = () => onQuantumStart(currentIntel.games[qi], qi);
             });
             bindQuantumEvents(activeIdx);
-            grid.querySelectorAll("[data-cv-filter]").forEach(btn => {
-                const ci = Number(btn.dataset.cvFilter);
-                btn.onclick = () => onCvFilterPick(
-                    currentIntel.games[ci],
-                    ci,
-                    btn.dataset.cvId
-                );
-            });
         }
 
         function autofillPassword() {
-            if (!currentIntel || !currentIntel.fragments.every(Boolean)) { showToast("请先完成三关小游戏。"); return; }
+            if (!currentIntel || !currentIntel.fragments.every(Boolean)) { showToast(t("completeMinigames")); return; }
             $("passwordGuess").value = currentIntel.fragments.join("");
         }
 
@@ -6497,8 +6716,8 @@
             const player = getPlayer();
             syncFromRoom();
             const target = refreshOpponentFromRoom(state.targetId) || getOpponent(state.targetId);
-            if (!player || !target) { showToast("请先入职并选择目标。"); return; }
-            if (breachUnlocked) { showToast("金库已解锁，请进行转账。"); return; }
+            if (!player || !target) { showToast(t("pickTargetFirstToast")); return; }
+            if (breachUnlocked) { showToast(t("vaultUnlockedTransfer")); return; }
             const guess = $("passwordGuess").value.toUpperCase();
             if (guess === target.password) {
                 if (isSinglePlayer) {
@@ -6506,20 +6725,20 @@
                     saveStateNow();
                     render();
                     playLevelCompleteSound();
-                    showToast(`金库破解成功：${target.name} 已解锁！`);
+                    showToast(tReplace("vaultBreachSuccess", { name: target.name }));
                     return;
                 }
                 Promise.resolve(CurrencySafeRoom.applyBreach(roomId, target.id)).then(res => {
-                    if (!res.ok) { showToast(res.error); return; }
+                    if (!res.ok) { showToast(tr(res.error)); return; }
                     breachUnlocked = true;
                     syncFromRoom();
                     syncProgressToRoom();
                     render();
                     playLevelCompleteSound();
-                    showToast(`金库破解成功：${target.name} 已解锁！`);
+                    showToast(tReplace("vaultBreachSuccess", { name: target.name }));
                 });
             } else {
-                showToast("密钥不正确，检查三段片段。");
+                showToast(t("transferFailed"));
                 shake($("passwordGuess"));
             }
         }
@@ -6546,8 +6765,8 @@
             const target = getOpponent(state.targetId);
             const preview = getMissionTransferPreview();
             const amount = preview?.amount || 0;
-            if (!player || !target || !breachUnlocked) { showToast("请先解锁目标。"); return; }
-            if (!amount) { showToast("请先完成三关任务。"); return; }
+            if (!player || !target || !breachUnlocked) { showToast(t("pickTargetFirstToast")); return; }
+            if (!amount) { showToast(t("completeMinigames")); return; }
             if (isSinglePlayer) {
                 let amt = amount;
                 if (amt > target.balance) amt = target.balance;
@@ -6585,7 +6804,7 @@
                 ? CurrencySafeRoom.applyBankTransfer(roomId, amount)
                 : CurrencySafeRoom.applyTransfer(roomId, target.id, { mistakes });
             Promise.resolve(transferPromise).then(res => {
-                if (!res.ok) { showToast(res.error); return; }
+                if (!res.ok) { showToast(tr(res.error)); return; }
                 const freshRoom = CurrencySafeRoom.getRoom(roomId);
                 applyTeamVaultToDisplay(freshRoom, player, csClientId);
                 if (isBankTarget(target.id)) {
@@ -6613,7 +6832,7 @@
                 stopGridPhaseTimers();
                 const afterTransfer = (claimRes) => {
                     if (claimRes && claimRes.ok === false) {
-                        showToast(claimRes.error);
+                        showToast(tr(claimRes.error));
                         return;
                     }
                     if (claimRes?.deploySeq != null) {
@@ -6632,7 +6851,7 @@
                     finishTransferFx(oldBal, player.balance,
                         `RM ${res.amount ?? amount} 已从 ${target.name} 转入队库。目标密码已轮换。`);
                     if (claimRes?.raid?.poolRemaining === 0) {
-                        setTimeout(() => showToast("该州攻坚奖池已抽空；同目标再攻将自动开启新池。"), 400);
+                        setTimeout(() => showToast(t("poolExhausted")), 400);
                     }
                 };
                 if (isSinglePlayer) {
@@ -6735,7 +6954,8 @@
                 const row = document.createElement("div");
                 row.className = "score-row";
                 const team = (room.teams || []).find(t => t.id === p.teamId);
-                const stateLabel = team?.state ? escapeHtml(team.state) + " · " : "";
+                const stateLabelText = formatStoredStateLabel(team);
+                const stateLabel = stateLabelText ? escapeHtml(stateLabelText) + " · " : "";
                 row.innerHTML =
                     `<div class="rank">${idx + 1}</div><div><b>${escapeHtml(p.name)}</b>` +
                     `<span>${stateLabel}${t("playerEarnedMeta").replace("{raid}", money(p.raid)).replace("{bonus}", money(p.bonus))}</span></div>` +
@@ -6752,7 +6972,8 @@
                 const row = document.createElement("div");
                 row.className = "score-row";
                 const nameColor = teamStateColor(team);
-                const stateLabel = team.state ? escapeHtml(team.state) + " · " : "";
+                const stateLabelText = formatStoredStateLabel(team);
+                const stateLabel = stateLabelText ? escapeHtml(stateLabelText) + " · " : "";
                 row.innerHTML =
                     `<div class="rank">${idx + 1}</div><div><b style="color:${nameColor}">${escapeHtml(team.name)}</b>` +
                     `<span>${stateLabel}${team.isAI ? t("aiTeam") : ""}</span>` +
@@ -6763,7 +6984,19 @@
         }
 
         const RAID_ACTIVITY_TYPES = new Set(["transfer", "vault_breach"]);
-        const RAID_ACTIVITY_LABELS = {
+        const ACTIVITY_LABEL_KEYS = {
+            level_clear: "activityLevelClear",
+            mission_deployed: "activityMissionDeploy",
+            mode_change: "activityModeChange",
+            game_start: "activityGameStart",
+            game_end: "activityGameEnd",
+            player_join: "activityPlayerJoin",
+            player_leave: "activityPlayerLeave",
+            spectator_join: "activitySpectatorJoin",
+            shuffle: "activityShuffle",
+            shuffle_states: "activityShuffleStates",
+            settings: "activitySettings",
+            bank_bonus: "activityBankBonus",
             transfer: "activityTransfer",
             vault_breach: "activityBreach"
         };
@@ -6781,7 +7014,7 @@
             const compact = $("raidActivityFeed");
             const full = $("scoreActivityFeed");
             const renderItem = (a) => {
-                const labelKey = RAID_ACTIVITY_LABELS[a.type] || a.type;
+                const labelKey = ACTIVITY_LABEL_KEYS[a.type] || a.type;
                 const tag = t(labelKey);
                 const time = a.at ? new Date(a.at).toLocaleTimeString() : "";
                 return `<div class="${compact ? "raid-act-item" : "act-item"}" data-type="${escapeHtml(a.type || "")}">` +
@@ -6893,6 +7126,7 @@
         }
 
         function render() {
+            if (isTutorialMode) applyTutorialBodyClasses();
             renderHud();
             renderForms();
             renderAttack();
@@ -6915,7 +7149,7 @@
         $("selectTargetBtn").onclick = () => { Promise.resolve(deployTargetIntel(true)); };
         $("refreshIntelBtn").onclick = () => {
             Promise.resolve(deployTargetIntel(true)).then(ok => {
-                if (ok) showToast("任务已重新部署。");
+                if (ok) showToast(t("redeploySameTarget"));
             });
         };
         $("closeAlertUpgrade").onclick = () => $("alertUpgradeModal").classList.remove("show");
@@ -6971,21 +7205,21 @@
             g.style.top = e.clientY + "px"; });
         setInterval(() => {
             const player = getPlayer();
-            if (player && isExpired(player)) {
+            if (player && !isTutorialMode && isExpired(player)) {
                 if (autoRotateIfExpired(player)) {
                     syncPlayerToRoom();
                     saveState();
                 }
             }
 
-            if (!isSinglePlayer) {
+            if (!isSinglePlayer && !isTutorialMode) {
                 if (checkRoomEndedAndRedirect()) return;
                 checkMultiplayerMatchExpired();
-            } else {
+            } else if (isSinglePlayer) {
                 checkSoloMatchExpired();
             }
 
-            const selfChanged = syncFromRoom();
+            const selfChanged = isTutorialMode ? false : syncFromRoom();
             renderHud();
             renderForms();
             renderMapLeaderboard();
@@ -6997,12 +7231,54 @@
             if (selfChanged) {
                 renderAttack();
             }
-            if (!isSinglePlayer && window.updateTeamMarkers3D) {
+            if (!isSinglePlayer && !isTutorialMode && window.updateTeamMarkers3D) {
                 window.updateTeamMarkers3D();
             }
             updateBankBonusPin();
-            runSinglePlayerAITick();
+            if (isSinglePlayer && !isTutorialMode) runSinglePlayerAITick();
         }, 1000);
+
+        function startTutorialApp() {
+            document.body.classList.add("mode-single", "mode-tutorial");
+            if ($("backLobbyBtn")) {
+                $("backLobbyBtn").href = "tutorial.html";
+                $("backLobbyBtn").setAttribute("data-i18n", "tutorialBackPick");
+            }
+            CurrencySafeI18n.mountLangBar({
+                onChange: () => {
+                    CurrencySafeI18n.applyToDocument();
+                    if (typeof render === "function") render();
+                    if (bankBonusSession) {
+                        MissionIntelread?.refreshBriefingLocale?.(bankBonusSession);
+                        renderBankBonusPanel();
+                    }
+                }
+            });
+            CurrencySafeI18n.applyToDocument();
+            if ($("muteBtn")) $("muteBtn").textContent = t(soundMuted ? "muteOn" : "muteOff");
+            localStorage.removeItem(storageKey);
+            state = loadState();
+            currentIntel = null;
+            breachUnlocked = false;
+            const ready = setupTutorialSandbox();
+            if (!ready) return;
+            CurrencySafeI18n.lockLang();
+            pickInitialTab();
+            showTab("attack");
+            applyTutorialBodyClasses();
+            render();
+            enableAudio();
+            if (TutorialCatalog?.isBonusKind?.(tutorialKind)) {
+                openTutorialBonusDrill();
+            } else if (currentIntel) {
+                startGridScoutIfNeeded();
+                if (currentIntel.tutorialFinaleOnly) {
+                    document.getElementById("miniGameFinale")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                } else {
+                    scrollToMission(0);
+                }
+            }
+        }
 
         function startSinglePlayerApp() {
             document.body.classList.add("mode-single");
@@ -7012,7 +7288,16 @@
                 $("backLobbyBtn").href = "index.html";
                 $("backLobbyBtn").setAttribute("data-i18n", "backHome");
             }
-            CurrencySafeI18n.mountLangBar({ onChange: () => CurrencySafeI18n.applyToDocument() });
+            CurrencySafeI18n.mountLangBar({
+                onChange: () => {
+                    CurrencySafeI18n.applyToDocument();
+                    if (typeof render === "function") render();
+                    if (bankBonusSession) {
+                        MissionIntelread?.refreshBriefingLocale?.(bankBonusSession);
+                        renderBankBonusPanel();
+                    }
+                }
+            });
             CurrencySafeI18n.applyToDocument();
             if (state.player) CurrencySafeI18n.lockLang();
             if ($("muteBtn")) $("muteBtn").textContent = t(soundMuted ? "muteOn" : "muteOff");
@@ -7030,7 +7315,16 @@
 
         function startGameApp() {
             document.body.classList.add("mode-mp");
-            CurrencySafeI18n.mountLangBar({ onChange: () => CurrencySafeI18n.applyToDocument() });
+            CurrencySafeI18n.mountLangBar({
+                onChange: () => {
+                    CurrencySafeI18n.applyToDocument();
+                    if (typeof render === "function") render();
+                    if (bankBonusSession) {
+                        MissionIntelread?.refreshBriefingLocale?.(bankBonusSession);
+                        renderBankBonusPanel();
+                    }
+                }
+            });
             CurrencySafeI18n.applyToDocument();
             CurrencySafeI18n.lockLang();
             if ($("muteBtn")) $("muteBtn").textContent = t(soundMuted ? "muteOn" : "muteOff");
@@ -7101,7 +7395,7 @@
                 startHoldEndTimer(() => {
                     Promise.resolve(CurrencySafeRoom.endGame(roomId)).then(res => {
                         if (res?.ok) goToEndedPage();
-                        else showToast(res?.error || "无法结束比赛");
+                        else showToast(tr(res?.error) || t("transferFailed"));
                     });
                 });
             }, true);
@@ -7132,7 +7426,9 @@
             location.href = "lobby.html?room=" + roomId; return false;
         }
 
-        if (isSinglePlayer) {
+        if (isTutorialMode) {
+            CurrencySafeRoom.ready.then(() => startTutorialApp());
+        } else if (isSinglePlayer) {
             CurrencySafeRoom.ready.then(() => startSinglePlayerApp());
         } else {
             CurrencySafeRoom.ready.then(() => Promise.resolve(CurrencySafeRoom.reconnectRoom(roomId)))
@@ -7151,10 +7447,10 @@
                     CurrencySafeRoom.onConnectionChange?.((st) => {
                         if (st.status === "reconnecting") {
                             wsWasReconnecting = true;
-                            showToast("网络断开，正在自动重连…");
+                            showToast(t("reconnecting"));
                         } else if (st.status === "connected" && wsWasReconnecting) {
                             wsWasReconnecting = false;
-                            showToast("已重新连接服务器");
+                            showToast(t("reconnected"));
                             CurrencySafeRoom.reconnectRoom(roomId);
                         }
                     });
@@ -7354,14 +7650,14 @@
                     el.className = 'threat-marker ' + cls;
                     el.style.left = pos.x + '%';
                     el.style.top = pos.y + '%';
-                    const placeLabel = team.state || team.city;
-                    const stateLabel = placeLabel ? ' · ' + placeLabel : '';
+                    const placeLabel = formatStoredStateLabel(team) || team.city;
+                    const placeSuffix = placeLabel ? ' · ' + placeLabel : '';
                     const dotColor = teamStateColor(team);
                     const labelColor = teamStateColor(team);
                     el.innerHTML =
                         `<span class="threat-marker-dot" style="background:${dotColor};box-shadow:0 0 14px ${dotColor}aa;border-color:${dotColor}"></span>` +
                         `<span class="threat-marker-label" style="color:${labelColor}">` +
-                        `<span class="pin-line pin-name">${(team.icon || '💻')} ${escapeHtml(team.name)}${stateLabel}</span>` +
+                        `<span class="pin-line pin-name">${(team.icon || '💻')} ${escapeHtml(team.name)}${placeSuffix}</span>` +
                         `<span class="pin-line pin-balance">RM ${money(team.balance)}</span></span>`;
                     el.onclick = (e) => {
                         e.stopPropagation();
@@ -7389,7 +7685,7 @@
                 cityFlashEl.style.left = pct.x + '%';
                 cityFlashEl.style.top = pct.y + '%';
                 cityFlashEl.style.display = 'block';
-                showToast('威胁地图已标记：' + (label || '目标城市'));
+                showToast(tReplace("intelLoaded", { name: label || t("scanIntercept") }));
                 clearTimeout(cityFlashTimer);
                 cityFlashTimer = setTimeout(() => { cityFlashEl.style.display = 'none'; }, 8000);
             };
@@ -7399,7 +7695,7 @@
                 cityFlashEl.style.left = xPercent + '%';
                 cityFlashEl.style.top = yPercent + '%';
                 cityFlashEl.style.display = 'block';
-                showToast('威胁地图已标记：' + (label || '目标城市'));
+                showToast(tReplace("intelLoaded", { name: label || t("scanIntercept") }));
                 clearTimeout(cityFlashTimer);
                 cityFlashTimer = setTimeout(() => { cityFlashEl.style.display = 'none'; }, 8000);
             };

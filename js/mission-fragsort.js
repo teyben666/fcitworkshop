@@ -4,6 +4,10 @@
 (function (global) {
     const BADGES = ["①", "②", "③", "④", "⑤"];
 
+    function mT(k, v) {
+        return global.MissionI18n?.mT?.(k, v) ?? k;
+    }
+
     function hashSeed(str) {
         return global.MissionGames?.hashSeed?.(str) ?? 1;
     }
@@ -42,14 +46,14 @@
             : chunks.join("").slice(0, Math.max(4, (fragment || "").length || 4));
         return {
             kind: "fragsort",
-            title: "组合密钥 · 碎片排序",
+            title: mT("mission.fragsort.title"),
             solved: false,
             mistakes: 0,
             cards,
             order,
             dragFrom: null,
             reveal,
-            agentNote: "特工笔记：碎片角标是真实序号，但被故意打乱摆放。按 ①→⑤ 从左到右排好，才能拼出密钥段。"
+            agentNote: mT("mission.fragsort.desc")
         };
     }
 
@@ -63,6 +67,8 @@
             game.order = [0, 1, 2, 3, 4];
         }
         if (typeof game.mistakes !== "number") game.mistakes = 0;
+        game.title = mT("mission.fragsort.title");
+        game.agentNote = mT("mission.fragsort.desc");
     }
 
     function isCorrectOrder(game) {
@@ -108,21 +114,21 @@
 
         const controls = !game.solved && !locked
             ? `<div class="fs-actions">
-                <button type="button" class="green" data-fs-lock="${idx}">锁定顺序</button>
-                <span class="muted">失误 ${game.mistakes || 0} 次${game.hintShown ? " · 已提示①位置" : ""}</span>
+                <button type="button" class="green" data-fs-lock="${idx}">${mT("mission.fragsort.lockBtn")}</button>
+                <span class="muted">${mT("mission.fragsort.mistakesMeta", { n: game.mistakes || 0 })}${game.hintShown ? ` · ${mT("mission.fragsort.hintShown")}` : ""}</span>
                </div>`
             : "";
 
         return `
             <div class="mini-game-card ${game.solved ? "solved" : ""} ${locked ? "locked" : ""}" id="miniGame${idx}">
                 <h3>${game.solved ? "✅" : "🧩"} ${escapeHtml(game.title)}</h3>
-                <p class="muted">拖动碎片，让角标从左到右变成 ① ② ③ ④ ⑤，然后点「锁定顺序」。</p>
+                <p class="muted">${mT("mission.fragsort.desc")}</p>
                 <div class="fs-row" data-fs-row="${idx}">${cardsHtml}</div>
                 ${controls}
                 ${game.solved
-                    ? `<div class="reveal">密钥片段：<strong>${escapeHtml(game.reveal)}</strong></div>
-                       <div class="agent-note">${escapeHtml(game.agentNote || "")}</div>`
-                    : locked ? `<p class="muted">完成上一关后解锁。</p>` : ""}
+                    ? `<div class="reveal">${mT("mission.common.keyFragment")}<strong>${escapeHtml(game.reveal)}</strong></div>
+                       <details class="agent-note-fold"><summary>${mT("mission.common.agentNote")}</summary><div class="agent-note">${escapeHtml(game.agentNote || "")}</div></details>`
+                    : locked ? `<p class="muted">${mT("mission.common.lockedPrev")}</p>` : ""}
             </div>`;
     }
 

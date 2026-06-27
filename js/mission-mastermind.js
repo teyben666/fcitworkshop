@@ -2,6 +2,10 @@
  * Mastermind mini-game — 6-color palette, pick 4 (practice 10 / competitive 8 guesses).
  */
 (function (global) {
+    function mT(k, v) {
+        return global.MissionI18n?.mT?.(k, v) ?? k;
+    }
+
     const COLORS = [
         { id: "R", label: "红", hex: "#ef4444" },
         { id: "O", label: "橙", hex: "#f97316" },
@@ -12,6 +16,10 @@
     ];
 
     const COLOR_BY_ID = Object.fromEntries(COLORS.map(c => [c.id, c]));
+
+    function colorLabel(colorId) {
+        return mT(`mission.color.${colorId}`);
+    }
 
     function hashSeed(str) {
         return global.MissionGames?.hashSeed?.(str) ?? 1;
@@ -60,7 +68,7 @@
         const seedStr = `${ctx?.password || ""}|${fragment}|${ctx?.target?.id || ""}`;
         return {
             kind: "mastermind",
-            title: "热力破解器 · 四色核密码",
+            title: mT("mission.mastermind.title"),
             solved: false,
             mistakes: 0,
             secret: buildSecret(seedStr),
@@ -70,7 +78,7 @@
             activeSlot: 0,
             lastFeedbackAt: 0,
             reveal: fragment || "",
-            agentNote: "特工笔记：六色密码中取四色排列上锁。绿点=颜色位置都对，黄点=颜色对但位置错——像真实的热力传感器反馈。"
+            agentNote: mT("mission.mastermind.agentNote")
         };
     }
 
@@ -87,6 +95,8 @@
         if (typeof game.activeSlot !== "number") game.activeSlot = 0;
         if (!game.maxGuesses) game.maxGuesses = 10;
         if (typeof game.lastFeedbackAt !== "number") game.lastFeedbackAt = 0;
+        game.title = mT("mission.mastermind.title");
+        game.agentNote = mT("mission.mastermind.agentNote");
     }
 
     function pickColor(game, colorId) {
@@ -130,7 +140,7 @@
             html += `<span class="mm-dot mm-dot-yellow${animate ? " mm-bulb-pop" : ""}" style="animation-delay:${(greens + i) * 60}ms"></span>`;
         }
         if (!greens && !yellows) {
-            html += '<span class="mm-dot mm-dot-empty" title="无命中"></span>';
+            html += `<span class="mm-dot mm-dot-empty" title="${mT("mission.mastermind.dotEmpty")}"></span>`;
         }
         return html;
     }
@@ -141,13 +151,13 @@
         const style = c
             ? `--mm-fill:${c.hex};--mm-glow:0 0 12px ${c.hex}88`
             : "";
-        return `<button type="button" class="${cls}" style="${style}" data-mm-slot="${slotIdx}" aria-label="色槽 ${slotIdx + 1}"></button>`;
+        return `<button type="button" class="${cls}" style="${style}" data-mm-slot="${slotIdx}" aria-label="${mT("mission.mastermind.slotAria", { n: slotIdx + 1 })}"></button>`;
     }
 
     function renderLegend() {
         return `<div class="mm-legend">
-            <span><span class="mm-dot mm-dot-green"></span> 绿 = 颜色+位置都对</span>
-            <span><span class="mm-dot mm-dot-yellow"></span> 黄 = 颜色对、位置错</span>
+            <span>${mT("mission.mastermind.legendGreen")}</span>
+            <span>${mT("mission.mastermind.legendYellow")}</span>
         </div>`;
     }
 
@@ -156,8 +166,8 @@
         const urgent = guessesLeft <= 1;
         return `<p class="mm-warn${urgent ? " mm-warn-urgent" : ""}">${
             urgent
-                ? "⚠️ 最后一行！用尽将重置密码并计 1 次部署失误。"
-                : `⚠️ 仅剩 ${guessesLeft} 行试探——合理排除颜色，别乱撞。`
+                ? mT("mission.mastermind.warnUrgent")
+                : mT("mission.mastermind.warnLow", { n: guessesLeft })
         }</p>`;
     }
 
@@ -170,7 +180,7 @@
             const isLatest = freshRow && ri === game.guesses.length - 1;
             const chips = row.guess.map(id => {
                 const c = COLOR_BY_ID[id];
-                return `<span class="mm-chip" style="background:${c.hex}" title="${c.label}"></span>`;
+                return `<span class="mm-chip" style="background:${c.hex}" title="${colorLabel(id)}"></span>`;
             }).join("");
             return `<div class="mm-history-row${isLatest ? " mm-row-fresh" : ""}">
                 <div class="mm-history-guess">${chips}</div>
@@ -181,7 +191,7 @@
         const palette = !game.solved && !locked
             ? `<div class="mm-palette">${COLORS.map(c =>
                 `<button type="button" class="mm-color-btn" data-mm-color="${c.id}" data-mm-idx="${idx}" ` +
-                `style="--mm-fill:${c.hex}" title="${c.label}"></button>`
+                `style="--mm-fill:${c.hex}" title="${colorLabel(c.id)}"></button>`
             ).join("")}</div>`
             : "";
 
@@ -192,23 +202,23 @@
                 renderSlot(id, si, game.activeSlot === si)
             ).join("")}</div>
             <div class="mm-actions">
-                <button type="button" class="secondary" data-mm-clear="${idx}">清空</button>
-                <button type="button" class="green" data-mm-submit="${idx}">注入试探</button>
+                <button type="button" class="secondary" data-mm-clear="${idx}">${mT("mission.mastermind.btnClear")}</button>
+                <button type="button" class="green" data-mm-submit="${idx}">${mT("mission.mastermind.btnSubmit")}</button>
             </div>
-            <p class="muted mm-meta">剩余 <strong>${guessesLeft}</strong> 行 · 部署失误 ${game.mistakes || 0} 次（仅用尽行数时 +1）</p>`
+            <p class="muted mm-meta">${mT("mission.mastermind.meta", { left: guessesLeft, mistakes: game.mistakes || 0 })}</p>`
             : "";
 
         return `
             <div class="mini-game-card ${game.solved ? "solved" : ""} ${locked ? "locked" : ""}" id="miniGame${idx}">
                 <h3>${game.solved ? "✅" : "🎨"} ${escapeHtml(game.title)}</h3>
-                <p class="muted">从六色中选四色排列。每次试探后，系统用绿/黄圆点反馈（绿=位置+颜色对，黄=颜色对位置错）。</p>
+                <p class="muted">${mT("mission.mastermind.desc")}</p>
                 ${pickRow}
                 ${palette}
                 ${game.guesses.length ? `<div class="mm-history">${history}</div>` : ""}
                 ${game.solved
-                    ? `<div class="reveal">密钥片段：<strong>${escapeHtml(game.reveal)}</strong></div>
-                       <div class="agent-note">${escapeHtml(game.agentNote || "")}</div>`
-                    : locked ? `<p class="muted">完成上一关后解锁。</p>` : ""}
+                    ? `<div class="reveal">${mT("mission.common.keyFragment")}<strong>${escapeHtml(game.reveal)}</strong></div>
+                       <details class="agent-note-fold"><summary>${mT("mission.common.agentNote")}</summary><p class="agent-note">${escapeHtml(game.agentNote || "")}</p></details>`
+                    : locked ? `<p class="muted">${mT("mission.common.lockedPrev")}</p>` : ""}
             </div>`;
     }
 
