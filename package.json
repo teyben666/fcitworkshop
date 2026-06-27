@@ -1,0 +1,20 @@
+{
+  "name": "workshop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Currency Safe classroom workshop",
+  "scripts": {
+    "map:export-svg": "krackedmaps svg --theme blueprint --out assets/malaysia-regions.svg",
+    "map:sync-anchors": "node scripts/sync-malaysia-anchors.mjs",
+    "map:refresh": "npm run map:export-svg && npm run map:sync-anchors",
+    "map:copy-vendor": "node -e \"const fs=require('fs'),p='node_modules/krackedmaps/dist';fs.copyFileSync(p+'/krackedmaps.umd.js','js/vendor/krackedmaps.umd.js');fs.copyFileSync(p+'/krackedmaps.css','css/vendor/krackedmaps.css');console.log('vendor copied');\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/teyben666/fcitworkshop.git"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "krackedmaps": "^0.1.2"
+  }
+}

@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,700;14..32,900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/shared.css" />
+    <link rel="stylesheet" href="css/vendor/krackedmaps.css" />
+    <link rel="stylesheet" href="css/kracked-map-overrides.css" />
     <link rel="stylesheet" href="css/spectator-dashboard.css" />
 </head>
 <body class="spectator-page">
@@ -72,7 +74,10 @@
 
     <script src="js/malaysia-states.js"></script>
     <script src="js/map-attack-lines.js"></script>
-    <script src="js/malaysia-map.js"></script>
+    <script src="js/map-layout.js"></script>
+    <script src="js/bank-bonus-pin.js"></script>
+    <script src="js/vendor/krackedmaps.umd.js"></script>
+    <script src="js/kracked-malaysia-map.js"></script>
     <script src="js/server-config.js?v=20260626"></script>
     <script src="js/room-shared.js"></script>
     <script src="js/room-local.js"></script>
@@ -136,29 +141,14 @@
             return `${done}/3`;
         }
 
-        const SPECTATOR_MAP = { w: 643, h: 316 };
+        const MAP_LAYOUT = window.CurrencySafeMapLayout;
 
         function spectatorMapLayout(wrapW, wrapH) {
-            const scale = Math.min(wrapW / SPECTATOR_MAP.w, wrapH / SPECTATOR_MAP.h);
-            const drawW = SPECTATOR_MAP.w * scale;
-            const drawH = SPECTATOR_MAP.h * scale;
-            return {
-                wrapW, wrapH,
-                offsetX: (wrapW - drawW) / 2,
-                offsetY: (wrapH - drawH) / 2,
-                drawW, drawH, scale
-            };
+            return MAP_LAYOUT.computeLayout(wrapW, wrapH);
         }
 
         function spectatorPinPercent(mapX, mapY, layout) {
-            const px = (mapX / 100) * SPECTATOR_MAP.w;
-            const py = (mapY / 100) * SPECTATOR_MAP.h;
-            const x = layout.offsetX + (px / SPECTATOR_MAP.w) * layout.drawW;
-            const y = layout.offsetY + (py / SPECTATOR_MAP.h) * layout.drawH;
-            return {
-                x: Math.max(1, Math.min(99, (x / layout.wrapW) * 100)),
-                y: Math.max(1, Math.min(99, (y / layout.wrapH) * 100))
-            };
+            return MAP_LAYOUT.imagePercentToWrapPercent(mapX, mapY, layout);
         }
 
         function updateSpectatorBankBonus(room) {

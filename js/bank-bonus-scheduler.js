@@ -11,12 +11,12 @@
         departMs: 3_000
     };
 
-    /** South China Sea — between peninsula and East Malaysia */
-    const BANK_BONUS_PIN = {
+    /** South China Sea — synced via npm run map:sync-anchors (js/bank-bonus-pin.js) */
+    const BANK_BONUS_PIN = window.BANK_BONUS_MAP_PIN || {
         id: "__BANK_BONUS__",
         name: "央行 Bonus",
-        mapX: 44,
-        mapY: 54,
+        mapX: 33.4,
+        mapY: 40.3,
         lat: 4.8,
         lon: 109.2,
         state: "海域",

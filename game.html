@@ -10,6 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,700;14..32,900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/fx.css" />
+    <link rel="stylesheet" href="css/vendor/krackedmaps.css" />
+    <link rel="stylesheet" href="css/kracked-map-overrides.css" />
     <style>
         /* ============================================================
            CSS — 2D Live Cyber Threat Map
@@ -524,6 +526,10 @@
             display: block;
             width: 100%;
             height: 100%;
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 5;
         }
         .threat-map-markers {
             position: absolute;
@@ -2220,7 +2226,7 @@
                         <span class="br">CLASSROOM SAFE MODE</span>
                     </div>
                     <!-- 路线层 (2D SVG) -->
-                    <svg class="route-layer" id="routeLayer" viewBox="0 0 643 316" preserveAspectRatio="xMidYMid meet"></svg>
+                    <svg class="route-layer" id="routeLayer" viewBox="0 0 799.85 352.74" preserveAspectRatio="xMidYMid meet"></svg>
                     <div class="map-rank-bar" id="mapLeaderboard"></div>
                     <div class="map-zoom-hint" data-i18n="mapZoomHint">滚轮缩放 · 左键拖拽平移</div>
                     <div class="map-stats-bar">
@@ -2439,7 +2445,12 @@
     <!-- ============================================================
     JavaScript — 2D Live Cyber Threat Map
     ============================================================ -->
+    <script src="js/map-layout.js"></script>
+    <script src="js/vendor/krackedmaps.umd.js"></script>
+    <script src="js/kracked-malaysia-map.js"></script>
     <script src="js/malaysia-states.js"></script>
+    <script src="js/malaysia-cities.js"></script>
+    <script src="js/bank-bonus-pin.js"></script>
     <script src="js/map-attack-lines.js"></script>
     <script src="js/server-config.js?v=20260626"></script>
     <script src="js/room-shared.js"></script>
@@ -2510,14 +2521,11 @@
         const storageKey = isTutorialMode
             ? ("currencySafeTutorial_" + tutorialKind)
             : isSinglePlayer ? "currencySafeSingle" : ("currencySafeGame_" + roomId);
-        const MAP_CONFIG = {
-            w: 643,
-            h: 316,
-            image: "malaysia.png",
+        const MAP_LAYOUT = window.CurrencySafeMapLayout;
+        const MAP_CONFIG = Object.assign(MAP_LAYOUT.getConfig(), {
             showCalibrationGrid: false,
-            showAttacks: true,
-            bounds: { latMin: 0.85, latMax: 7.5, lonMin: 99.0, lonMax: 119.5 }
-        };
+            showAttacks: true
+        });
         window.__mapLayout = { wrapW: 0, wrapH: 0, offsetX: 0, offsetY: 0, drawW: 0, drawH: 0, scale: 1 };
         const GAME_CONFIG = {
             typingKeywordLen: 6,
@@ -2525,18 +2533,7 @@
         };
         const GRID_SCOUT_SEC = 3;
         const GRID_SCAN_FLASH_MS = 1500;
-        const MALAYSIA_CITIES = [
-            { name: "KUALA_LUMPUR", label: "吉隆坡", mapX: 18.9, mapY: 67, lat: 3.139, lon: 101.686 },
-            { name: "GEORGETOWN", label: "槟城", mapX: 8.4, mapY: 29.4, lat: 5.414, lon: 100.329 },
-            { name: "JOHOR_BAHRU", label: "新山", mapX: 35.4, mapY: 87.8, lat: 1.493, lon: 103.741 },
-            { name: "IPOH", label: "怡保", mapX: 13.1, mapY: 40.1, lat: 4.597, lon: 101.090 },
-            { name: "KUCHING", label: "古晋", mapX: 66.6, mapY: 61.3, lat: 1.553, lon: 110.359 },
-            { name: "KOTA_KINABALU", label: "亚庇", mapX: 84.4, mapY: 29.4, lat: 5.980, lon: 116.073 },
-            { name: "MELAKA", label: "马六甲", mapX: 24.3, mapY: 82.9, lat: 2.194, lon: 102.250 },
-            { name: "KUANTAN", label: "关丹", mapX: 27.1, mapY: 58.7, lat: 3.807, lon: 103.326 },
-            { name: "KOTA_BHARU", label: "哥打峇鲁", mapX: 21.9, mapY: 29.9, lat: 6.125, lon: 102.238 },
-            { name: "MIRI", label: "美里", mapX: 64, mapY: 52, lat: 4.399, lon: 113.991 }
-        ];
+        const MALAYSIA_CITIES = window.MALAYSIA_CITIES || [];
 
         let mapZoom = 1;
         let mapPanX = 0;
@@ -2545,16 +2542,11 @@
         const MAP_ZOOM_MAX = 2.8;
 
         function computeMapLayout(wrapW, wrapH) {
-            const baseScale = Math.min(wrapW / MAP_CONFIG.w, wrapH / MAP_CONFIG.h);
-            const scale = baseScale * mapZoom;
-            const drawW = MAP_CONFIG.w * scale;
-            const drawH = MAP_CONFIG.h * scale;
-            return {
-                wrapW, wrapH,
-                offsetX: (wrapW - drawW) / 2 + mapPanX,
-                offsetY: (wrapH - drawH) / 2 + mapPanY,
-                drawW, drawH, scale, baseScale, zoom: mapZoom
-            };
+            return MAP_LAYOUT.computeLayout(wrapW, wrapH, {
+                zoom: mapZoom,
+                panX: mapPanX,
+                panY: mapPanY
+            });
         }
 
         function zoomMapAt(wrap, clientX, clientY, deltaY) {
@@ -2655,29 +2647,11 @@
         }
 
         function malaysiaLatLonToXY(lat, lon) {
-            const b = MAP_CONFIG.bounds;
-            return {
-                x: ((lon - b.lonMin) / (b.lonMax - b.lonMin)) * MAP_CONFIG.w,
-                y: ((b.latMax - lat) / (b.latMax - b.latMin)) * MAP_CONFIG.h
-            };
+            return MAP_LAYOUT.latLonToDesignXY(lat, lon);
         }
 
         function malaysiaImagePercentToWrapPercent(mapX, mapY) {
-            const px = (mapX / 100) * MAP_CONFIG.w;
-            const py = (mapY / 100) * MAP_CONFIG.h;
-            const layout = window.__mapLayout;
-            if (!layout?.wrapW) {
-                return {
-                    x: Math.max(1, Math.min(99, mapX)),
-                    y: Math.max(1, Math.min(99, mapY))
-                };
-            }
-            const x = layout.offsetX + (px / MAP_CONFIG.w) * layout.drawW;
-            const y = layout.offsetY + (py / MAP_CONFIG.h) * layout.drawH;
-            return {
-                x: Math.max(1, Math.min(99, (x / layout.wrapW) * 100)),
-                y: Math.max(1, Math.min(99, (y / layout.wrapH) * 100))
-            };
+            return MAP_LAYOUT.imagePercentToWrapPercent(mapX, mapY, window.__mapLayout);
         }
 
         function coordsToMapPercent(obj) {
@@ -2691,20 +2665,7 @@
         }
 
         function malaysiaLatLonToPercent(lat, lon) {
-            const p = malaysiaLatLonToXY(lat, lon);
-            const layout = window.__mapLayout;
-            if (!layout?.wrapW) {
-                return {
-                    x: Math.max(1, Math.min(99, (p.x / MAP_CONFIG.w) * 100)),
-                    y: Math.max(1, Math.min(99, (p.y / MAP_CONFIG.h) * 100))
-                };
-            }
-            const x = layout.offsetX + (p.x / MAP_CONFIG.w) * layout.drawW;
-            const y = layout.offsetY + (p.y / MAP_CONFIG.h) * layout.drawH;
-            return {
-                x: Math.max(1, Math.min(99, (x / layout.wrapW) * 100)),
-                y: Math.max(1, Math.min(99, (y / layout.wrapH) * 100))
-            };
+            return MAP_LAYOUT.latLonToWrapPercent(lat, lon, window.__mapLayout);
         }
 
         function getTeamMapPercent(team) {
@@ -7463,34 +7424,26 @@
         (function initThreatMap2D() {
             const canvas = document.getElementById('threatMapCanvas');
             const markersEl = document.getElementById('threatMapMarkers');
+            const threatMapEl = document.getElementById('threat-map');
             const cityFlashEl = document.getElementById('cityFlashMarker');
             if (!canvas || !markersEl) return;
 
-            const MAP_W = MAP_CONFIG.w;
-            const MAP_H = MAP_CONFIG.h;
+            const MAP_W = MAP_LAYOUT.DESIGN_W;
+            const MAP_H = MAP_LAYOUT.DESIGN_H;
             const ctx = canvas.getContext('2d');
             let dpr = 1;
-            let mapReady = false;
             let cityFlashTimer = null;
 
-            const mapImg = new Image();
-
-            function onMapImageReady() {
-                mapReady = true;
-                if (mapImg.naturalWidth > 0 && mapImg.naturalHeight > 0) {
-                    MAP_CONFIG.w = mapImg.naturalWidth;
-                    MAP_CONFIG.h = mapImg.naturalHeight;
-                }
-                resize();
+            canvas.classList.add('map-attacks-only');
+            let kmHost = null;
+            let kmMap = null;
+            if (window.KrackedMalaysiaMap) {
+                const mounted = KrackedMalaysiaMap.mountGameBase(threatMapEl);
+                kmHost = mounted?.host;
+                kmMap = mounted?.map;
+            } else {
+                console.warn('KrackedMalaysiaMap not loaded — threat map base missing');
             }
-
-            mapImg.onload = onMapImageReady;
-            mapImg.onerror = () => {
-                mapReady = false;
-                console.warn('Malaysia map image failed to load:', MAP_CONFIG.image);
-            };
-            mapImg.src = MAP_CONFIG.image;
-            if (mapImg.complete && mapImg.naturalWidth > 0) onMapImageReady();
 
             const THREAT_HUBS = MALAYSIA_STATES.map(s => ({ mapX: s.mapX, mapY: s.mapY }));
 
@@ -7540,41 +7493,9 @@
                 return MapAttackLines.drawAll(ctx, collectMissionAttacks(), MAP_W, MAP_H, now);
             }
 
-            function drawMapBase() {
-                ctx.fillStyle = '#030810';
-                ctx.fillRect(0, 0, MAP_W, MAP_H);
-
-                ctx.strokeStyle = 'rgba(0, 160, 220, 0.06)';
-                ctx.lineWidth = 1;
-                for (let x = 0; x <= MAP_W; x += 60) {
-                    ctx.beginPath();
-                    ctx.moveTo(x, 0);
-                    ctx.lineTo(x, MAP_H);
-                    ctx.stroke();
-                }
-                for (let y = 0; y <= MAP_H; y += 60) {
-                    ctx.beginPath();
-                    ctx.moveTo(0, y);
-                    ctx.lineTo(MAP_W, y);
-                    ctx.stroke();
-                }
-
-                if (mapReady) {
-                    ctx.save();
-                    ctx.globalAlpha = 0.88;
-                    ctx.drawImage(mapImg, 0, 0, mapImg.naturalWidth, mapImg.naturalHeight, 0, 0, MAP_W, MAP_H);
-                    ctx.restore();
-                    drawCalibrationGrid();
-                    ctx.save();
-                    ctx.globalCompositeOperation = 'lighter';
-                    ctx.globalAlpha = 0.12;
-                    ctx.fillStyle = 'rgba(0, 210, 255, 1)';
-                    ctx.fillRect(0, 0, MAP_W, MAP_H);
-                    ctx.restore();
-                }
-
+            function drawThreatHubs() {
+                if (!MAP_CONFIG.showAttacks) return;
                 THREAT_HUBS.forEach(h => {
-                    if (!MAP_CONFIG.showAttacks) return;
                     const p = mapPointToXY(h);
                     const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 6);
                     g.addColorStop(0, 'rgba(0, 200, 255, 0.35)');
@@ -7607,6 +7528,9 @@
                 canvas.style.height = h + 'px';
                 ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
                 if (window.updateTeamMarkers3D) window.updateTeamMarkers3D();
+                if (kmHost && window.KrackedMalaysiaMap) {
+                    KrackedMalaysiaMap.syncGameTransform(kmHost);
+                }
             }
 
             function animate() {
@@ -7616,18 +7540,20 @@
                 window.__mapLayout = layout;
                 ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
                 ctx.clearRect(0, 0, w, h);
-                ctx.fillStyle = '#030810';
-                ctx.fillRect(0, 0, w, h);
                 ctx.save();
                 ctx.translate(layout.offsetX, layout.offsetY);
                 ctx.scale(layout.scale, layout.scale);
-                drawMapBase();
+                if (MAP_CONFIG.showCalibrationGrid) drawCalibrationGrid();
+                drawThreatHubs();
                 try {
                     drawAttacks(performance.now());
                 } catch (err) {
                     console.warn("threat map drawAttacks:", err);
                 }
                 ctx.restore();
+                if (kmHost && window.KrackedMalaysiaMap) {
+                    KrackedMalaysiaMap.syncGameTransform(kmHost);
+                }
                 requestAnimationFrame(animate);
             }
 
@@ -7670,6 +7596,9 @@
                     };
                     markersEl.appendChild(el);
                 });
+                if (kmMap && window.KrackedMalaysiaMap) {
+                    KrackedMalaysiaMap.setGameChoropleth(kmMap, teams);
+                }
                 } catch (err) {
                     console.warn("threat map markers:", err);
                 }
@@ -7748,7 +7677,7 @@
 
         🔜 Phase 2 课堂部署（建议下一迭代）
            - 拆分 JS：game-typing / game-dial / game-grid / threat-map.js
-           - 马来西亚本地威胁地图（malaysia.png）；城市/队伍坐标对齐西马与东马
+           - 马来西亚威胁地图（KrackedMaps interactive widget）；州/城市坐标由 map:sync-anchors 生成
            - renderMiniGames 完全增量 DOM 更新
            - 教师看板（#teacher 口令）多特工进度汇总
 

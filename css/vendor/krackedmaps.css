@@ -1,0 +1,219 @@
+/* ============================================================
+   peta-malaysia — map styles. Everything is scoped under `.mmap`
+   (the container createMalaysiaMap() is mounted in), so it can't
+   leak into a host page. Restyle by overriding the CSS variables,
+   or pass a theme to createMalaysiaMap().
+   ============================================================ */
+.mmap {
+  /* ---- theme: blueprint by default (override these to restyle) ---- */
+  --sea:         #0a1e3f;
+  --grid:        rgba(120, 180, 255, 0.10);
+  --grid-size:   38px;
+
+  --land:        #0d2950;
+  --land-hover:  #15406f;
+  --land-active: #5fd0ff;
+  --stroke:      #5fa8ff;
+  --stroke-w:    1;
+
+  --district:    #0d2950;
+  --carve:       #3d77c0;
+  --carve-w:     0.75;
+  --district-hi: #5fd0ff;
+
+  --label:       #cfe6ff;
+  --label-dim:   rgba(207, 230, 255, 0.55);
+  --pin:         #ffd166;
+  --pin-ring:    rgba(255, 209, 102, 0.5);
+  --accent:      #5fd0ff;
+  --panel-bg:    #0a1e3f;
+  --panel-edge:  #1d3c6b;
+
+  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* ---- the widget is a self-contained, self-sized stage ---- */
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 800 / 353;       /* sensible default if the host gives only a width */
+  background-color: var(--sea);
+  background-image:
+    linear-gradient(to right, var(--grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
+  font-family: var(--font);
+}
+
+.mmap-svg { width: 100%; height: 100%; display: block; touch-action: none; position: relative; z-index: 1; }
+
+/* grid-glow: brighter grid lines spotlit under the cursor, behind the map.
+   JS sets --mx/--my; off-screen by default so there's no glow until you move. */
+.mmap::before {
+  content: "";
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--accent) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--accent) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
+  opacity: .45;
+  -webkit-mask-image: radial-gradient(circle 130px at var(--mx, -200px) var(--my, -200px), #000 0%, transparent 70%);
+  mask-image: radial-gradient(circle 130px at var(--mx, -200px) var(--my, -200px), #000 0%, transparent 70%);
+}
+.mmap--static .mmap-svg { pointer-events: none; }
+
+/* ---- land (flat) ---- */
+.mmap .state {
+  fill: var(--land);
+  stroke: var(--stroke);
+  stroke-width: var(--stroke-w);
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;   /* borders stay crisp at any zoom */
+  transition: fill .2s ease, opacity .5s ease, transform .6s ease;
+  transform-box: fill-box;
+  transform-origin: center;
+  cursor: pointer;
+}
+.mmap .state.is-hover  { fill: var(--land-hover); }
+.mmap .state.is-active { fill: var(--land-active); }
+
+/* intro: states fade + rise in, staggered via inline --i */
+.mmap .state.intro { opacity: 0; transform: translateY(8px) scale(.985); }
+
+/* choropleth mode sets per-state fill via inline style */
+.mmap .state[data-fill] { fill: var(--data-fill); }
+
+/* dim the rest of the country while one state is drilled into */
+.mmap .land.drilled .state:not(.is-active) { opacity: .28; }
+.mmap .land.drilled .state.is-active { fill: var(--district); }
+/* where districts cover a state, drop its ADM1 outline so it doesn't double the
+   ADM2 carve lines (the two come from different sources and don't align) */
+.mmap .land.drilled .state.is-active.has-districts { stroke: none; }
+.mmap.show-all-districts .state.has-districts { stroke: none; }
+
+/* ---- districts (drill-down layer, flat) ---- */
+.mmap .district {
+  fill: var(--district);
+  stroke: var(--carve);
+  stroke-width: var(--carve-w);
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .35s ease, fill .15s ease;
+  cursor: pointer;
+}
+.mmap .district.show { opacity: 1; pointer-events: auto; }
+.mmap--static .district.show { pointer-events: none; }
+.mmap .district.is-hover  { fill: var(--district-hi); }
+.mmap .district.is-active { fill: var(--district-hi); }
+/* states-only ↔ show-all-districts (used by the playground) */
+.mmap.show-all-districts .district { opacity: 1; }
+
+/* ---- labels ---- */
+.mmap .label {
+  fill: var(--label);
+  font-size: var(--label-fs, 9px);
+  font-weight: 600;
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: rgba(0,0,0,.55);
+  stroke-width: var(--label-sw, 2.4px);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+.mmap .labels.show .label { opacity: 1; }
+.mmap .label.ft { fill: var(--label-dim); font-size: 7.5px; }
+
+/* ---- pins ---- */
+.mmap .pin-dot { fill: var(--pin); stroke: #fff; stroke-width: 1.2; cursor: pointer; }
+.mmap .pin-ring {
+  fill: none; stroke: var(--pin-ring); stroke-width: 2;
+  transform-box: fill-box; transform-origin: center;
+  animation: mmap-pulse 2.4s ease-out infinite; pointer-events: none;
+}
+@keyframes mmap-pulse {
+  0%   { transform: scale(.4); opacity: .9; }
+  70%  { transform: scale(2.6); opacity: 0; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+.mmap .pin-label {
+  fill: #fff; font-size: 8px; font-weight: 600; text-anchor: middle;
+  paint-order: stroke; stroke: rgba(0,0,0,.6); stroke-width: 2.4px; pointer-events: none;
+}
+
+/* ---- tooltip (absolute within the container) ---- */
+.mmap-tooltip {
+  position: absolute;
+  z-index: 20;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .2px;
+  color: #eafffa;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-edge);
+  border-radius: 8px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -130%);
+  transition: opacity .12s ease;
+  white-space: nowrap;
+}
+.mmap-tooltip.show { opacity: 1; }
+
+/* ---- info panel (slides in within the container) ---- */
+.mmap-panel {
+  position: absolute; z-index: 16; right: 0; top: 0; bottom: 0;
+  width: min(320px, 84%);
+  padding: 26px 24px;
+  background: var(--panel-bg);
+  border-left: 1px solid var(--panel-edge);
+  transform: translateX(100%);
+  transition: transform .35s cubic-bezier(.4,0,.2,1);
+  overflow-y: auto;
+  font-family: var(--font);
+}
+.mmap-panel.open { transform: translateX(0); }
+.mmap-panel .kicker { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+.mmap-panel h2 { margin: 6px 0 2px; font-size: 26px; color: #fff; }
+.mmap-panel .sub { font-size: 13px; color: rgba(255,255,255,.55); margin-bottom: 18px; }
+.mmap-panel .row { display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid rgba(255,255,255,.07); font-size: 14px; color: rgba(255,255,255,.7); }
+.mmap-panel .row span:last-child { color: #fff; font-weight: 600; }
+.mmap-panel .close { position: absolute; top: 16px; right: 18px; cursor: pointer; color: rgba(255,255,255,.5); font-size: 22px; line-height: 1; }
+.mmap-panel .close:hover { color: #fff; }
+
+/* ============================================================
+   THEME PRESETS — createMalaysiaMap(el, { theme: 'light' })
+   ============================================================ */
+.mmap--theme-mono { /* identical to the defaults above; here for switching back */
+  --sea:#ffffff; --grid:rgba(0,0,0,.05); --land:#ffffff; --land-hover:#e6e6e6;
+  --land-active:#111111; --stroke:#111111; --district:#ffffff; --carve:#9a9a9a;
+  --district-hi:#111111; --label:#111111; --label-dim:rgba(17,17,17,.5); --accent:#111111;
+  --pin:#111111; --pin-ring:rgba(0,0,0,.4); --panel-bg:#111111; --panel-edge:#333333;
+}
+.mmap--theme-flat-dark {
+  --sea:#151619; --grid:rgba(255,255,255,.045); --land:#f5f6f7; --land-hover:#d7efe8;
+  --land-active:#ffcc33; --stroke:#313640; --district:#fff; --carve:#c4cad2;
+  --district-hi:#ffcc33; --label:#1b1d22; --accent:#34c3a6; --panel-bg:#122031; --panel-edge:#1e3a44;
+}
+.mmap--theme-light {
+  --sea:#e7ecf1; --grid:rgba(20,30,50,.06); --land:#ffffff; --land-hover:#cfeee6;
+  --land-active:#ffc83d; --stroke:#9aa6b4; --district:#f7f9fb; --carve:#d3dae2;
+  --district-hi:#ffc83d; --label:#26303c; --label-dim:rgba(38,48,60,.5);
+  --pin:#e0445a; --pin-ring:rgba(224,68,90,.5); --accent:#0e8f76;
+  --panel-bg:#16202b; --panel-edge:#2a3848;
+}
+.mmap--theme-blueprint {
+  --sea:#0a1e3f; --grid:rgba(120,180,255,.10); --land:#0d2950; --land-hover:#15406f;
+  --land-active:#5fd0ff; --stroke:#5fa8ff; --stroke-w:1; --district:#0d2950; --carve:#3d77c0;
+  --district-hi:#5fd0ff; --label:#cfe6ff; --label-dim:rgba(207,230,255,.55);
+  --pin:#ffd166; --pin-ring:rgba(255,209,102,.5); --accent:#5fd0ff;
+  --panel-bg:#0a1e3f; --panel-edge:#1d3c6b;
+}
+.mmap--theme-batik {
+  --sea:#2a1a12; --grid:rgba(255,210,160,.06); --land:#f3e3cf; --land-hover:#e8c79c;
+  --land-active:#d98324; --stroke:#7a4a25; --district:#f7ecdb; --carve:#cdab85;
+  --district-hi:#d98324; --label:#4a2e16; --label-dim:rgba(74,46,22,.5);
+  --pin:#c1432f; --pin-ring:rgba(193,67,47,.5); --accent:#d98324;
+  --panel-bg:#241008; --panel-edge:#46291a;
+}
