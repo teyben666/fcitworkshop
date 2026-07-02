@@ -11,14 +11,15 @@
     <link rel="stylesheet" href="css/fx.css" />
     <link rel="stylesheet" href="css/lobby-hud.css?v=20260626a" />
     <link rel="stylesheet" href="css/vendor/krackedmaps.css" />
-    <link rel="stylesheet" href="css/kracked-map-overrides.css" />
+    <link rel="stylesheet" href="css/kracked-map-overrides.css?v=20260628" />
     <script>
         (function () {
             var p = new URLSearchParams(location.search);
             if (!p.get("room")) location.replace("index.html");
         })();
     </script>
-    <script src="js/i18n.js?v=20260624b"></script>
+    <script src="js/i18n.js?v=20260629"></script>
+    <script src="js/portal-sound.js?v=20260629"></script>
 </head>
 <body class="lobby-page" data-i18n-page-title="pageTitleLobby">
     <div class="lobby-dot-grid" aria-hidden="true"></div>
@@ -28,19 +29,21 @@
         <!-- Top brand header -->
         <header class="lobby-top-header glass-panel">
             <div class="lobby-brand">
-                <div class="lobby-brand-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <div class="lobby-brand-logo">
+                    <img src="fcitlogo.png" alt="FCIT" width="56" height="56" />
                 </div>
                 <div>
-                    <p class="lobby-brand-kicker" data-i18n="lobbyCommand">作战大厅</p>
+                    <p class="lobby-brand-kicker">Federal Security Network</p>
                     <h1 class="lobby-brand-title">
-                        Currency Safe
+                        <span data-i18n="gameTitlePrefix">Currency Safe:</span>
+                        <span class="lobby-brand-accent" data-i18n="gameTitleSuffix">金库行动</span>
                         <span class="lobby-version-badge">Live</span>
                     </h1>
                 </div>
             </div>
             <div class="lobby-top-actions">
                 <div class="lobby-lang-slot" id="lobbyLangSlot" aria-label="Language"></div>
+                <button type="button" class="lobby-mute-btn" id="lobbyMuteBtn" aria-pressed="false" data-i18n="muteOff">音效：开</button>
                 <a href="index.html" class="lobby-back-home" id="backHomeBtn" data-i18n="backHome">返回主页</a>
             </div>
         </header>
@@ -105,6 +108,13 @@
                         </div>
                         <input type="range" id="maxTeamSizeRange" min="2" max="6" step="1" value="4" />
                         <div class="duration-ticks"><span>2</span><span>4</span><span>6</span></div>
+                    </div>
+                    <div id="mapEffectsBlock">
+                        <label class="lobby-check-row">
+                            <input type="checkbox" id="mapEffectsEnabled" checked />
+                            <span data-i18n="mapEffectsEnable">地图攻击线特效</span>
+                        </label>
+                        <p class="notice muted" data-i18n="mapEffectsHint">关闭后地图更简洁（练习模式默认关闭）</p>
                     </div>
                     <div class="room-password-block" id="roomPasswordBlock">
                         <label class="lobby-check-row">
@@ -184,7 +194,7 @@
                                 <input id="joinName" maxlength="24" placeholder="例如：Alex · 默认 Player 1" />
                             </div>
                         </div>
-                        <p class="muted join-hint">进房后先在候场区等待；确认名称后，点击右侧编队地图的 <strong>空位 +</strong> 进驻某州。一队一州，同队多人占不同空位。</p>
+                        <p class="muted join-hint">进房后先在候场区等待；确认名称后，<strong>点击地图上的州属</strong>或右侧编队空位进驻。一队一州，同队多人占不同空位。</p>
                         <div class="join-actions">
                             <button type="button" class="lobby-btn join-player" id="confirmNameBtn">确认名称</button>
                             <button type="button" class="lobby-btn join-spec" id="joinSpectatorBtn" data-i18n="joinAsSpectator">保持候场</button>
@@ -199,7 +209,7 @@
                     <div class="panel-head split">
                         <div>
                             <h2 data-i18n="mapPreview">地图预览</h2>
-                            <p class="panel-sub" data-i18n="mapPreviewTag">Shuffle 后图钉同步更新</p>
+                            <p class="panel-sub" data-i18n="lobbyMapHint">点击州属进驻或加入未满队伍 · 滚轮缩放 · 左键拖拽平移</p>
                         </div>
                         <span class="live-tag">● Vault Coordinates</span>
                     </div>
@@ -258,12 +268,13 @@
     <script src="js/malaysia-states.js"></script>
     <script src="js/map-attack-lines.js"></script>
     <script src="js/map-layout.js"></script>
+    <script src="js/map-viewport.js?v=20260629"></script>
     <script src="js/vendor/krackedmaps.umd.js"></script>
-    <script src="js/kracked-malaysia-map.js"></script>
+    <script src="js/kracked-malaysia-map.js?v=20260628b"></script>
     <script src="js/server-config.js?v=20260626"></script>
     <script src="js/join-token.js"></script>
-    <script src="js/room-shared.js"></script>
-    <script src="js/room-local.js"></script>
+    <script src="js/room-shared.js?v=20260630b"></script>
+    <script src="js/room-local.js?v=20260628"></script>
     <script src="js/room-ws.js?v=20260626"></script>
     <script src="js/room.js?v=20260624d"></script>
     <script>
@@ -285,6 +296,25 @@
         }
 
         setRoomCodeDisplay(roomId);
+
+        function relabelMapZoomControls() {
+            document.querySelectorAll(".map-preview-zoom").forEach((bar) => {
+                window.CurrencySafeMapViewport?.labelZoomButtons?.(bar);
+            });
+        }
+
+        function updateLobbyMuteBtn() {
+            const btn = $("lobbyMuteBtn");
+            if (!btn || !window.CurrencySafePortalSound) return;
+            const muted = CurrencySafePortalSound.isMuted();
+            btn.setAttribute("aria-pressed", muted ? "true" : "false");
+            btn.textContent = t(muted ? "muteOn" : "muteOff");
+        }
+        $("lobbyMuteBtn")?.addEventListener("click", () => {
+            CurrencySafePortalSound.toggle();
+            updateLobbyMuteBtn();
+        });
+
         let unsub = null;
         let refreshTimer = null;
         let launchTickTimer = null;
@@ -409,9 +439,18 @@
             if (!window.MalaysiaMapPreview) return;
             const mapEl = $("lobbyMapPreview");
             if (!mapEl) return;
+            const clientId = getLobbyClientId();
+            const me = room?.players?.find(p => p.id === clientId);
             const markers = mapMarkersFromRoom(room);
-            if (mapEl._mapSetPlayers) mapEl._mapSetPlayers(markers);
-            else MalaysiaMapPreview.render(mapEl, markers, { orderNumbers: false, showAttackLines: false });
+            const mapOpts = {
+                mode: "lobby",
+                showAttackLines: false,
+                hideGhostPins: true,
+                highlightStateId: me?.stateId || null,
+                onStateSelect: (stateId) => tryJoinState(stateId, null)
+            };
+            if (mapEl._mapSetPlayers) mapEl._mapSetPlayers(markers, mapOpts);
+            else MalaysiaMapPreview.render(mapEl, markers, mapOpts);
         }
 
         function paintLobbyShell() {
@@ -473,6 +512,8 @@
                         const room = CurrencySafeRoom.getRoom(roomId);
                         if (room) renderRoom(room);
                         else paintLobbyShell();
+                        updateLobbyMuteBtn();
+                        relabelMapZoomControls();
                     }
                 });
                 const langSlot = $("lobbyLangSlot");
@@ -483,6 +524,7 @@
                 }
                 CurrencySafeI18n.unlockLang();
             }
+            updateLobbyMuteBtn();
             addLog("LOBBY: 等待战术小队部署…");
 
             ensureLobbyReady().then((room) => {
@@ -632,6 +674,10 @@
 
         function tryJoinState(stateId, teamId) {
             if (!stateId && !teamId) return;
+            const now = Date.now();
+            if (tryJoinState._busy) return;
+            if (now - (tryJoinState._lastAt || 0) < 450) return;
+            tryJoinState._lastAt = now;
             const name = getLobbyDisplayName();
             if (!name) {
                 showNotice("请先填写并确认显示名称", true);
@@ -647,18 +693,40 @@
                     showNotice("比赛已开始，无法更换州属。", true);
                     return;
                 }
+                teamId = S.resolveJoinTeamId(teamId, room.teams);
                 const clientId = CurrencySafeRoom.getClientId();
                 const me = room.players.find(p => p.id === clientId);
                 if (me && teamId && me.teamId === teamId) return;
                 if (me && !teamId && me.stateId === stateId) return;
-                const confirmThenJoin = () => runAction(
-                    CurrencySafeRoom.joinRoomAsPlayer(roomId, name, stateId, teamId || null),
+                if (!teamId && stateId) {
+                    const gate = S.canJoinStateTeam(room, stateId, clientId);
+                    if (!gate.ok) {
+                        if (gate.reason === "full") {
+                            showNotice(t("lobbyTeamFull").replace("{n}", String(gate.maxTeam || 4)), true);
+                            return;
+                        }
+                        if (gate.reason === "already") return;
+                    }
+                    if (gate.teamId) teamId = gate.teamId;
+                }
+                const joinTeamId = teamId;
+                const confirmThenJoin = () => {
+                    tryJoinState._busy = true;
+                    runAction(
+                    CurrencySafeRoom.joinRoomAsPlayer(roomId, name, stateId, joinTeamId || null),
                     () => {
                         markJoinNameCommitted();
                         const st = (MALAYSIA_STATES || []).find(s => s.id === stateId);
-                        showNotice(teamId ? "已加入该队" : `已进驻 ${st?.label || stateId}`, false);
+                        if (joinTeamId) {
+                            const team = (room.teams || []).find(t => t.id === joinTeamId);
+                            const n = S.memberIdList(team?.memberIds).length;
+                            showNotice(t("lobbyJoinedTeam").replace("{n}", String(Math.max(1, n))), false);
+                        } else {
+                            showNotice(t("lobbyJoinedState").replace("{state}", st?.label || stateId), false);
+                        }
                     }
-                );
+                ).finally(() => { tryJoinState._busy = false; });
+                };
                 const visitor = (room.visitors || []).find(v => v.id === clientId);
                 const nameOk = me?.name === name || visitor?.name === name;
                 if (nameOk) return confirmThenJoin();
@@ -703,8 +771,8 @@
                         ? ` data-join-state="${st.id}"${team ? ` data-join-team="${team.id}"` : ""} tabindex="0" role="button"`
                         : "";
                     const slotLabel = full
-                        ? "已满"
-                        : (team && members.length > 0 ? "空位" : "进驻");
+                        ? t("squadSlotFull")
+                        : (team && members.length > 0 ? t("squadSlotOpen") : t("squadSlotDeploy"));
                     slots.push(`<div class="squad-slot empty${canJoin && !full ? " joinable" : " disabled"}${full ? " squad-slot-full" : ""}"${click}>
                         <span class="empty-slot-icon">${full ? "—" : "+"}</span>
                         <span>${slotLabel}</span>
@@ -959,8 +1027,10 @@
                 setRoomCodeDisplay(roomId);
                 return;
             }
-            if (room.status !== "playing") CurrencySafeI18n.unlockLang();
+            CurrencySafeI18n.unlockLang();
             CurrencySafeI18n.applyToDocument();
+            updateLobbyMuteBtn();
+            relabelMapZoomControls();
             setRoomStatus(room);
 
             sessionStorage.setItem(CurrencySafeRoom.SK.roomId, room.id);
@@ -1027,6 +1097,14 @@
             }
             if ($("maxTeamSizeBlock")) {
                 $("maxTeamSizeBlock").style.display = host && room.status === "lobby" ? "" : "none";
+            }
+            const mapFx = $("mapEffectsEnabled");
+            if (mapFx && document.activeElement !== mapFx) {
+                const defFx = S.defaultRoomSettings(room.mode).mapEffects;
+                mapFx.checked = room.settings?.mapEffects ?? defFx;
+            }
+            if ($("mapEffectsBlock")) {
+                $("mapEffectsBlock").style.display = host && room.status === "lobby" && room.mode === "competitive" ? "" : "none";
             }
             const rosterSub = $("squadRosterSub");
             if (rosterSub) {
@@ -1194,6 +1272,12 @@
             });
         }
 
+        function applyMapEffects() {
+            runAction(CurrencySafeRoom.setRoomMapEffects(roomId, $("mapEffectsEnabled").checked), () => {
+                showNotice(t("mapEffectsSet"), false);
+            });
+        }
+
         function escapeHtml(text) {
             const d = document.createElement("div");
             d.textContent = text;
@@ -1341,6 +1425,7 @@
 
         $("maxTeamSizeRange")?.addEventListener("input", syncMaxTeamSizeLabel);
         $("maxTeamSizeRange")?.addEventListener("change", applyMaxTeamSize);
+        $("mapEffectsEnabled")?.addEventListener("change", applyMapEffects);
 
         $("kickPlayerBtn").onclick = () => {
             const val = $("kickPlayerSelect").value;

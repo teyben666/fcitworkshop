@@ -31,11 +31,7 @@ class RoomStore {
         if (!id) return null;
         let raw = this.cache.get(id);
         if (!raw) return null;
-        raw.players = S.listFromMap(raw.players);
-        raw.spectators = S.listFromMap(raw.spectators);
-        raw.teams = S.listFromMap(raw.teams);
-        raw.activity = S.listFromMap(raw.activity);
-        raw.transactions = S.listFromMap(raw.transactions);
+        S.ensureRoomLists(raw);
         return raw;
     }
 

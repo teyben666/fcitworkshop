@@ -4,6 +4,12 @@ body.ended-page {
     overflow-x: hidden;
 }
 
+.ended-topbar {
+    position: relative;
+    z-index: 5;
+    margin: 1rem auto 0;
+}
+
 .ended-stage {
     position: relative;
     z-index: 2;

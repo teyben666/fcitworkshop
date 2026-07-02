@@ -61,7 +61,7 @@ const CITIES = [
     { name: "MIRI", label: "美里", lat: 4.399, lon: 113.991 }
 ];
 
-const BANK_BONUS = { lat: 4.8, lon: 109.2 };
+const BANK_BONUS = { lat: 4.2, lon: 108.5, mapX: 50, mapY: 50 };
 
 const bySlug = Object.fromEntries(STATES.map((s) => [s.slug, s]));
 const DESIGN_W = PROJECTION.viewW;
@@ -95,7 +95,7 @@ const cities = CITIES.map((c) => {
     return { ...c, mapX: pct.mapX, mapY: pct.mapY };
 });
 
-const bankPin = projectPct(BANK_BONUS.lon, BANK_BONUS.lat);
+const bankPin = { mapX: BANK_BONUS.mapX, mapY: BANK_BONUS.mapY };
 
 console.log("PROJECTION viewBox:", DESIGN_W, "x", DESIGN_H);
 states.forEach((s) => console.log(`  ${s.id}: ${s.mapX}, ${s.mapY}`));
@@ -249,7 +249,7 @@ writeFileSync(join(root, "js", "map-layout.js"), `/**
 })(window);
 `, "utf8");
 
-writeFileSync(join(root, "js", "bank-bonus-pin.js"), `/** Central bank bonus map pin — synced from krackedmaps project() */
+writeFileSync(join(root, "js", "bank-bonus-pin.js"), `/** Central bank bonus map pin — map image center (map:sync-anchors) */
 window.BANK_BONUS_MAP_PIN = {
     id: "__BANK_BONUS__",
     name: "央行 Bonus",

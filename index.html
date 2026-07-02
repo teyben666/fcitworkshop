@@ -9,77 +9,119 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,700;14..32,900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/shared.css" />
     <link rel="stylesheet" href="css/lobby-hud.css?v=20260624b" />
-    <link rel="stylesheet" href="css/home-portal.css?v=20260624b" />
-    <script src="js/i18n.js?v=20260624b"></script>
+    <link rel="stylesheet" href="css/home-portal.css?v=20260627d" />
+    <script src="js/i18n.js?v=20260629"></script>
+    <script src="js/portal-sound.js?v=20260629"></script>
 </head>
 <body class="lobby-page home-page" data-i18n-page-title="pageTitleHome">
     <div class="home-dot-grid" aria-hidden="true"></div>
     <div class="lobby-hud-overlay" aria-hidden="true"></div>
 
-    <main class="portal home-shell">
-        <div class="home-hero">
-            <div class="home-badge">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                <span>Federal Security Network</span>
+    <header class="home-topbar glass-panel">
+        <div class="home-topbar-brand">
+            <div class="home-topbar-logo">
+                <img src="fcitlogo.png" alt="FCIT" width="64" height="64" />
             </div>
-            <h1>
-                <span data-i18n="gameTitlePrefix">Currency Safe:</span>
-                <span class="gradient-text" data-i18n="gameTitleSuffix">金库行动</span>
-            </h1>
-            <p class="subtitle" data-i18n="homeSubtitle">金库行动 · 真人互攻或单人练习 · 创建/加入房间</p>
+            <div class="home-topbar-titles">
+                <p class="home-topbar-kicker">Federal Security Network</p>
+                <h1>
+                    <span data-i18n="gameTitlePrefix">Currency Safe:</span>
+                    <span class="gradient-text" data-i18n="gameTitleSuffix">金库行动</span>
+                </h1>
+                <p class="subtitle" data-i18n="homeSubtitle">金库行动 · 真人互攻或单人练习 · 创建/加入房间</p>
+            </div>
         </div>
-
-        <div class="home-sync-row home-toolbar">
+        <div class="home-topbar-actions">
             <div class="home-lang-slot" id="homeLangSlot" aria-label="Language"></div>
-            <button type="button" class="home-sync-pill home-sound-btn" id="homeSoundToggle" aria-pressed="true" title="音效开关">🔊</button>
-            <span class="home-sync-pill" id="syncStatus" data-i18n="syncLocal">同步：localStorage</span>
-            <a href="history.html" class="home-sync-pill home-toolbar-link">📜 历史赛局</a>
-            <a href="BACKEND_ROADMAP.md" class="home-sync-pill home-toolbar-link" id="cloudSetupLink">📡 服务器说明</a>
+            <button type="button" class="home-menu-btn" id="homeMenuBtn" aria-expanded="false" aria-controls="homeMenuPanel" data-i18n-aria-label="menuOpen">
+                <span class="home-menu-icon" aria-hidden="true"></span>
+                <span class="home-sync-dot" id="homeSyncDot" aria-hidden="true"></span>
+            </button>
         </div>
+        <div class="home-menu-panel hidden" id="homeMenuPanel" role="menu">
+            <button type="button" class="home-menu-item home-sound-btn" id="homeSoundToggle" aria-pressed="false" role="menuitem" data-i18n="muteOff">音效：开</button>
+            <div class="home-menu-item home-menu-sync" id="syncStatus" role="menuitem" data-i18n="syncLocal">同步：localStorage</div>
+            <a href="history.html" class="home-menu-item home-toolbar-link" role="menuitem" data-i18n="matchHistory">历史赛局</a>
+            <a href="BACKEND_ROADMAP.md" class="home-menu-item home-toolbar-link" id="cloudSetupLink" role="menuitem" data-i18n="serverSetupLink">服务器说明</a>
+        </div>
+    </header>
 
-        <div class="home-cards">
-            <article class="glass-panel home-card create" id="createRoomCard" tabindex="0" role="button">
-                <div>
+    <main class="portal home-shell">
+        <div class="home-cards home-cards-primary">
+            <article class="glass-panel home-card home-card--hero create" id="createRoomCard" tabindex="0" role="button">
+                <div class="home-card-preview home-card-preview--create" aria-hidden="true">
+                    <div class="home-preview-stage">
+                        <img class="home-preview-map" src="assets/malaysia-regions.svg" alt="" />
+                        <div class="home-preview-scan"></div>
+                        <span class="home-preview-chip host">HOST</span>
+                        <span class="home-preview-room">ROOM · · · ·</span>
+                    </div>
+                </div>
+                <div class="home-card-body">
                     <div class="home-card-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
                     </div>
                     <h3 data-i18n="createRoom">创建房间</h3>
                     <p data-i18n="homeCreateDesc">作为 HOST 房主开房，可 Shuffle 分队、设置比赛模式与时长。</p>
+                    <span class="home-card-cta" data-i18n="homeCreateCta">进入作战室 →</span>
                 </div>
-                <span class="home-card-cta" data-i18n="homeCreateCta">进入作战室 →</span>
             </article>
 
-            <article class="glass-panel home-card join" id="joinRoomCard" tabindex="0" role="button">
-                <div>
+            <article class="glass-panel home-card home-card--hero join" id="joinRoomCard" tabindex="0" role="button">
+                <div class="home-card-preview home-card-preview--join" aria-hidden="true">
+                    <div class="home-preview-stage">
+                        <img class="home-preview-map" src="assets/malaysia-regions.svg" alt="" />
+                        <div class="home-preview-scan"></div>
+                        <span class="home-preview-chip join">JOIN</span>
+                        <span class="home-preview-room code">AB12</span>
+                    </div>
+                </div>
+                <div class="home-card-body">
                     <div class="home-card-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     </div>
                     <h3 data-i18n="joinRoom">加入房间</h3>
                     <p data-i18n="homeJoinDesc">输入房间码进入对战大厅，代号与州属在厅内登记。</p>
+                    <span class="home-card-cta" id="joinCardCta" data-i18n="homeJoinCta">展开加入表单 →</span>
                 </div>
-                <span class="home-card-cta" id="joinCardCta" data-i18n="homeJoinCta">展开加入表单 →</span>
             </article>
+        </div>
 
-            <article class="glass-panel home-card solo" id="soloCard" tabindex="0" role="button">
-                <div>
+        <div class="home-cards home-cards-secondary">
+            <article class="glass-panel home-card home-card--compact solo" id="soloCard" tabindex="0" role="button">
+                <div class="home-card-preview home-card-preview--solo" aria-hidden="true">
+                    <div class="home-preview-stage home-preview-stage--compact">
+                        <div class="home-preview-radar"></div>
+                        <span class="home-preview-chip solo">SOLO</span>
+                    </div>
+                </div>
+                <div class="home-card-body">
                     <div class="home-card-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg>
                     </div>
                     <h3 data-i18n="singlePlayerBtn">单人练习</h3>
                     <p data-i18n="singlePlayerDesc">离线训练营，AI 战队部署于地图各州，规则同练习模式。</p>
+                    <span class="home-card-cta" data-i18n="homeSoloCta">启动训练模拟 →</span>
                 </div>
-                <span class="home-card-cta" data-i18n="homeSoloCta">启动训练模拟 →</span>
             </article>
 
-            <article class="glass-panel home-card tutorial" id="tutorialCard" tabindex="0" role="button">
-                <div>
+            <article class="glass-panel home-card home-card--compact tutorial" id="tutorialCard" tabindex="0" role="button">
+                <div class="home-card-preview home-card-preview--tutorial" aria-hidden="true">
+                    <div class="home-preview-stage home-preview-stage--compact">
+                        <div class="home-preview-missions">
+                            <span>01</span><span>02</span><span>03</span>
+                        </div>
+                        <span class="home-preview-chip tutorial">TRAINING</span>
+                    </div>
+                </div>
+                <div class="home-card-body">
                     <div class="home-card-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg>
                     </div>
                     <h3 data-i18n="tutorialBtn">训练营</h3>
                     <p data-i18n="tutorialDesc">按关卡直接开玩，适合课堂演示与孩子自由加练。</p>
+                    <span class="home-card-cta" data-i18n="tutorialCta">进入训练营 →</span>
                 </div>
-                <span class="home-card-cta" data-i18n="tutorialCta">进入训练营 →</span>
             </article>
         </div>
 
@@ -135,18 +177,16 @@
             homeLangSlot.appendChild(langBar);
         }
 
-        let soundOn = localStorage.getItem("csSound") !== "off";
         function updateSoundBtn() {
             const btn = $("homeSoundToggle");
             if (!btn) return;
-            btn.setAttribute("aria-pressed", soundOn ? "true" : "false");
-            btn.textContent = soundOn ? "🔊" : "🔇";
-            btn.classList.toggle("is-muted", !soundOn);
-            btn.title = soundOn ? "音效开（点击静音）" : "音效关（点击开启）";
+            const muted = CurrencySafePortalSound.isMuted();
+            btn.setAttribute("aria-pressed", muted ? "true" : "false");
+            btn.textContent = t(muted ? "muteOn" : "muteOff");
+            btn.classList.toggle("is-muted", muted);
         }
         $("homeSoundToggle")?.addEventListener("click", () => {
-            soundOn = !soundOn;
-            localStorage.setItem("csSound", soundOn ? "on" : "off");
+            CurrencySafePortalSound.toggle();
             updateSoundBtn();
         });
         updateSoundBtn();
@@ -162,32 +202,35 @@
         function refreshSyncStatus() {
             const backend = CurrencySafeRoom.getBackend();
             const el = $("syncStatus");
+            const dot = $("homeSyncDot");
+            let dotState = "ok";
             if (window.CURRENCY_SAFE_WS_ERROR && (window.CURRENCY_SAFE_SERVER?.enabled !== false)) {
                 el.textContent = "⚠ 未连上游戏服务器（域名需 Tunnel → :8787）";
-                el.style.borderColor = "rgba(248,113,113,.5)";
                 el.style.color = "#fca5a5";
                 el.title = window.CURRENCY_SAFE_WS_ERROR;
+                dotState = "err";
             } else if (backend === "ws") {
                 const wsSt = CurrencySafeRoom.getConnectionStatus?.() || {};
                 if (wsSt.status === "reconnecting") {
                     el.textContent = "↻ WebSocket 重连中…";
-                    el.style.borderColor = "rgba(251,191,36,.5)";
                     el.style.color = "#fcd34d";
+                    dotState = "warn";
                 } else {
                     el.textContent = t("syncWs");
-                    el.style.borderColor = "";
                     el.style.color = "";
                 }
             } else {
                 el.textContent = t("syncLocal");
-                el.style.borderColor = "";
                 el.style.color = "";
+            }
+            if (dot) {
+                dot.className = "home-sync-dot home-sync-dot--" + dotState;
             }
             const link = $("cloudSetupLink");
             if (link) {
                 link.style.display = backend === "ws" ? "none" : "";
                 if (window.CURRENCY_SAFE_WS_ERROR) {
-                    link.textContent = "📡 启动说明";
+                    link.textContent = t("startServerSetup");
                     link.href = "BACKEND_ROADMAP.md";
                 }
             }
@@ -262,6 +305,29 @@
         $("homeJoinConfirm").onclick = goJoinRoom;
         $("homeRoomCode").addEventListener("keydown", (e) => {
             if (e.key === "Enter") goJoinRoom();
+        });
+
+        function toggleHomeMenu(force) {
+            const panel = $("homeMenuPanel");
+            const btn = $("homeMenuBtn");
+            if (!panel || !btn) return;
+            const open = typeof force === "boolean" ? force : panel.classList.contains("hidden");
+            panel.classList.toggle("hidden", !open);
+            btn.setAttribute("aria-expanded", open ? "true" : "false");
+        }
+        $("homeMenuBtn")?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const panel = $("homeMenuPanel");
+            toggleHomeMenu(panel?.classList.contains("hidden"));
+        });
+        document.addEventListener("click", (e) => {
+            const panel = $("homeMenuPanel");
+            if (!panel || panel.classList.contains("hidden")) return;
+            if (e.target.closest(".home-topbar")) return;
+            toggleHomeMenu(false);
+        });
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") toggleHomeMenu(false);
         });
     </script>
 </body>

@@ -36,9 +36,106 @@
 .map-preview-markers {
     z-index: 6;
 }
+        .map-mode-lobby .kracked-map-root,
+        .map-mode-lobby .kracked-map-mount,
+        #threat-map .kracked-map-root {
+            cursor: pointer;
+        }
+.map-preview-marker.is-me .map-preview-dot {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35), 0 0 16px rgba(95, 208, 255, 0.9) !important;
+}
+/* E5 — shape + color for color-blind readability */
+.map-preview-marker--self .map-preview-dot,
+.map-preview-marker.is-me .map-preview-dot {
+    border-radius: 3px;
+}
+.map-preview-marker--other .map-preview-dot {
+    border-radius: 50%;
+}
+.map-preview-marker.highlight:not(.is-me) .map-preview-dot {
+    border-radius: 2px;
+    transform: rotate(45deg);
+}
+.map-preview-marker--mini .map-preview-dot {
+    width: 9px;
+    height: 9px;
+    border-width: 1px;
+}
+.map-preview-marker--mini {
+    pointer-events: auto;
+    cursor: default;
+}
+.map-preview-marker--mini .map-preview-label--mini {
+    opacity: 0;
+    transition: opacity 0.15s ease, max-width 0.15s ease;
+}
+.map-preview-marker--mini:hover {
+    z-index: 20;
+}
+.map-preview-marker--mini:hover .map-preview-dot {
+    width: 13px;
+    height: 13px;
+    border-width: 2px;
+}
+.map-preview-marker--mini:hover .map-preview-label--mini {
+    opacity: 1;
+    max-width: 150px !important;
+}
+.map-preview-label--mini {
+    font-size: 0.58rem !important;
+    padding: 1px 5px !important;
+    max-width: 88px !important;
+}
+.map-mode-spectator .map-preview-markers {
+    pointer-events: none;
+}
 .map-preview-inner {
     position: relative;
     width: 100%;
     height: 100%;
     min-height: 200px;
+}
+
+.map-preview-wrap.is-panning,
+.map-preview-card .map-preview-wrap.is-panning {
+    cursor: grabbing;
+}
+
+.map-preview-wrap.is-panning .kracked-map-mount {
+    cursor: grabbing;
+}
+
+.map-preview-zoom {
+    position: absolute;
+    right: 0.65rem;
+    bottom: 0.65rem;
+    z-index: 12;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    pointer-events: auto;
+}
+
+.map-zoom-btn {
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 0.55rem;
+    border: 1px solid rgba(56, 189, 248, 0.28);
+    background: rgba(3, 10, 18, 0.88);
+    color: #e2e8f0;
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.map-zoom-btn:hover {
+    border-color: rgba(56, 189, 248, 0.55);
+    color: #7dd3fc;
+}
+
+.map-zoom-btn[data-zoom-reset] {
+    font-size: 0.85rem;
 }

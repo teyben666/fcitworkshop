@@ -9,14 +9,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,700;14..32,900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/shared.css" />
     <link rel="stylesheet" href="css/fx.css" />
+    <link rel="stylesheet" href="css/home-portal.css?v=20260629" />
     <link rel="stylesheet" href="css/ended.css" />
-    <script src="js/i18n.js"></script>
+    <script src="js/i18n.js?v=20260629"></script>
+    <script src="js/portal-sound.js?v=20260629"></script>
 </head>
-<body class="ended-page" data-i18n-page-title="pageTitleEnded">
+<body class="lobby-page home-page ended-page" data-i18n-page-title="pageTitleEnded">
+    <div class="home-dot-grid" aria-hidden="true"></div>
+    <header class="home-topbar glass-panel ended-topbar">
+        <div class="home-topbar-brand">
+            <a href="index.html" class="home-topbar-logo" aria-label="FCIT">
+                <img src="fcitlogo.png" alt="FCIT" width="56" height="56" />
+            </a>
+            <div class="home-topbar-titles">
+                <p class="home-topbar-kicker">Federal Security Network</p>
+                <h1>
+                    <span data-i18n="gameTitlePrefix">Currency Safe:</span>
+                    <span class="gradient-text" data-i18n="missionComplete">任务完成</span>
+                </h1>
+            </div>
+        </div>
+        <div class="home-topbar-actions">
+            <div class="home-lang-slot" id="endedLangSlot" aria-label="Language"></div>
+        </div>
+    </header>
     <div class="ended-scanline"></div>
     <main class="ended-stage">
-        <div class="portal-logo" style="margin:0 auto 16px"><img src="logo-dark.png" alt="" onerror="this.parentElement.textContent='🏆'" /></div>
-        <h1 class="ended-title" data-i18n="missionComplete">任务完成</h1>
         <p class="ended-sub"><span data-i18n="roomCodeLabel">房间码</span> <span class="room-code" id="roomCodeDisplay">----</span></p>
 
         <div class="podium" id="podium">
@@ -60,7 +78,15 @@
             || sessionStorage.getItem(CurrencySafeRoom.SK.roomId) || "").toUpperCase();
         let revealStarted = false;
 
-        CurrencySafeI18n.mountLangBar();
+        CurrencySafeI18n.mountLangBar({
+            onChange: () => CurrencySafeI18n.applyToDocument()
+        });
+        const endedLangSlot = $("endedLangSlot");
+        const langBar = document.getElementById("csLangBar");
+        if (endedLangSlot && langBar) {
+            langBar.classList.add("lang-bar--inline");
+            endedLangSlot.appendChild(langBar);
+        }
         CurrencySafeI18n.unlockLang();
 
         function escapeHtml(text) {

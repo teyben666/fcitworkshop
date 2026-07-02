@@ -386,7 +386,7 @@
     const RPC_METHODS = [
         "joinRoomAsPlayer", "joinRoomAsSpectator", "setRoomMode", "shufflePlayers",
         "shuffleStatesOnly", "shuffleTeamGroups", "assignPlayerToTeam", "createTeam",
-        "setRoomMaxTeamSize", "abandonTargetRaid",
+        "setRoomMaxTeamSize", "setRoomMapEffects", "abandonTargetRaid",
         "setRoomJoinPassword",
         "startGame", "endGame", "beginLaunchCountdown", "cancelLaunchCountdown",
         "kickPlayer", "kickSpectator",

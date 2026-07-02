@@ -60,6 +60,12 @@ pm2 start ecosystem.config.cjs
 pm2 save
 ```
 
+### 课堂一键启动（Windows）
+
+```powershell
+.\scripts\start-classroom.ps1
+```
+
 课前：`/health` → `"storage":"postgres"` 或 `"json"`。
 
 ## 架构

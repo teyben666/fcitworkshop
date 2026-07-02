@@ -56,7 +56,7 @@ const CLIENT_RPC = new Set([
     "createRoom", "saveRoom", "joinRoom", "reconnectRoom", "ensureRoom",
     "joinRoomAsPlayer", "joinRoomAsSpectator", "setRoomMode", "shufflePlayers",
     "shuffleStatesOnly", "shuffleTeamGroups", "assignPlayerToTeam", "createTeam",
-    "setRoomMaxTeamSize", "abandonTargetRaid",
+    "setRoomMaxTeamSize", "setRoomMapEffects", "abandonTargetRaid",
     "setRoomJoinPassword",
     "startGame", "endGame", "beginLaunchCountdown", "cancelLaunchCountdown",
     "kickPlayer", "kickSpectator", "leaveRoom",

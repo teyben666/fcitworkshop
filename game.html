@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="css/fx.css" />
     <link rel="stylesheet" href="css/vendor/krackedmaps.css" />
     <link rel="stylesheet" href="css/kracked-map-overrides.css" />
+    <link rel="stylesheet" href="css/shared.css?v=20260628" />
     <style>
         /* ============================================================
            CSS — 2D Live Cyber Threat Map
@@ -104,10 +105,11 @@
             overflow: hidden;
         }
         header {
+            position: relative;
             display: flex;
             justify-content: space-between;
             gap: 18px;
-            align-items: flex-start;
+            align-items: center;
             flex-shrink: 0;
             width: 100%;
             margin-bottom: 12px;
@@ -118,6 +120,9 @@
             -webkit-backdrop-filter: blur(16px) saturate(1.15);
             border-bottom: 1px solid rgba(34, 211, 238, 0.14);
             box-shadow: 0 10px 36px rgba(0, 0, 0, 0.38);
+        }
+        header:has(.game-menu-panel:not(.hidden)) {
+            z-index: 110;
         }
         .brand {
             display: flex;
@@ -224,13 +229,107 @@
             0%, 100% { box-shadow: var(--glow), 0 0 0 rgba(255, 110, 121, 0); }
             50% { box-shadow: var(--glow), 0 0 18px rgba(255, 110, 121, 0.35); }
         }
-        .hud-primary { align-items: stretch; }
-        .hud-actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
+        .hud-primary { align-items: stretch; flex: 1; min-width: 0; }
+        .game-menu-wrap {
+            position: relative;
+            flex-shrink: 0;
         }
+        .game-menu-btn {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            background: rgba(5, 16, 12, 0.9);
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            padding: 0;
+        }
+        .game-menu-btn:hover { border-color: rgba(113, 255, 232, 0.35); }
+        .game-menu-icon,
+        .game-menu-icon::before,
+        .game-menu-icon::after {
+            display: block;
+            width: 1.1rem;
+            height: 2px;
+            background: var(--text);
+            border-radius: 1px;
+            position: relative;
+        }
+        .game-menu-icon::before,
+        .game-menu-icon::after {
+            content: "";
+            position: absolute;
+            left: 0;
+        }
+        .game-menu-icon::before { top: -5px; }
+        .game-menu-icon::after { top: 5px; }
+        .game-menu-panel {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 8px);
+            min-width: min(280px, calc(100vw - 2rem));
+            padding: 8px;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            background: rgba(5, 18, 14, 0.98);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 120;
+        }
+        .game-menu-panel.hidden { display: none; }
+        .game-menu-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 2px;
+        }
+        .game-menu-lang {
+            padding: 4px 6px 8px;
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 2px;
+        }
+        .game-menu-lang .lang-bar { justify-content: flex-start; }
+        .game-menu-lang .lang-locked-tip {
+            flex: 1 1 100%;
+            font-size: 0.7rem;
+            color: var(--amber);
+            padding: 4px 2px 0;
+        }
+        .game-menu-info {
+            padding: 8px 8px 4px;
+            font-size: 0.82rem;
+            color: var(--muted);
+        }
+        .game-menu-item {
+            display: block;
+            width: 100%;
+            text-align: left;
+            box-sizing: border-box;
+        }
+        .game-menu-item.hud-link {
+            border-radius: 10px;
+            border-color: transparent;
+            background: transparent;
+        }
+        .game-menu-item.hud-link:hover {
+            background: rgba(113, 255, 232, 0.08);
+            border-color: rgba(113, 255, 232, 0.15);
+        }
+        .game-menu-info div { margin-bottom: 8px; }
+        .game-menu-info div:last-child { margin-bottom: 0; }
+        .game-menu-info small {
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            font-size: 0.66rem;
+            margin-bottom: 2px;
+        }
+        .game-menu-info strong { color: var(--text); font-weight: 800; }
         .hud-link {
             padding: 8px 14px;
             border-radius: 12px;
@@ -244,27 +343,6 @@
             font-family: inherit;
         }
         .hud-link:hover { color: var(--cyan); border-color: rgba(113, 255, 232, 0.35); }
-        .pill-more { position: relative; min-width: auto; padding: 6px 10px; }
-        .pill-more button {
-            background: none; border: none; color: var(--text);
-            font-size: 1.2rem; cursor: pointer; padding: 4px 8px; font-family: inherit;
-        }
-        .hud-more-menu {
-            position: absolute;
-            top: calc(100% + 6px);
-            right: 0;
-            min-width: 200px;
-            padding: 12px;
-            border-radius: 14px;
-            border: 1px solid var(--line);
-            background: rgba(5, 18, 14, 0.98);
-            box-shadow: var(--shadow);
-            z-index: 50;
-            font-size: 0.85rem;
-            color: var(--muted);
-        }
-        .hud-more-menu div { margin-bottom: 8px; }
-        .hud-more-menu strong { color: var(--text); }
         .alert-bar {
             padding: 12px 14px;
             border-radius: 12px;
@@ -453,6 +531,23 @@
             text-align: right;
             padding: 2px 6px 0;
         }
+        .lang-bar.lang-bar--inline,
+        .game-menu-lang .lang-bar {
+            position: static;
+            top: auto;
+            right: auto;
+            z-index: auto;
+            max-width: none;
+            padding: 0;
+            border: none;
+            background: transparent;
+            box-shadow: none;
+            gap: 6px;
+        }
+        .game-menu-lang .lang-bar .lang-btn {
+            padding: 8px 12px;
+            font-size: 0.78rem;
+        }
         .layout {
             flex: 1;
             min-height: 0;
@@ -540,18 +635,23 @@
         .threat-marker {
             position: absolute;
             transform: translate(-50%, -50%);
-            pointer-events: auto;
-            cursor: pointer;
+            pointer-events: none;
+            cursor: default;
             text-align: center;
         }
         .threat-marker-dot {
             display: block;
-            width: 12px;
-            height: 12px;
+            width: 9px;
+            height: 9px;
             margin: 0 auto;
             border-radius: 50%;
             background: #44ddff;
-            box-shadow: 0 0 12px rgba(68, 221, 255, 0.8);
+            box-shadow: 0 0 10px rgba(68, 221, 255, 0.65);
+        }
+        .threat-marker-label--info {
+            font-size: 0.62rem;
+            padding: 2px 6px;
+            opacity: 0.92;
         }
         .threat-marker.target .threat-marker-dot {
             width: 16px;
@@ -1919,11 +2019,6 @@
             background: rgba(4,16,11,.88); border: 1px solid var(--line);
             font-size: .78rem; color: var(--muted); pointer-events: none; max-width: 90%;
         }
-        .overlay-modal {
-            position: fixed; inset: 0; z-index: 70; display: none;
-            place-items: center; background: rgba(0,0,0,.82); padding: 20px;
-        }
-        .overlay-modal.show { display: grid; }
         .bank-bonus-box {
             text-align: left;
             max-width: min(96vw, 920px);
@@ -2077,85 +2172,9 @@
             25% { transform: translateX(-6px); }
             75% { transform: translateX(6px); }
         }
-        .overlay-box {
-            text-align: center; padding: 28px; border-radius: 24px;
-            border: 1px solid var(--line);
-            background: linear-gradient(180deg, #071710, #04110c);
-            max-width: 420px; animation: fade .3s ease;
-        }
-        .overlay-box h2 { margin: 0 0 8px; font-size: 1.5rem; }
-        .overlay-box p { color: var(--muted); line-height: 1.55; }
-        .vault-door-icon {
-            font-size: 4rem; margin: 12px 0; animation: char-bounce 1s ease infinite;
-        }
-        .toast {
-            position: fixed;
-            z-index: 30;
-            left: 50%;
-            bottom: 24px;
-            transform: translateX(-50%) translateY(80px);
-            opacity: 0;
-            pointer-events: none;
-            transition: .25s ease;
-            background: var(--green-2);
-            color: #021008;
-            padding: 14px 18px;
-            border-radius: 999px;
-            font-weight: 950;
-            box-shadow: var(--shadow);
-            max-width: min(92vw, 760px);
-            text-align: center;
-        }
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-        .modal {
-            position: fixed;
-            inset: 0;
-            z-index: 40;
-            display: none;
-            place-items: center;
-            background: rgba(0, 0, 0, 0.74);
-            padding: 20px;
-        }
-        .modal.show {
-            display: grid;
-        }
-        .modal-box {
-            width: min(760px, 100%);
-            padding: 24px;
-            border-radius: 28px;
-            border: 1px solid var(--line);
-            background: linear-gradient(180deg, #071710, #04110c);
-            box-shadow: var(--shadow);
-        }
-        .modal-box h2 {
-            margin: 0 0 10px;
-        }
-        .modal-box p,
-        .modal-box li {
-            color: var(--muted);
-            line-height: 1.65;
-        }
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 16px;
-            pointer-events: none;
-            z-index: 60;
-            animation: fall .9s ease-out forwards;
-            border-radius: 3px;
-        }
-        @keyframes fall {
-            to {
-                transform: translate(var(--x), var(--y)) rotate(650deg);
-                opacity: 0;
-            }
-        }
     </style>
 </head>
-<body data-i18n-page-title="pageTitleGame">
+<body class="game-page" data-i18n-page-title="pageTitleGame">
 
     <!-- ===== 鼠标光晕 ===== -->
     <div class="mouse-glow" id="mouseGlow"></div>
@@ -2170,21 +2189,26 @@
                     <h1 data-i18n="gameTitle">Currency Safe: 金库行动</h1>
                 </div>
             </div>
-            <div class="hud-actions">
-                <a href="#" class="hud-link" id="backLobbyBtn" data-i18n="leaveMatch">离开比赛</a>
-                <button type="button" class="hud-link" id="howBtnHeader" data-i18n="briefing">任务简报</button>
-                <button type="button" class="hud-link" id="muteBtn" data-i18n="muteOff">音效：开</button>
-            </div>
             <div class="hud hud-primary">
                 <div class="pill pill-match"><small data-i18n="matchTime">比赛时间</small><span id="hudMatchTime">--:--</span></div>
                 <div class="pill" id="hudBalancePill"><small data-i18n="balance">余额</small>RM <span id="hudBalance">0</span></div>
                 <div class="pill" id="hudTargetPill"><small data-i18n="currentTarget">当前目标</small><span id="hudTargetName">—</span></div>
-                <div class="pill pill-more">
-                    <button type="button" id="hudMoreBtn" aria-label="More">⋯</button>
-                    <div class="hud-more-menu hidden" id="hudMoreMenu">
-                        <div><small data-i18n="room">房间</small><br/><strong id="hudMoreRoom">----</strong></div>
-                        <div><small data-i18n="mode">模式</small><br/><strong id="hudMoreMode">—</strong></div>
-                        <div><small data-i18n="otherPlayers">其他玩家</small><br/><strong id="hudMoreOthers">0</strong></div>
+            </div>
+            <div class="game-menu-wrap">
+                <button type="button" class="game-menu-btn" id="gameMenuBtn" aria-expanded="false" aria-controls="gameMenuPanel" data-i18n-aria-label="menuOpen">
+                    <span class="game-menu-icon" aria-hidden="true"></span>
+                </button>
+                <div class="game-menu-panel hidden" id="gameMenuPanel" role="menu">
+                    <div class="game-menu-actions">
+                        <a href="#" class="hud-link game-menu-item" id="backLobbyBtn" role="menuitem" data-i18n="leaveMatch">离开比赛</a>
+                        <button type="button" class="hud-link game-menu-item" id="howBtnHeader" role="menuitem" data-i18n="briefing">任务简报</button>
+                        <button type="button" class="hud-link game-menu-item" id="muteBtn" role="menuitem" data-i18n="muteOff">音效：开</button>
+                    </div>
+                    <div class="game-menu-lang" id="gameLangSlot" aria-label="Language"></div>
+                    <div class="game-menu-info" id="gameMenuInfo">
+                        <div><small data-i18n="room">房间</small><strong id="hudMoreRoom">----</strong></div>
+                        <div><small data-i18n="mode">模式</small><strong id="hudMoreMode">—</strong></div>
+                        <div><small data-i18n="otherPlayers">其他玩家</small><strong id="hudMoreOthers">0</strong></div>
                     </div>
                 </div>
             </div>
@@ -2446,20 +2470,22 @@
     JavaScript — 2D Live Cyber Threat Map
     ============================================================ -->
     <script src="js/map-layout.js"></script>
+    <script src="js/map-viewport.js?v=20260628"></script>
+    <script src="js/game-map-bootstrap.js?v=20260628b"></script>
     <script src="js/vendor/krackedmaps.umd.js"></script>
-    <script src="js/kracked-malaysia-map.js"></script>
     <script src="js/malaysia-states.js"></script>
     <script src="js/malaysia-cities.js"></script>
-    <script src="js/bank-bonus-pin.js"></script>
+    <script src="js/bank-bonus-pin.js?v=20260630c"></script>
     <script src="js/map-attack-lines.js"></script>
     <script src="js/server-config.js?v=20260626"></script>
-    <script src="js/room-shared.js"></script>
-    <script src="js/room-local.js"></script>
+    <script src="js/room-shared.js?v=20260630b"></script>
+    <script src="js/room-local.js?v=20260630b"></script>
     <script src="js/room-ws.js?v=20260626"></script>
     <script src="js/room.js?v=20260626"></script>
     <script src="js/fx.js"></script>
-    <script src="js/i18n.js"></script>
-    <script src="js/i18n-missions-catalog.js"></script>
+    <script src="js/i18n.js?v=20260630c"></script>
+    <script src="js/kracked-malaysia-map.js?v=20260628b"></script>
+    <script src="js/i18n-missions-catalog.js?v=20260630"></script>
     <script src="js/mission-i18n.js"></script>
     <script src="js/intel-briefings-en-data.js"></script>
     <script src="js/mission-games.js"></script>
@@ -2467,7 +2493,7 @@
     <script src="js/mission-mastermind.js"></script>
     <script src="js/mission-fragsort.js"></script>
     <script src="js/mission-binary.js"></script>
-    <script src="js/mission-quantum.js"></script>
+    <script src="js/mission-quantum.js?v=20260629"></script>
     <script src="js/mission-finale.js"></script>
     <script src="js/bank-bonus-scheduler.js"></script>
     <script src="js/intel-briefings-data.js"></script>
@@ -2535,123 +2561,46 @@
         const GRID_SCAN_FLASH_MS = 1500;
         const MALAYSIA_CITIES = window.MALAYSIA_CITIES || [];
 
-        let mapZoom = 1;
-        let mapPanX = 0;
-        let mapPanY = 0;
         const MAP_ZOOM_MIN = 0.85;
         const MAP_ZOOM_MAX = 2.8;
+        const gameMapRuntime = CurrencySafeGameMapBootstrap.create({
+            zoomMin: MAP_ZOOM_MIN,
+            zoomMax: MAP_ZOOM_MAX
+        });
+        const mapViewport = gameMapRuntime.mapViewport;
 
-        function computeMapLayout(wrapW, wrapH) {
-            return MAP_LAYOUT.computeLayout(wrapW, wrapH, {
-                zoom: mapZoom,
-                panX: mapPanX,
-                panY: mapPanY
-            });
-        }
-
-        function zoomMapAt(wrap, clientX, clientY, deltaY) {
-            if (!wrap) return;
-            const rect = wrap.getBoundingClientRect();
-            const mx = clientX - rect.left;
-            const my = clientY - rect.top;
-            const w = wrap.clientWidth;
-            const h = wrap.clientHeight;
-            const layout = computeMapLayout(w, h);
-            const factor = deltaY < 0 ? 1.12 : 1 / 1.12;
-            const newZoom = Math.max(MAP_ZOOM_MIN, Math.min(MAP_ZOOM_MAX, mapZoom * factor));
-            if (Math.abs(newZoom - mapZoom) < 0.001) return;
-            const mapX = (mx - layout.offsetX) / layout.scale;
-            const mapY = (my - layout.offsetY) / layout.scale;
-            mapZoom = newZoom;
-            if (mapZoom <= 1.001) {
-                mapZoom = 1;
-                mapPanX = 0;
-                mapPanY = 0;
-            } else {
-                const baseScale = Math.min(w / MAP_CONFIG.w, h / MAP_CONFIG.h);
-                const newScale = baseScale * mapZoom;
-                mapPanX = mx - mapX * newScale - (w - MAP_CONFIG.w * newScale) / 2;
-                mapPanY = my - mapY * newScale - (h - MAP_CONFIG.h * newScale) / 2;
-            }
-            if (mapZoom > 1.001) {
-                if (routeLayer) routeLayer.innerHTML = "";
-            }
-            clampMapPan(w, h);
+        function onMapViewportChange() {
+            if (mapViewport.getState().zoom > 1.001 && routeLayer) routeLayer.innerHTML = "";
             if (window.__globeResize) window.__globeResize();
             if (window.updateTeamMarkers3D) window.updateTeamMarkers3D();
         }
 
+        function computeMapLayout(wrapW, wrapH) {
+            return gameMapRuntime.computeMapLayout(wrapW, wrapH);
+        }
+
+        function zoomMapAt(wrap, clientX, clientY, deltaY) {
+            gameMapRuntime.zoomMapAt(wrap, clientX, clientY, deltaY, onMapViewportChange);
+        }
+
         function clampMapPan(wrapW, wrapH) {
-            if (mapZoom <= 1.001) {
-                mapPanX = 0;
-                mapPanY = 0;
-                return;
-            }
-            const baseScale = Math.min(wrapW / MAP_CONFIG.w, wrapH / MAP_CONFIG.h);
-            const scale = baseScale * mapZoom;
-            const drawW = MAP_CONFIG.w * scale;
-            const drawH = MAP_CONFIG.h * scale;
-            const maxPanX = Math.max(0, (drawW - wrapW) / 2);
-            const maxPanY = Math.max(0, (drawH - wrapH) / 2);
-            mapPanX = Math.max(-maxPanX, Math.min(maxPanX, mapPanX));
-            mapPanY = Math.max(-maxPanY, Math.min(maxPanY, mapPanY));
+            mapViewport.clampPan(wrapW, wrapH);
         }
 
         function setupMapPanning(wrap) {
-            if (!wrap) return;
-            let panning = false;
-            let panMoved = false;
-            let startX = 0;
-            let startY = 0;
-            let startPanX = 0;
-            let startPanY = 0;
+            gameMapRuntime.setupMapPanning(wrap, onMapViewportChange);
+        }
 
-            wrap.addEventListener("mousedown", (e) => {
-                if (e.button !== 0) return;
-                if (e.target.closest(".threat-marker")) return;
-                panning = true;
-                panMoved = false;
-                startX = e.clientX;
-                startY = e.clientY;
-                startPanX = mapPanX;
-                startPanY = mapPanY;
-                wrap.classList.add("is-panning");
-            });
+        function malaysiaImagePercentToWrapPercent(mapX, mapY) {
+            return gameMapRuntime.malaysiaImagePercentToWrapPercent(mapX, mapY, window.__mapLayout);
+        }
 
-            window.addEventListener("mousemove", (e) => {
-                if (!panning) return;
-                const dx = e.clientX - startX;
-                const dy = e.clientY - startY;
-                if (Math.abs(dx) > 3 || Math.abs(dy) > 3) panMoved = true;
-                mapPanX = startPanX + dx;
-                mapPanY = startPanY + dy;
-                clampMapPan(wrap.clientWidth, wrap.clientHeight);
-                if (window.__globeResize) window.__globeResize();
-                if (window.updateTeamMarkers3D) window.updateTeamMarkers3D();
-            });
-
-            const endPan = () => {
-                if (!panning) return;
-                panning = false;
-                wrap.classList.remove("is-panning");
-                if (panMoved) wrap.dataset.suppressClick = "1";
-            };
-            window.addEventListener("mouseup", endPan);
-            wrap.addEventListener("click", (e) => {
-                if (wrap.dataset.suppressClick === "1") {
-                    wrap.dataset.suppressClick = "";
-                    e.stopPropagation();
-                    e.preventDefault();
-                }
-            }, true);
+        function malaysiaLatLonToPercent(lat, lon) {
+            return gameMapRuntime.malaysiaLatLonToPercent(lat, lon, window.__mapLayout);
         }
 
         function malaysiaLatLonToXY(lat, lon) {
             return MAP_LAYOUT.latLonToDesignXY(lat, lon);
-        }
-
-        function malaysiaImagePercentToWrapPercent(mapX, mapY) {
-            return MAP_LAYOUT.imagePercentToWrapPercent(mapX, mapY, window.__mapLayout);
         }
 
         function coordsToMapPercent(obj) {
@@ -2664,21 +2613,36 @@
             return { x: obj?.x ?? 50, y: obj?.y ?? 50 };
         }
 
-        function malaysiaLatLonToPercent(lat, lon) {
-            return MAP_LAYOUT.latLonToWrapPercent(lat, lon, window.__mapLayout);
-        }
-
         function getTeamMapPercent(team) {
             if (!team) return { x: 50, y: 50 };
-            if (team.mapX != null && team.mapY != null) {
-                return malaysiaImagePercentToWrapPercent(team.mapX, team.mapY);
-            }
             if (team.stateId) {
                 const st = getMalaysiaState(team.stateId);
                 if (st?.mapX != null) return malaysiaImagePercentToWrapPercent(st.mapX, st.mapY);
             }
+            if (team.mapX != null && team.mapY != null) {
+                return malaysiaImagePercentToWrapPercent(team.mapX, team.mapY);
+            }
             if (team.lat != null && team.lon != null) return malaysiaLatLonToPercent(team.lat, team.lon);
             return { x: team.x ?? 50, y: team.y ?? 50 };
+        }
+
+        function handleGameStateSelect(stateId) {
+            const teams = getThreatMapMarkers();
+            const myTeamId = getMyTeamId();
+            const inState = teams.filter((t) => t.stateId === stateId);
+            const mine = inState.find((t) => t.isSelf || t.teamId === myTeamId);
+            const enemy = inState.find((t) => !t.isSelf && t.id !== csClientId && t.teamId !== myTeamId);
+            if (mine && !enemy) {
+                showToast(t("yourOwnTeam").replace("{name}", mine.name));
+                return;
+            }
+            if (enemy) {
+                $("targetTeamSelect").value = enemy.id;
+                Promise.resolve(deployTargetIntel(true));
+                return;
+            }
+            const st = getMalaysiaState(stateId);
+            showToast((st?.label || stateId) + " · " + t("mapNoDeploy"));
         }
 
         function getMalaysiaState(id) {
@@ -3512,7 +3476,8 @@
             return CurrencySafeRoomShared.getPasswordRotateMs(room);
         }
 
-        function enableAudio() {
+        function unlockAudioFromGesture() {
+            if (soundMuted) return;
             try {
                 if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 if (audioCtx.state === "suspended") audioCtx.resume();
@@ -3522,8 +3487,7 @@
         function playTone(freq, dur = 0.07, type = "square", vol = 0.08) {
             if (soundMuted) return;
             try {
-                enableAudio();
-                if (!audioCtx) return;
+                if (!audioCtx || audioCtx.state !== "running") return;
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = type;
@@ -3987,14 +3951,23 @@
             return Math.min(20, total);
         }
 
+        function formatLootEstMeta(mistakes) {
+            return tReplace("lootEstMeta", {
+                base: money(ROOM_SHARED.RAID_BASE_PAYOUT),
+                mistakes,
+                penalty: money(ROOM_SHARED.MISTAKE_LOOT_PENALTY)
+            });
+        }
+
         function computeMissionTransferAmount(intel, target) {
-            if (!intel || !target) return { amount: 0, score: 0, mistakes: 0 };
+            if (!intel || !target) return { amount: 0, mistakes: 0 };
             const games = intel.games || [];
-            if (!games.every(g => g.solved)) return { amount: 0, score: 0, mistakes: 0 };
+            if (!games.every(g => g.solved)) return { amount: 0, mistakes: 0 };
             if (intel.finale && !intel.finale.solved && !breachUnlocked) {
-                return { amount: 0, score: 0, mistakes: 0 };
+                return { amount: 0, mistakes: 0 };
             }
             const mistakes = sumIntelMistakes(intel);
+            const balance = target.isBank ? (target.balance || 0) : (target.balance || 0);
 
             if (!isSinglePlayer && !target.isBank) {
                 const room = CurrencySafeRoom.getRoom(roomId);
@@ -4003,23 +3976,17 @@
                     || room?.players?.find(p => p.id === target.id)?.teamId;
                 if (victimTeamId && me) {
                     const preview = ROOM_SHARED.previewRaidPayout(room, victimTeamId, me.id, mistakes);
-                    const factor = Math.max(0, 1 - mistakes / 20);
                     return {
                         amount: preview.payout,
-                        score: Math.round(factor * 100),
-                        mistakes,
-                        raidPercent: preview.percent,
-                        raidShare: Math.round(preview.share),
-                        poolRemaining: preview.poolRemaining,
-                        activeRaiders: preview.activeCount
+                        mistakes: preview.mistakes,
+                        base: preview.base,
+                        penalty: preview.penalty
                     };
                 }
             }
 
-            const score = ROOM_SHARED.computeMissionScorePercent(intel, getAgentCfg());
-            const pool = target.isBank ? (target.balance || 0) : (target.balance || 0);
-            const amt = ROOM_SHARED.computeLootAmount(pool, score);
-            return { amount: amt, score, mistakes };
+            const amt = ROOM_SHARED.computeRaidLoot(mistakes, balance);
+            return { amount: amt, mistakes, base: ROOM_SHARED.RAID_BASE_PAYOUT, penalty: ROOM_SHARED.MISTAKE_LOOT_PENALTY };
         }
 
         function getMissionTransferPreview() {
@@ -4031,34 +3998,10 @@
             return computeMissionTransferAmount(currentIntel, target);
         }
 
-        function computeLiveMissionScore(intel, cfg) {
-            if (!intel?.games) return 25;
-            let score = 25;
-            const games = intel.games;
-            const typing = games.find(g => g.kind === "typing");
-            if (typing) {
-                score -= Math.min(6, typing.mistakes || 0);
-            }
-            const grid = games.find(g => g.kind === "grid");
-            if (grid) {
-                score -= Math.max(0, 3 - (grid.shields ?? 3));
-                score -= Math.max(0, 2 - (grid.scansLeft ?? 2));
-            }
-            games.forEach(g => {
-                const m = Number(g.mistakes) || 0;
-                if (m <= 0) return;
-                if (g.kind === "mastermind") score -= Math.min(4, m);
-                else if (g.kind === "fragsort") score -= Math.min(3, m);
-                else if (g.kind === "binary") score -= Math.min(3, m);
-                else if (g.kind === "quantum") score -= Math.min(4, m);
-            });
-            if (intel.finale?.mistakes) score -= Math.min(3, intel.finale.mistakes);
-            return Math.max(10, Math.min(25, Math.round(score)));
-        }
-
         function computeLiveLootPreview(intel, target) {
             if (!intel || !target) return null;
             const mistakes = sumIntelMistakes(intel);
+            const balance = target.balance || 0;
 
             if (!isSinglePlayer && !target.isBank) {
                 const room = CurrencySafeRoom.getRoom(roomId);
@@ -4069,24 +4012,19 @@
                     const preview = ROOM_SHARED.previewRaidPayout(room, victimTeamId, me.id, mistakes);
                     return {
                         amount: preview.payout,
-                        mistakes,
-                        mode: "raid",
-                        share: Math.round(preview.share),
-                        raidPercent: preview.percent,
-                        activeRaiders: preview.activeCount,
-                        poolRemaining: preview.poolRemaining,
+                        mistakes: preview.mistakes,
+                        base: preview.base,
+                        penalty: preview.penalty,
                         targetName: target.name
                     };
                 }
             }
 
-            const score = computeLiveMissionScore(intel, getAgentCfg());
-            const pool = target.balance || 0;
             return {
-                amount: ROOM_SHARED.computeLootAmount(pool, score),
-                score,
+                amount: ROOM_SHARED.computeRaidLoot(mistakes, balance),
                 mistakes,
-                mode: "solo",
+                base: ROOM_SHARED.RAID_BASE_PAYOUT,
+                penalty: ROOM_SHARED.MISTAKE_LOOT_PENALTY,
                 targetName: target.name
             };
         }
@@ -4122,17 +4060,7 @@
                 amountEl.textContent = `RM ${money(preview.amount)}`;
             }
             if (metaEl) {
-                if (preview.mode === "raid") {
-                    const factor = Math.max(0, 1 - preview.mistakes / 20);
-                    metaEl.textContent =
-                        `攻坚池 P=${preview.raidPercent}% · 份额 RM ${money(preview.share)}` +
-                        ` · 池余 RM ${money(preview.poolRemaining ?? 0)}` +
-                        ` · 失误 ${preview.mistakes}/20 · 实拿 ×${factor.toFixed(2)}` +
-                        (preview.activeRaiders > 1 ? ` · ${preview.activeRaiders} 人同时攻坚` : "");
-                } else {
-                    metaEl.textContent =
-                        `表现约 ${preview.score}% · 失误 ${preview.mistakes} 次 · 答错会压低夺取额`;
-                }
+                metaEl.textContent = formatLootEstMeta(preview.mistakes);
             }
             lastRaidLiveAmount = preview.amount;
 
@@ -4161,15 +4089,7 @@
                 rewardEl.textContent = preview ? `RM ${money(preview.amount)}` : "RM —";
             }
             if (hintEl && preview) {
-                if (!isSinglePlayer && preview.raidPercent != null) {
-                    hintEl.textContent =
-                        `攻坚池 P=${preview.raidPercent}% · 份额 RM ${money(preview.raidShare || 0)}` +
-                        ` · 失误 ${preview.mistakes}/20 · 实拿 ×${Math.max(0, 1 - (preview.mistakes || 0) / 20).toFixed(2)}`;
-                } else if (preview.score != null) {
-                    hintEl.textContent = `${t("transferPerfScore")} ${preview.score}%`;
-                } else {
-                    hintEl.textContent = t("transferPerfHint");
-                }
+                hintEl.textContent = formatLootEstMeta(preview.mistakes);
             } else if (hintEl) {
                 hintEl.textContent = t("transferPerfHint");
             }
@@ -4300,7 +4220,7 @@
             }
             stopTypingArc();
             stopGridPhaseTimers();
-            enableAudio();
+            unlockAudioFromGesture();
             const homeState = getMalaysiaState(me.stateId || "selangor");
             const pct = malaysiaImagePercentToWrapPercent(me.mapX, me.mapY);
             state.player = {
@@ -4345,7 +4265,6 @@
             saveStateNow();
             render();
             showTab("attack");
-            CurrencySafeI18n.lockLang();
             showToast(tReplace("mpStarted", { state: homeState.label }));
         }
 
@@ -4361,7 +4280,7 @@
             }
             stopTypingArc();
             stopGridPhaseTimers();
-            enableAudio();
+            unlockAudioFromGesture();
             const homeState = getMalaysiaState($("playerState")?.value || "selangor");
             const playerCoords = teamCoordsFromState(homeState, true);
             state.player = {
@@ -4410,7 +4329,6 @@
             saveStateNow();
             render();
             showTab("attack");
-            CurrencySafeI18n.lockLang();
             showToast(t("soloStarted").replace("{state}", homeState.label));
         }
 
@@ -5025,9 +4943,6 @@
                 showToast(resetAll
                     ? `任务已部署：${target.name}${pickLabel ? " · " + pickLabel : ""}`
                     : `继续任务：${target.name}`);
-                if (raidInfo && raidInfo.poolRemaining === 0) {
-                    setTimeout(() => showToast(t("poolExhausted")), 400);
-                }
                 return true;
             }
 
@@ -5957,20 +5872,37 @@
             tick();
         }
 
+        function flashQuantumCell(game, idx, cellIdx, done) {
+            const ci = Number(cellIdx);
+            game._tapFlash = ci;
+            if (!paintQuantumPanel(game, idx)) renderMiniGames();
+            clearTimeout(onQuantumCell._tapTimer);
+            onQuantumCell._tapTimer = setTimeout(() => {
+                game._tapFlash = -1;
+                paintQuantumPanel(game, idx);
+                if (done) done();
+            }, 160);
+        }
+
         function onQuantumStart(game, idx) {
             if (!game || game.kind !== "quantum" || game.solved || !isGameUnlocked(idx)) return;
+            unlockAudioFromGesture();
             startQuantumRound(game, idx);
         }
 
         function onQuantumCell(game, idx, cellIdx) {
             if (!game || game.kind !== "quantum" || game.solved || !isGameUnlocked(idx)) return;
+            unlockAudioFromGesture();
             const res = MissionQuantum.tapCell(game, Number(cellIdx));
             if (!res.ok) return;
             if (res.win) {
-                stopQuantumFlash();
-                completeMissionSlot(game, {
-                    beforeOnLevelComplete: () => { playLevelCompleteSound(); },
-                    toast: tReplace("quantumWin")
+                playClickSound();
+                flashQuantumCell(game, idx, cellIdx, () => {
+                    stopQuantumFlash();
+                    completeMissionSlot(game, {
+                        beforeOnLevelComplete: () => { playLevelCompleteSound(); },
+                        toast: tReplace("quantumWin")
+                    });
                 });
                 return;
             }
@@ -5983,23 +5915,23 @@
                 else saveStateNow();
                 quantumFlashTimer = setTimeout(() => startQuantumRound(game, idx), 1000);
                 return;
-            } else if (res.correct) {
-                playClickSound();
-                game._tapFlash = Number(cellIdx);
-                if (!paintQuantumPanel(game, idx)) renderMiniGames();
-                clearTimeout(onQuantumCell._tapTimer);
-                onQuantumCell._tapTimer = setTimeout(() => {
-                    game._tapFlash = -1;
-                    paintQuantumPanel(game, idx);
-                }, 140);
-            } else if (res.roundComplete) {
-                playLevelCompleteSound();
-                showToast(tReplace("quantumRoundOk", { n: game.round }));
-                game.phase = "round_done";
-                quantumFlashTimer = setTimeout(() => startQuantumRound(game, idx), 1000);
             }
-            if (!paintQuantumPanel(game, idx)) renderMiniGames();
-            saveStateNow();
+            if (res.correct) {
+                playClickSound();
+                flashQuantumCell(game, idx, cellIdx, () => saveStateNow());
+                return;
+            }
+            if (res.roundComplete) {
+                playClickSound();
+                flashQuantumCell(game, idx, cellIdx, () => {
+                    playLevelCompleteSound();
+                    showToast(tReplace("quantumRoundOk", { n: game.round }));
+                    game.phase = "round_done";
+                    if (!paintQuantumPanel(game, idx)) renderMiniGames();
+                    saveStateNow();
+                    quantumFlashTimer = setTimeout(() => startQuantumRound(game, idx), 1000);
+                });
+            }
         }
 
         function onBinaryPick(game, idx, value) {
@@ -6811,9 +6743,6 @@
                     startGridScoutIfNeeded();
                     finishTransferFx(oldBal, player.balance,
                         `RM ${res.amount ?? amount} 已从 ${target.name} 转入队库。目标密码已轮换。`);
-                    if (claimRes?.raid?.poolRemaining === 0) {
-                        setTimeout(() => showToast(t("poolExhausted")), 400);
-                    }
                 };
                 if (isSinglePlayer) {
                     afterTransfer({ ok: true });
@@ -7147,19 +7076,58 @@
         $("exportBtn").onclick = exportReport;
         $("resetBtn").onclick = () => { if (confirm("重置整个模拟？")) { localStorage.removeItem(storageKey);
                 location.reload(); } };
-        $("howBtnHeader").onclick = () => $("howModal").classList.add("show");
+        $("howBtnHeader").onclick = () => {
+            toggleGameMenu(false);
+            CurrencySafeI18n.applyToDocument();
+            $("howModal").classList.add("show");
+        };
         $("closeHowBtn").onclick = () => $("howModal").classList.remove("show");
         $("howModal").onclick = (e) => { if (e.target === $("howModal")) $("howModal").classList.remove("show"); };
-        $("hudMoreBtn").onclick = (e) => {
+        function toggleGameMenu(force) {
+            const panel = $("gameMenuPanel");
+            const btn = $("gameMenuBtn");
+            if (!panel || !btn) return;
+            const open = typeof force === "boolean" ? force : panel.classList.contains("hidden");
+            panel.classList.toggle("hidden", !open);
+            btn.setAttribute("aria-expanded", open ? "true" : "false");
+        }
+        $("gameMenuBtn")?.addEventListener("click", (e) => {
             e.stopPropagation();
-            $("hudMoreMenu").classList.toggle("hidden");
-        };
-        document.addEventListener("click", () => $("hudMoreMenu")?.classList.add("hidden"));
+            const panel = $("gameMenuPanel");
+            toggleGameMenu(panel?.classList.contains("hidden"));
+        });
+        document.addEventListener("click", (e) => {
+            const panel = $("gameMenuPanel");
+            if (panel && !panel.classList.contains("hidden") && !e.target.closest(".game-menu-wrap")) {
+                toggleGameMenu(false);
+            }
+        });
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") toggleGameMenu(false);
+        });
         $("muteBtn").onclick = () => {
             soundMuted = !soundMuted;
             sessionStorage.setItem("csMuted", soundMuted ? "1" : "0");
             $("muteBtn").textContent = t(soundMuted ? "muteOn" : "muteOff");
+            if (!soundMuted) unlockAudioFromGesture();
         };
+        document.addEventListener("pointerdown", unlockAudioFromGesture, { passive: true });
+        document.addEventListener("keydown", unlockAudioFromGesture, { passive: true });
+        function mountGameLangBar(extra) {
+            CurrencySafeI18n.unlockLang();
+            const slot = $("gameLangSlot");
+            CurrencySafeI18n.mountLangBar(Object.assign({
+                slot,
+                onChange: () => {
+                    CurrencySafeI18n.applyToDocument();
+                    if (typeof render === "function") render();
+                    if (bankBonusSession) {
+                        MissionIntelread?.refreshBriefingLocale?.(bankBonusSession);
+                        renderBankBonusPanel();
+                    }
+                }
+            }, extra || {}));
+        }
         document.addEventListener("keydown", handleTypingKey);
         window.addEventListener("mousemove", e => { const g = $("mouseGlow");
             g.style.left = e.clientX + "px";
@@ -7205,16 +7173,7 @@
                 $("backLobbyBtn").href = "tutorial.html";
                 $("backLobbyBtn").setAttribute("data-i18n", "tutorialBackPick");
             }
-            CurrencySafeI18n.mountLangBar({
-                onChange: () => {
-                    CurrencySafeI18n.applyToDocument();
-                    if (typeof render === "function") render();
-                    if (bankBonusSession) {
-                        MissionIntelread?.refreshBriefingLocale?.(bankBonusSession);
-                        renderBankBonusPanel();
-                    }
-                }
-            });
+            mountGameLangBar();
             CurrencySafeI18n.applyToDocument();
             if ($("muteBtn")) $("muteBtn").textContent = t(soundMuted ? "muteOn" : "muteOff");
             localStorage.removeItem(storageKey);
@@ -7223,12 +7182,10 @@
             breachUnlocked = false;
             const ready = setupTutorialSandbox();
             if (!ready) return;
-            CurrencySafeI18n.lockLang();
             pickInitialTab();
             showTab("attack");
             applyTutorialBodyClasses();
             render();
-            enableAudio();
             if (TutorialCatalog?.isBonusKind?.(tutorialKind)) {
                 openTutorialBonusDrill();
             } else if (currentIntel) {
@@ -7249,18 +7206,8 @@
                 $("backLobbyBtn").href = "index.html";
                 $("backLobbyBtn").setAttribute("data-i18n", "backHome");
             }
-            CurrencySafeI18n.mountLangBar({
-                onChange: () => {
-                    CurrencySafeI18n.applyToDocument();
-                    if (typeof render === "function") render();
-                    if (bankBonusSession) {
-                        MissionIntelread?.refreshBriefingLocale?.(bankBonusSession);
-                        renderBankBonusPanel();
-                    }
-                }
-            });
+            mountGameLangBar();
             CurrencySafeI18n.applyToDocument();
-            if (state.player) CurrencySafeI18n.lockLang();
             if ($("muteBtn")) $("muteBtn").textContent = t(soundMuted ? "muteOn" : "muteOff");
             initStateSelect();
             prefillFromRoom();
@@ -7276,18 +7223,8 @@
 
         function startGameApp() {
             document.body.classList.add("mode-mp");
-            CurrencySafeI18n.mountLangBar({
-                onChange: () => {
-                    CurrencySafeI18n.applyToDocument();
-                    if (typeof render === "function") render();
-                    if (bankBonusSession) {
-                        MissionIntelread?.refreshBriefingLocale?.(bankBonusSession);
-                        renderBankBonusPanel();
-                    }
-                }
-            });
+            mountGameLangBar();
             CurrencySafeI18n.applyToDocument();
-            CurrencySafeI18n.lockLang();
             if ($("muteBtn")) $("muteBtn").textContent = t(soundMuted ? "muteOn" : "muteOff");
             initStateSelect();
             syncFromRoom();
@@ -7306,13 +7243,13 @@
                 });
         }
 
-        const HOST_END_HOLD_MS = 10000;
+        const HOST_END_HOLD_MS = 3000;
         let hostEndKeyTimer = null;
         let hostEndKeyStart = 0;
         let hostEndToastAt = 0;
 
-        function isZeroKey(e) {
-            return e.key === "0" || e.code === "Digit0" || e.code === "Numpad0";
+        function isHostEndKey(e) {
+            return e.key === "`" || e.code === "Backquote";
         }
 
         function cancelHoldEndTimer() {
@@ -7330,12 +7267,12 @@
                 if (elapsed >= HOST_END_HOLD_MS) {
                     cancelHoldEndTimer();
                     onComplete();
-                } else if (elapsed >= 2000 && Date.now() - hostEndToastAt > 900) {
+                } else if (elapsed >= 800 && Date.now() - hostEndToastAt > 600) {
                     hostEndToastAt = Date.now();
                     const left = Math.ceil((HOST_END_HOLD_MS - elapsed) / 1000);
                     showToast(isSinglePlayer
-                        ? `按住 0 · ${left}s 后结束练习`
-                        : `房主按住 0 · ${left}s 后结束比赛`);
+                        ? tReplace("hostEndHoldSolo", { n: left })
+                        : tReplace("hostEndHold", { n: left }));
                 }
             }, 200);
         }
@@ -7345,7 +7282,7 @@
             window.__csMatchEndHotkeyBound = true;
 
             document.addEventListener("keydown", (e) => {
-                if (!isZeroKey(e) || e.repeat) return;
+                if (!isHostEndKey(e) || e.repeat) return;
                 if (isSinglePlayer) {
                     if (!state.player || state._soloMatchEnded) return;
                     startHoldEndTimer(() => endSoloMatch("manual"));
@@ -7362,7 +7299,7 @@
             }, true);
 
             document.addEventListener("keyup", (e) => {
-                if (!isZeroKey(e)) return;
+                if (!isHostEndKey(e)) return;
                 cancelHoldEndTimer();
             }, true);
         }
@@ -7375,7 +7312,6 @@
             if (!room) { location.href = "index.html"; return false; }
             if (room.status === "ended") { goToEndedPage(); return false; }
             if (room.status !== "playing") { location.href = "lobby.html?room=" + roomId; return false; }
-            CurrencySafeI18n.lockLang();
             const me = room.players.find(p => p.id === csClientId);
             if (me) {
                 sessionStorage.setItem(CurrencySafeRoom.SK.roomRole, "player");
@@ -7438,7 +7374,9 @@
             let kmHost = null;
             let kmMap = null;
             if (window.KrackedMalaysiaMap) {
-                const mounted = KrackedMalaysiaMap.mountGameBase(threatMapEl);
+                const mounted = KrackedMalaysiaMap.mountGameBase(threatMapEl, {
+                    onStateSelect: handleGameStateSelect
+                });
                 kmHost = mounted?.host;
                 kmMap = mounted?.map;
             } else {
@@ -7581,23 +7519,18 @@
                     const dotColor = teamStateColor(team);
                     const labelColor = teamStateColor(team);
                     el.innerHTML =
-                        `<span class="threat-marker-dot" style="background:${dotColor};box-shadow:0 0 14px ${dotColor}aa;border-color:${dotColor}"></span>` +
-                        `<span class="threat-marker-label" style="color:${labelColor}">` +
-                        `<span class="pin-line pin-name">${(team.icon || '💻')} ${escapeHtml(team.name)}${placeSuffix}</span>` +
+                        `<span class="threat-marker-dot" style="background:${dotColor};box-shadow:0 0 10px ${dotColor}88;border-color:${dotColor}"></span>` +
+                        `<span class="threat-marker-label threat-marker-label--info" style="color:${labelColor}">` +
+                        `<span class="pin-line pin-name">${(team.icon || '💻')} ${escapeHtml(team.name)}</span>` +
                         `<span class="pin-line pin-balance">RM ${money(team.balance)}</span></span>`;
-                    el.onclick = (e) => {
-                        e.stopPropagation();
-                        if (!team.isSelf && team.id !== csClientId) {
-                            $("targetTeamSelect").value = team.id;
-                            Promise.resolve(deployTargetIntel(true));
-                        } else {
-                            showToast(t("yourOwnTeam").replace("{name}", team.name));
-                        }
-                    };
                     markersEl.appendChild(el);
                 });
                 if (kmMap && window.KrackedMalaysiaMap) {
                     KrackedMalaysiaMap.setGameChoropleth(kmMap, teams);
+                }
+                const myTeam = teams.find((t) => t.isSelf);
+                if (myTeam?.stateId && threatMapEl) {
+                    KrackedMalaysiaMap.highlightGameState(threatMapEl, myTeam.stateId);
                 }
                 } catch (err) {
                     console.warn("threat map markers:", err);

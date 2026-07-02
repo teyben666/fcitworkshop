@@ -12,12 +12,12 @@
 
     function resolveMapPercent(team) {
         if (!team) return null;
-        if (team.mapX != null && team.mapY != null) {
-            return { x: team.mapX, y: team.mapY };
-        }
         if (team.stateId) {
             const st = window.getMalaysiaStateById?.(team.stateId);
             if (st?.mapX != null) return { x: st.mapX, y: st.mapY };
+        }
+        if (team.mapX != null && team.mapY != null) {
+            return { x: team.mapX, y: team.mapY };
         }
         if (team.x != null && team.y != null) return { x: team.x, y: team.y };
         return null;

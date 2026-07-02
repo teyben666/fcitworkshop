@@ -1,7 +1,7 @@
 /* Tutorial sandbox picker — extends home portal */
 
 body.tutorial-page .portal {
-    width: min(52rem, 94vw);
+    width: min(88rem, 96vw);
 }
 
 .tutorial-back-row {

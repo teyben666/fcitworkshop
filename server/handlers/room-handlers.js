@@ -13,11 +13,7 @@ function createRoomHandlers(store) {
         if (!id) return null;
         let raw = store.getRaw(id);
         if (!raw) return null;
-        raw.players = S.listFromMap(raw.players);
-        raw.spectators = S.listFromMap(raw.spectators);
-        raw.teams = S.listFromMap(raw.teams);
-        raw.activity = S.listFromMap(raw.activity);
-        raw.transactions = S.listFromMap(raw.transactions);
+        S.ensureRoomLists(raw);
         return raw;
     }
 
@@ -28,17 +24,13 @@ function createRoomHandlers(store) {
     }
 
     function persist(raw) {
-        raw.players = S.listFromMap(raw.players);
-        raw.spectators = S.listFromMap(raw.spectators);
-        raw.teams = S.listFromMap(raw.teams);
-        raw.activity = S.listFromMap(raw.activity);
-        raw.transactions = S.listFromMap(raw.transactions);
+        S.ensureRoomLists(raw);
         store.save(raw);
         return getRoom(raw.id);
     }
 
     function pushActivity(raw, type, message, clientId) {
-        raw.activity = S.listFromMap(raw.activity);
+        S.ensureRoomLists(raw);
         raw.activity.unshift({ at: Date.now(), type, message, clientId });
         if (raw.activity.length > 100) raw.activity.length = 100;
     }
@@ -162,66 +154,29 @@ function createRoomHandlers(store) {
                 raw.spectators = (raw.spectators || []).filter(s => s.id !== clientId);
                 if (raw.visitors) delete raw.visitors[clientId];
                 const existing = raw.players.find(p => p.id === clientId);
-                const maxTeam = raw.settings?.maxTeamSize || 4;
+                teamId = S.resolveJoinTeamId(teamId, raw.teams);
 
                 if (teamId) {
-                    const team = (raw.teams || []).find(t => t.id === teamId);
-                    if (!team) return { ok: false, error: "队伍不存在。" };
-                    if ((team.memberIds || []).length >= maxTeam && !(team.memberIds || []).includes(clientId)) {
-                        return { ok: false, error: "该队已满（最多 4 人）。" };
+                    const joinTeam = S.joinPlayerToTeamId(raw, clientId, teamId, trimmed, existing);
+                    if (!joinTeam.ok) return joinTeam;
+                    if (!existing) {
+                        pushActivity(raw, "player_join", `${trimmed} 加入 ${joinTeam.team.state || "队伍"}`, clientId);
                     }
-                    if (existing) {
-                        (raw.teams || []).forEach(t => {
-                            t.memberIds = (t.memberIds || []).filter(id => id !== clientId);
-                        });
-                        existing.name = trimmed;
-                        existing.teamId = teamId;
-                        if (!(team.memberIds || []).includes(clientId)) team.memberIds.push(clientId);
-                    } else {
-                        raw.players.push({
-                            id: clientId, name: trimmed, teamId,
-                            balance: 0, password: S.randomVaultPassword(8),
-                            passwordUpdatedAt: Date.now(), wins: 0, losses: 0, agentRank: "trainee", icon: "🧑"
-                        });
-                        team.memberIds = team.memberIds || [];
-                        if (!team.memberIds.includes(clientId)) team.memberIds.push(clientId);
-                        pushActivity(raw, "player_join", `${trimmed} 加入 ${team.state || "队伍"}`, clientId);
-                    }
-                    S.syncPlayersFromTeams(raw.players, raw.teams);
                 } else {
-                    if (raw.teams.some(t => t.stateId === stateId && !(t.memberIds || []).includes(clientId))) {
-                        return { ok: false, error: "该州属已被其他队伍选择。" };
-                    }
-                    const coords = S.coordsFromState(stateId);
-                    if (existing) {
-                        (raw.teams || []).forEach(t => {
-                            t.memberIds = (t.memberIds || []).filter(id => id !== clientId);
-                        });
-                        existing.name = trimmed;
-                        const tid = S.createTeamId();
-                        existing.teamId = tid;
-                        raw.teams = raw.teams || [];
-                        raw.teams.push(S.newTeamRecord({
-                            id: tid, name: coords.state || trimmed, ...coords, memberIds: [clientId]
-                        }));
-                        const newTeam = raw.teams[raw.teams.length - 1];
-                        S.ensureVaultCredentials(newTeam);
-                        S.syncTeamPasswordToMembers(raw, newTeam);
-                    } else {
-                        const tid = S.createTeamId();
+                    const joinRes = S.joinPlayerToState(raw, clientId, stateId, trimmed, existing);
+                    if (!joinRes.ok) return joinRes;
+                    if (!existing) {
+                        const team = joinRes.team;
                         raw.players.push({
-                            id: clientId, name: trimmed, teamId: tid, ...coords,
+                            id: clientId, name: trimmed, teamId: team.id, ...S.coordsFromState(stateId),
                             balance: 0, password: S.randomVaultPassword(8),
                             passwordUpdatedAt: Date.now(), wins: 0, losses: 0, agentRank: "trainee", icon: "🧑"
                         });
-                        raw.teams = raw.teams || [];
-                        raw.teams.push(S.newTeamRecord({
-                            id: tid, name: coords.state || trimmed, ...coords, memberIds: [clientId]
-                        }));
-                        const newTeam = raw.teams[raw.teams.length - 1];
-                        S.ensureVaultCredentials(newTeam);
-                        S.syncTeamPasswordToMembers(raw, newTeam);
-                        pushActivity(raw, "player_join", `${trimmed} 创建队伍（${coords.state}）`, clientId);
+                        S.syncPlayersFromTeams(raw.players, raw.teams);
+                        S.syncTeamPasswordToMembers(raw, team);
+                        pushActivity(raw, "player_join", `${trimmed} 创建队伍（${team.state}）`, clientId);
+                    } else {
+                        pushActivity(raw, "player_join", `${trimmed} 进驻 ${joinRes.team.state || stateId}`, clientId);
                     }
                 }
                 persist(raw);
@@ -348,6 +303,18 @@ function createRoomHandlers(store) {
                 return { ok: true, room: getRoom(raw.id), maxTeamSize: max };
             },
 
+            setRoomMapEffects(roomId, enabled) {
+                const raw = getRaw(roomId);
+                if (!raw) return { ok: false, error: "房间不存在。" };
+                if (cid() !== raw.hostId) return { ok: false, error: "仅房主可设置。" };
+                if (raw.status !== "lobby") return { ok: false, error: "比赛已开始。" };
+                raw.settings = raw.settings || S.defaultRoomSettings(raw.mode);
+                raw.settings.mapEffects = !!enabled;
+                pushActivity(raw, "settings", enabled ? "已开启地图攻击线特效" : "已关闭地图攻击线特效", cid());
+                persist(raw);
+                return { ok: true, room: getRoom(raw.id), mapEffects: !!enabled };
+            },
+
             abandonTargetRaid(roomId) {
                 const raw = getRaw(roomId);
                 if (!raw) return { ok: false, error: "房间不存在。" };
@@ -364,33 +331,18 @@ function createRoomHandlers(store) {
                 S.ensureTeamsAndBank(raw);
                 const player = raw.players.find(p => p.id === playerId);
                 if (!player) return { ok: false, error: "玩家不存在。" };
-                const maxTeam = raw.settings?.maxTeamSize || 4;
                 if (!teamId) {
-                    (raw.teams || []).forEach(t => {
-                        t.memberIds = (t.memberIds || []).filter(id => id !== playerId);
-                    });
-                    const tid = S.createTeamId();
-                    player.teamId = tid;
+                    player.teamId = S.createTeamId();
                     raw.teams.push(S.newTeamRecord({
-                        id: tid, name: player.name,
+                        id: player.teamId, name: player.name,
                         stateId: player.stateId, state: player.state,
                         mapX: player.mapX, mapY: player.mapY, lat: player.lat, lon: player.lon,
                         memberIds: [playerId]
                     }));
-                    S.syncPlayersFromTeams(raw.players, raw.teams);
+                    S.reconcileLobbyTeams(raw);
                 } else {
-                    const team = raw.teams.find(t => t.id === teamId);
-                    if (!team) return { ok: false, error: "队伍不存在。" };
-                    if ((team.memberIds || []).length >= maxTeam && !(team.memberIds || []).includes(playerId)) {
-                        return { ok: false, error: "该队已满。" };
-                    }
-                    (raw.teams || []).forEach(t => {
-                        t.memberIds = (t.memberIds || []).filter(id => id !== playerId);
-                    });
-                    player.teamId = teamId;
-                    team.memberIds = team.memberIds || [];
-                    if (!team.memberIds.includes(playerId)) team.memberIds.push(playerId);
-                    S.syncPlayersFromTeams(raw.players, raw.teams);
+                    const joinTeam = S.joinPlayerToTeamId(raw, playerId, teamId, player.name, player);
+                    if (!joinTeam.ok) return joinTeam;
                 }
                 pushActivity(raw, "team_assign", `房主调整分队：${player.name}`, cid());
                 persist(raw);
@@ -458,6 +410,7 @@ function createRoomHandlers(store) {
                 raw.matchStartedAt = Date.now();
                 raw.leaderboardLocked = raw.settings?.leaderboardLocked ?? (raw.mode === "competitive");
                 S.ensureTeamsAndBank(raw);
+                S.refreshTeamCoordsFromStates(raw.teams);
                 (raw.teams || []).forEach(t => {
                     S.ensureVaultCredentials(t);
                     S.syncTeamPasswordToMembers(raw, t);
@@ -624,13 +577,12 @@ function createRoomHandlers(store) {
                 const targetPlayer = raw.players.find(p => p.id === targetId);
                 if (targetPlayer?.teamId) {
                     const raidBefore = S.getTargetRaid(raw, targetPlayer.teamId);
-                    const isNewPool = !raidBefore || S.shouldStartNewRaid(raidBefore);
+                    const isNewRaid = !raidBefore;
                     S.joinTargetRaid(raw, targetPlayer.teamId, clientId, me.teamId);
-                    if (isNewPool) {
-                        const raid = S.getTargetRaid(raw, targetPlayer.teamId);
+                    if (isNewRaid) {
                         const vicTeam = raw.teams.find(t => t.id === targetPlayer.teamId);
                         pushActivity(raw, "raid_pool",
-                            `集体攻坚开启：${vicTeam?.state || targetPlayer.name} 奖池 P=${raid?.percent}% · RM ${(raid?.lootPotTotal || 0).toLocaleString()}`,
+                            `开始攻坚：${vicTeam?.state || targetPlayer.name} · 名义 RM ${S.RAID_BASE_PAYOUT}`,
                             clientId);
                     }
                 }
@@ -688,16 +640,16 @@ function createRoomHandlers(store) {
                 const mistakes = typeof opts === "object" && opts != null
                     ? Math.max(0, Math.min(20, Number(opts.mistakes) || 0))
                     : 0;
-                const raidBefore = S.getTargetRaid(raw, vicTeam.id);
                 const raidResult = S.completeTargetRaid(raw, vicTeam.id, attackerId, attacker.teamId, mistakes);
                 const amt = raidResult.payout;
                 if (amt <= 0) {
                     persist(raw);
+                    const tooManyMistakes = mistakes * S.MISTAKE_LOOT_PENALTY >= S.RAID_BASE_PAYOUT;
                     return {
                         ok: false,
-                        error: mistakes >= 20
-                            ? "失误满 20 次，本次攻坚无收益。"
-                            : "攻坚奖池已空或份额为 0，本次无收益。"
+                        error: tooManyMistakes
+                            ? "失误过多，本次攻坚无收益。"
+                            : "目标队库余额不足，本次无收益。"
                     };
                 }
                 if (!S.debitTeamVault(raw, vicTeam.id, amt)) {
@@ -712,17 +664,13 @@ function createRoomHandlers(store) {
                     fromId: targetId, toId: attackerId,
                     fromTeamId: vicTeam.id, toTeamId: atkTeam.id,
                     amount: amt, kind: "pvp",
-                    raidPercent: raidResult.percent,
                     raidMistakes: mistakes,
-                    raidShare: Math.round(raidResult.share)
+                    raidBase: raidResult.base
                 });
                 if (raw.transactions.length > 50) raw.transactions.length = 50;
-                const poolNote = raidBefore && raidBefore.lootPotTotal === raidBefore.lootPotRemaining
-                    ? ` · 攻坚池 ${raidResult.percent}%`
-                    : "";
                 pushActivity(raw, "transfer",
                     `${attacker.name} 攻坚 ${target.name}（${vicTeam.state || "队库"}）入账 RM ${amt.toLocaleString()}` +
-                    `${poolNote} · 失误 ${mistakes} · 剩余池 RM ${Math.round(raidResult.poolRemaining).toLocaleString()}`,
+                    ` · 失误 ${mistakes}`,
                     attackerId);
                 persist(raw);
                 return {

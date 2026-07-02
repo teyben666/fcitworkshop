@@ -166,9 +166,10 @@
         if (game.phase === "ready" || game.phase === "countdown") return mT("mission.quantum.phaseReady");
         if (game.phase === "show") return mT("mission.quantum.phaseShow");
         if (game.phase === "input") {
+            const total = currentSequence(game).length;
             return mT("mission.quantum.phaseInput", {
-                i: game.inputIndex,
-                len: currentSequence(game).length
+                cur: Math.min(game.inputIndex + 1, total),
+                total
             });
         }
         if (game.phase === "wrong") return mT("mission.quantum.phaseWrong");

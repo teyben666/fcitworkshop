@@ -1,5 +1,5 @@
 /**
- * Shared room utilities (local + Firebase backends)
+ * Shared room utilities (localStorage + WebSocket server backends)
  */
 window.CurrencySafeRoomShared = (function () {
     const SK = {
@@ -86,16 +86,17 @@ window.CurrencySafeRoomShared = (function () {
 
     function migrateRoomSchema(raw) {
         if (!raw) return raw;
+        ensureRoomLists(raw);
         ensureTeamsAndBankCore(raw);
         const ver = raw.schemaVersion || 1;
         if (ver >= ROOM_SCHEMA_VERSION) {
-            (raw.teams || []).forEach(ensureTeamFields);
+            raw.teams.forEach(ensureTeamFields);
             if (!raw.playerStats) raw.playerStats = {};
             if (raw.joinPasswordEnabled == null) raw.joinPasswordEnabled = false;
             return raw;
         }
-        const players = listFromMap(raw.players);
-        (raw.teams || []).forEach(team => {
+        const players = raw.players;
+        raw.teams.forEach(team => {
             ensureTeamFields(team);
             const members = players.filter(p => p.teamId === team.id);
             const sum = members.reduce((s, p) => s + (Number(p.balance) || 0), 0);
@@ -290,7 +291,6 @@ window.CurrencySafeRoomShared = (function () {
 
     function ensureTeamsAndBankCore(raw) {
         if (!raw) return raw;
-        raw.teams = listFromMap(raw.teams);
         raw.teamDeployCounts = raw.teamDeployCounts || {};
         if (!raw.bank) {
             raw.bank = defaultBank();
@@ -298,7 +298,7 @@ window.CurrencySafeRoomShared = (function () {
         } else {
             ensureVaultCredentials(raw.bank);
         }
-        const players = listFromMap(raw.players);
+        const players = raw.players;
         if (!raw.teams.length && players.length) {
             raw.teams = players.map(p => {
                 const tid = createTeamId();
@@ -319,7 +319,10 @@ window.CurrencySafeRoomShared = (function () {
         const teamMap = Object.fromEntries(raw.teams.map(t => [t.id, t]));
         players.forEach(p => {
             if (!p.teamId || !teamMap[p.teamId]) {
-                const solo = raw.teams.find(t => t.memberIds?.length === 1 && t.memberIds[0] === p.id);
+                const solo = raw.teams.find(t => {
+                    const m = memberIdList(t.memberIds);
+                    return m.length === 1 && m[0] === p.id;
+                });
                 if (solo) p.teamId = solo.id;
                 else {
                     const tid = createTeamId();
@@ -339,15 +342,9 @@ window.CurrencySafeRoomShared = (function () {
                     teamMap[tid] = team;
                 }
             }
-            const team = teamMap[p.teamId];
-            if (team && !(team.memberIds || []).includes(p.id)) {
-                if ((team.memberIds || []).length < 4) team.memberIds.push(p.id);
-            }
         });
-        raw.teams.forEach(t => {
-            t.memberIds = (t.memberIds || []).filter(id => players.some(p => p.id === id));
-            ensureTeamFields(t);
-        });
+        syncTeamMemberIdsFromPlayers(players, raw.teams);
+        refreshTeamCoordsFromStates(raw.teams);
         syncPlayersFromTeams(players, raw.teams);
         raw.players = players;
         return raw;
@@ -355,6 +352,7 @@ window.CurrencySafeRoomShared = (function () {
 
     function ensureTeamsAndBank(raw) {
         if (!raw) return raw;
+        ensureRoomLists(raw);
         ensureTeamsAndBankCore(raw);
         return migrateRoomSchema(raw);
     }
@@ -481,6 +479,173 @@ window.CurrencySafeRoomShared = (function () {
         };
     }
 
+    function resolveJoinTeamId(teamId, teams) {
+        if (!teamId) return null;
+        const id = String(teamId);
+        if (!/^T[A-Z0-9]+$/i.test(id)) return null;
+        if (!asArray(teams).some((t) => t.id === id)) return null;
+        return id;
+    }
+
+    /** Drop teams with no members (orphans from lobby state switches). */
+    function pruneEmptyTeams(teams) {
+        return asArray(teams).filter((t) => memberIdList(t.memberIds).length > 0);
+    }
+
+    /** Keep each player on exactly one team.memberIds list (authoritative: player.teamId). */
+    function syncTeamMemberIdsFromPlayers(players, teams, maxTeamSize) {
+        const maxTeam = Math.max(1, Math.floor(Number(maxTeamSize) || 4));
+        const teamList = asArray(teams);
+        teamList.forEach((t) => {
+            ensureTeamFields(t);
+            t.memberIds = [];
+        });
+        const teamMap = Object.fromEntries(teamList.map((t) => [t.id, t]));
+        (players || []).forEach((p) => {
+            if (!p?.id || !p.teamId) return;
+            const team = teamMap[p.teamId];
+            if (!team) return;
+            const members = memberIdList(team.memberIds);
+            if (!members.includes(p.id) && members.length < maxTeam) {
+                team.memberIds = [...members, p.id];
+            }
+        });
+        teamList.forEach(ensureTeamFields);
+    }
+
+    /** After lobby team mutations: rebuild memberIds from player.teamId, sync coords, prune empties. */
+    function reconcileLobbyTeams(raw) {
+        if (!raw) return;
+        const maxTeam = raw.settings?.maxTeamSize || 4;
+        syncTeamMemberIdsFromPlayers(raw.players, raw.teams, maxTeam);
+        syncPlayersFromTeams(raw.players, raw.teams);
+        raw.teams = pruneEmptyTeams(raw.teams || []);
+    }
+
+    /**
+     * Lobby: join an existing team by teamId (map click on non-full squad, roster slot, etc.).
+     * Mutates raw. player.teamId is authoritative.
+     */
+    function joinPlayerToTeamId(raw, clientId, teamId, trimmed, existing) {
+        if (!raw || !teamId) return { ok: false, error: "队伍不存在。" };
+        const maxTeam = raw.settings?.maxTeamSize || 4;
+        const team = (raw.teams || []).find((t) => t.id === teamId);
+        if (!team) return { ok: false, error: "队伍不存在。" };
+
+        (raw.teams || []).forEach((t) => {
+            ensureTeamFields(t);
+            t.memberIds = memberIdList(t.memberIds).filter((id) => id !== clientId);
+        });
+
+        const members = memberIdList(team.memberIds);
+        if (!members.includes(clientId) && members.length >= maxTeam) {
+            return { ok: false, error: "该队已满。" };
+        }
+
+        if (existing) {
+            existing.name = trimmed;
+            existing.teamId = teamId;
+        } else {
+            raw.players.push({
+                id: clientId,
+                name: trimmed,
+                teamId,
+                balance: 0,
+                password: randomVaultPassword(8),
+                passwordUpdatedAt: Date.now(),
+                wins: 0,
+                losses: 0,
+                agentRank: "trainee",
+                icon: "🧑"
+            });
+        }
+
+        reconcileLobbyTeams(raw);
+        ensureVaultCredentials(team);
+        return { ok: true, team };
+    }
+
+    /** Re-sync map anchors from MALAYSIA_STATES (KrackedMaps centroids). */
+    function refreshTeamCoordsFromStates(teams) {
+        (teams || []).forEach((t) => {
+            if (!t?.stateId) return;
+            const st = window.getMalaysiaStateById?.(t.stateId);
+            if (!st) return;
+            t.mapX = st.mapX;
+            t.mapY = st.mapY;
+            t.lat = st.lat;
+            t.lon = st.lon;
+            if (!t.state) t.state = st.label;
+        });
+    }
+
+    /**
+     * Lobby: can player click a state on the map to join?
+     * Returns { ok, reason?, maxTeam?, teamId?, vacant? }
+     */
+    function canJoinStateTeam(room, stateId, clientId) {
+        if (!stateId) return { ok: false, reason: "invalid" };
+        const maxTeam = room?.settings?.maxTeamSize || 4;
+        const team = (room?.teams || []).find((t) => t.stateId === stateId);
+        if (!team) return { ok: true, vacant: true };
+        const members = memberIdList(team.memberIds);
+        if (members.includes(clientId)) return { ok: false, reason: "already" };
+        if (members.length >= maxTeam) return { ok: false, reason: "full", maxTeam };
+        return { ok: true, teamId: team.id, slotsLeft: maxTeam - members.length };
+    }
+
+    /**
+     * Lobby: assign player to a state team — prune empties, reuse coords, join if not full.
+     * Mutates raw. Returns { ok, error?, team? }.
+     */
+    function joinPlayerToState(raw, clientId, stateId, trimmed, existing) {
+        if (!raw || !stateId) return { ok: false, error: "无效州属。" };
+        const coords = coordsFromState(stateId);
+        const maxTeam = raw.settings?.maxTeamSize || 4;
+        raw.teams = raw.teams || [];
+        raw.teams.forEach(ensureTeamFields);
+
+        raw.teams.forEach((t) => {
+            t.memberIds = memberIdList(t.memberIds).filter((id) => id !== clientId);
+        });
+        raw.teams = pruneEmptyTeams(raw.teams);
+
+        let team = raw.teams.find((t) => t.stateId === stateId);
+        if (team) {
+            ensureTeamFields(team);
+            const members = memberIdList(team.memberIds);
+            if (members.length >= maxTeam) {
+                return { ok: false, error: "该队已满。" };
+            }
+            team.memberIds = [...members, clientId];
+            Object.assign(team, coords);
+            if (!team.name) team.name = coords.state || trimmed;
+            ensureVaultCredentials(team);
+        } else {
+            const tid = createTeamId();
+            team = newTeamRecord({
+                id: tid,
+                name: coords.state || trimmed,
+                ...coords,
+                memberIds: [clientId]
+            });
+            ensureVaultCredentials(team);
+            raw.teams.push(team);
+        }
+
+        if (existing) {
+            existing.name = trimmed;
+            existing.teamId = team.id;
+            Object.assign(existing, coords);
+            syncTeamPasswordToMembers(raw, team);
+        }
+
+        syncTeamMemberIdsFromPlayers(raw.players, raw.teams, raw.settings?.maxTeamSize);
+        syncPlayersFromTeams(raw.players, raw.teams);
+        refreshTeamCoordsFromStates(raw.teams);
+        return { ok: true, team };
+    }
+
     function randomVaultPassword(len = 8) {
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         let out = "";
@@ -488,62 +653,75 @@ window.CurrencySafeRoomShared = (function () {
         return out;
     }
 
-    function listFromMap(obj) {
-        if (!obj) return [];
-        if (Array.isArray(obj)) return obj;
-        return Object.keys(obj).map(k => ({ ...obj[k], id: obj[k].id || k }));
+    /** Coerce room list fields to arrays (legacy map-shaped JSON). */
+    function asArray(val) {
+        if (!val) return [];
+        if (Array.isArray(val)) return val;
+        if (typeof val !== "object") return [];
+        return Object.keys(val).map((k) => {
+            const item = val[k];
+            if (!item || typeof item !== "object") return null;
+            return { ...item, id: item.id || k };
+        }).filter(Boolean);
     }
 
-    /** Firebase stores arrays as {0: id, 1: id2}; normalize to string id list. */
+    /** @deprecated use asArray */
+    const listFromMap = asArray;
+
+    /** Normalize team.memberIds to string[]. */
     function memberIdList(val) {
         if (!val) return [];
-        if (Array.isArray(val)) return val.filter(id => typeof id === "string");
+        if (Array.isArray(val)) return val.filter((id) => typeof id === "string");
+        if (typeof val !== "object") return [];
         return Object.keys(val)
-            .filter(k => /^\d+$/.test(k))
+            .filter((k) => /^\d+$/.test(k))
             .sort((a, b) => Number(a) - Number(b))
-            .map(k => val[k])
-            .filter(id => typeof id === "string");
+            .map((k) => val[k])
+            .filter((id) => typeof id === "string");
     }
 
-    function mapFromList(arr) {
-        const m = {};
-        (arr || []).forEach(p => { if (p?.id) m[p.id] = p; });
-        return m;
+    function ensureRoomLists(raw) {
+        if (!raw) return raw;
+        raw.players = asArray(raw.players);
+        raw.spectators = asArray(raw.spectators);
+        raw.teams = asArray(raw.teams);
+        raw.activity = asArray(raw.activity);
+        raw.transactions = asArray(raw.transactions);
+        raw.visitors = asArray(raw.visitors);
+        raw.teams.forEach((t) => {
+            if (t) t.memberIds = memberIdList(t.memberIds);
+        });
+        if (raw.targetRaids && typeof raw.targetRaids === "object") {
+            Object.values(raw.targetRaids).forEach((raid) => {
+                if (!raid || typeof raid !== "object") return;
+                raid.activeAttackers = asArray(raid.activeAttackers);
+                raid.completed = asArray(raid.completed);
+            });
+        }
+        return raw;
     }
 
     function normalizeRoom(id, raw) {
         if (!raw) return null;
         ensureTeamsAndBank(raw);
         ensureBankBonus(raw);
-        const players = listFromMap(raw.players).sort((a, b) => (a.order || 0) - (b.order || 0));
-        const teams = listFromMap(raw.teams);
-        const activity = listFromMap(raw.activity).sort((a, b) => (b.at || 0) - (a.at || 0));
-        const transactions = listFromMap(raw.transactions).sort((a, b) => (b.at || 0) - (a.at || 0));
+        const players = [...raw.players].sort((a, b) => (a.order || 0) - (b.order || 0));
+        const activity = [...raw.activity].sort((a, b) => (b.at || 0) - (a.at || 0));
+        const transactions = [...raw.transactions].sort((a, b) => (b.at || 0) - (a.at || 0));
         return {
             ...raw,
             id: raw.id || id,
             players,
-            teams,
+            teams: raw.teams,
             bank: raw.bank,
             teamDeployCounts: raw.teamDeployCounts || {},
-            spectators: listFromMap(raw.spectators),
-            visitors: listFromMap(raw.visitors),
+            spectators: raw.spectators,
+            visitors: raw.visitors,
             activity,
             transactions,
             deployLocks: raw.deployLocks || {},
             targetRaids: raw.targetRaids || {},
             bankBonus: raw.bankBonus || defaultBankBonus()
-        };
-    }
-
-    function serializeLists(room) {
-        return {
-            ...room,
-            players: mapFromList(room.players.map((p, i) => ({ ...p, order: i }))),
-            teams: mapFromList(room.teams || []),
-            spectators: mapFromList(room.spectators),
-            activity: mapFromList(room.activity),
-            transactions: mapFromList(room.transactions)
         };
     }
 
@@ -695,7 +873,7 @@ window.CurrencySafeRoomShared = (function () {
             (a, b) => teamBalance(room, b.id) - teamBalance(room, a.id)
         );
         teamsSorted.forEach((tm, i) => {
-            const n = (tm.memberIds || []).length;
+            const n = memberIdList(tm.memberIds).length;
             lines.push([
                 i + 1, csvEsc(tm.name || tm.state), csvEsc(tm.state),
                 teamBalance(room, tm.id), n
@@ -772,10 +950,10 @@ window.CurrencySafeRoomShared = (function () {
     function normalizeRaidRecord(raid) {
         if (!raid) return null;
         if (!Array.isArray(raid.activeAttackers)) {
-            raid.activeAttackers = listFromMap(raid.activeAttackers);
+            raid.activeAttackers = asArray(raid.activeAttackers);
         }
         if (!Array.isArray(raid.completed)) {
-            raid.completed = listFromMap(raid.completed);
+            raid.completed = asArray(raid.completed);
         }
         return raid;
     }
@@ -786,28 +964,23 @@ window.CurrencySafeRoomShared = (function () {
         return normalizeRaidRecord(raid);
     }
 
-    function rollRaidPercent(room, victimTeamId) {
-        const seed = `${room?.id || ""}|${victimTeamId}|${room?.matchStartedAt || 0}`;
-        return 25 + (hashSeed(seed) % 16);
+    const RAID_BASE_PAYOUT = 250;
+    const MISTAKE_LOOT_PENALTY = 30;
+
+    function computeRaidLoot(mistakes, victimBalance) {
+        const m = Math.max(0, Number(mistakes) || 0);
+        let payout = Math.max(0, RAID_BASE_PAYOUT - m * MISTAKE_LOOT_PENALTY);
+        payout = Math.min(payout, Math.max(0, Number(victimBalance) || 0));
+        return payout;
     }
 
     function shouldStartNewRaid(raid) {
-        if (!raid) return true;
-        const active = (raid.activeAttackers || []).length;
-        return (Number(raid.lootPotRemaining) || 0) <= 0 && active === 0;
+        return !raid;
     }
 
-    function initTargetRaid(raw, victimTeamId, percentOverride) {
-        const vault = teamBalance(raw, victimTeamId);
-        const percent = percentOverride != null
-            ? Number(percentOverride)
-            : rollRaidPercent(raw, victimTeamId);
-        const pool = roundPoolHundreds(vault * percent / 100);
+    function initTargetRaid(raw, victimTeamId) {
         return {
             victimTeamId,
-            percent,
-            lootPotTotal: pool,
-            lootPotRemaining: pool,
             activeAttackers: [],
             completed: [],
             startedAt: Date.now()
@@ -838,37 +1011,18 @@ window.CurrencySafeRoomShared = (function () {
         return raid;
     }
 
-    function computeRaidShare(raid) {
-        if (!raid) return 0;
-        const remaining = Math.max(0, Number(raid.lootPotRemaining) || 0);
-        const n = Math.max(1, (raid.activeAttackers || []).length);
-        return remaining / n;
-    }
-
-    function computeRaidPayout(share, mistakes) {
-        const s = Math.max(0, Number(share) || 0);
-        const m = Math.max(0, Math.min(20, Number(mistakes) || 0));
-        return Math.round(s * Math.max(0, 1 - m / 20));
-    }
-
     function previewRaidPayout(raw, victimTeamId, playerId, mistakes) {
+        const balance = teamBalance(raw, victimTeamId);
+        const m = Math.max(0, Number(mistakes) || 0);
+        const payout = computeRaidLoot(m, balance);
         const raid = getTargetRaid(raw, victimTeamId);
-        if (!raid) return { payout: 0, share: 0, activeCount: 0, percent: 0, poolRemaining: 0 };
-        const activeCount = Math.max(1, (raid.activeAttackers || []).length);
-        const inRaid = (raid.activeAttackers || []).some(a => a.playerId === playerId);
-        const share = inRaid ? computeRaidShare(raid) : computeRaidShare({
-            ...raid,
-            activeAttackers: [...(raid.activeAttackers || []), { playerId }]
-        });
-        let payout = computeRaidPayout(share, mistakes);
-        payout = Math.min(payout, Math.max(0, Number(raid.lootPotRemaining) || 0));
-        payout = Math.min(payout, teamBalance(raw, victimTeamId));
+        const activeCount = (raid?.activeAttackers || []).length;
         return {
             payout,
-            share,
-            activeCount: inRaid ? activeCount : activeCount + 1,
-            percent: raid.percent,
-            poolRemaining: raid.lootPotRemaining
+            base: RAID_BASE_PAYOUT,
+            mistakes: m,
+            penalty: MISTAKE_LOOT_PENALTY,
+            activeCount
         };
     }
 
@@ -876,7 +1030,7 @@ window.CurrencySafeRoomShared = (function () {
         ensureTargetRaids(raw);
         let raid = getTargetRaid(raw, victimTeamId);
         if (!raid) {
-            raid = getOrCreateTargetRaid(raw, victimTeamId);
+            getOrCreateTargetRaid(raw, victimTeamId);
             joinTargetRaid(raw, victimTeamId, playerId, attackerTeamId);
             raid = getTargetRaid(raw, victimTeamId);
         }
@@ -884,42 +1038,36 @@ window.CurrencySafeRoomShared = (function () {
             joinTargetRaid(raw, victimTeamId, playerId, attackerTeamId);
             raid = getTargetRaid(raw, victimTeamId);
         }
-        const activeCount = Math.max(1, (raid.activeAttackers || []).length);
-        const share = computeRaidShare(raid);
-        let payout = computeRaidPayout(share, mistakes);
-        payout = Math.min(payout, Math.max(0, Number(raid.lootPotRemaining) || 0));
-        payout = Math.min(payout, teamBalance(raw, victimTeamId));
-        payout = Math.max(0, payout);
+        const m = Math.max(0, Number(mistakes) || 0);
+        const payout = computeRaidLoot(m, teamBalance(raw, victimTeamId));
 
-        raid.lootPotRemaining = Math.max(0, (Number(raid.lootPotRemaining) || 0) - payout);
         raid.activeAttackers = (raid.activeAttackers || []).filter(a => a.playerId !== playerId);
         raid.completed = raid.completed || [];
         raid.completed.push({
             playerId,
             teamId: attackerTeamId,
             amount: payout,
-            mistakes: Math.max(0, Math.min(20, Number(mistakes) || 0)),
-            shareAtComplete: share,
-            activeCountAtComplete: activeCount,
+            mistakes: m,
             at: Date.now()
         });
+        raw.targetRaids[victimTeamId] = raid;
 
         return {
             payout,
-            share,
-            activeCount,
-            percent: raid.percent,
-            poolRemaining: raid.lootPotRemaining
+            base: RAID_BASE_PAYOUT,
+            mistakes: m,
+            penalty: MISTAKE_LOOT_PENALTY
         };
     }
 
     function removePlayerFromTeamLists(raw, playerId) {
         if (!raw || !playerId) return;
-        (raw.teams || []).forEach(t => {
-            t.memberIds = (t.memberIds || []).filter(id => id !== playerId);
-        });
         const p = raw.players.find(x => x.id === playerId);
         if (p) p.teamId = null;
+        (raw.teams || []).forEach(t => {
+            t.memberIds = memberIdList(t.memberIds).filter(id => id !== playerId);
+        });
+        reconcileLobbyTeams(raw);
     }
 
     function removePlayerFromAllRaids(raw, playerId) {
@@ -993,12 +1141,9 @@ window.CurrencySafeRoomShared = (function () {
 
     function raidSnapshot(raid) {
         const r = normalizeRaidRecord(raid);
-        if (!r) return { poolRemaining: 0, activeCount: 0, percent: 0, lootPotTotal: 0 };
+        if (!r) return { activeCount: 0 };
         return {
-            poolRemaining: Number(r.lootPotRemaining) || 0,
-            activeCount: (r.activeAttackers || []).length,
-            percent: r.percent || 0,
-            lootPotTotal: Number(r.lootPotTotal) || 0
+            activeCount: (r.activeAttackers || []).length
         };
     }
 
@@ -1013,11 +1158,15 @@ window.CurrencySafeRoomShared = (function () {
         creditTeamVault, debitTeamVault, rotateTeamVaultPassword, recordPlayerEarnings,
         syncTeamPasswordToMembers, ensureTeamFields, isSameTeam,
         computeMissionScorePercent, computeLootAmount,
-        coordsFromState, randomVaultPassword, normalizeRoom, serializeLists,
-        listFromMap, mapFromList, memberIdList, buildCsv, downloadCsv,
+        coordsFromState, pruneEmptyTeams, refreshTeamCoordsFromStates, joinPlayerToState,
+        joinPlayerToTeamId, reconcileLobbyTeams, canJoinStateTeam,
+        resolveJoinTeamId, syncTeamMemberIdsFromPlayers,
+        randomVaultPassword, normalizeRoom, ensureRoomLists, asArray,
+        listFromMap, memberIdList, buildCsv, downloadCsv,
         transferStatsForPlayer, transferStatsForTeam,
-        hashSeed, roundPoolHundreds, ensureTargetRaids, getTargetRaid, rollRaidPercent,
-        getOrCreateTargetRaid, joinTargetRaid, computeRaidShare, computeRaidPayout,
+        hashSeed, roundPoolHundreds, ensureTargetRaids, getTargetRaid,
+        RAID_BASE_PAYOUT, MISTAKE_LOOT_PENALTY, computeRaidLoot,
+        getOrCreateTargetRaid, joinTargetRaid,
         previewRaidPayout, completeTargetRaid, shouldStartNewRaid,
         removePlayerFromTeamLists, removePlayerFromAllRaids,
         buildEvenTeamChunks, shufflePlayersIntoTeams, parseMaxTeamSize, raidSnapshot,

@@ -22,6 +22,14 @@
         labuan: "labuan"
     };
 
+    const SLUG_TO_STATE_ID = Object.fromEntries(
+        Object.entries(STATE_ID_TO_SLUG).map(([id, slug]) => [slug, id])
+    );
+
+    function slugToStateId(slug) {
+        return SLUG_TO_STATE_ID[slug] || null;
+    }
+
     const WORKSHOP_THEME = {
         "--sea": "#030810",
         "--grid": "rgba(0, 160, 220, 0.08)",
@@ -89,7 +97,7 @@
         el.style.transformOrigin = "0 0";
     }
 
-    function playerChoropleth(players) {
+    function occupancyChoropleth(players) {
         const data = {};
         (players || []).forEach((p) => {
             if (p._ghost) return;
@@ -99,10 +107,32 @@
         return data;
     }
 
+    function playerChoropleth(players) {
+        return occupancyChoropleth(players);
+    }
+
     function escapeHtml(text) {
         const d = document.createElement("div");
         d.textContent = text;
         return d.innerHTML;
+    }
+
+    function programmaticSelect(map, host, slug) {
+        if (!map?.select || !slug) return;
+        host._kmSuppressSelect = true;
+        try { map.select(slug); } catch (_) { /* ignore */ }
+        host._kmSuppressSelect = false;
+    }
+
+    function wireSelectHandler(map, host, container, getHandler) {
+        if (!map) return;
+        map.on("select", (slug) => {
+            if (host?._kmSuppressSelect) return;
+            const stateId = slugToStateId(slug);
+            if (!stateId) return;
+            const handler = typeof getHandler === "function" ? getHandler() : getHandler;
+            if (handler) handler(stateId, slug);
+        });
     }
 
     function stateColor(stateId) {
@@ -137,17 +167,60 @@
         const attackCtx = attackCanvas.getContext("2d");
         let playersRef = players || [];
 
+        const isLobby = options.mode === "lobby";
+        const isSpectator = options.mode === "spectator";
         const map = mountWidget(kmHost, { interactive: true });
-        if (map) map.setData(playerChoropleth(playersRef));
+        const hideGhosts = options.hideGhostPins || isLobby || isSpectator;
+        const minimalPins = options.minimalPins || isSpectator;
+
+        if (map) {
+            map.setData(occupancyChoropleth(playersRef));
+            wireSelectHandler(map, kmHost, container, () =>
+                container._kmOnStateSelect || options.onStateSelect
+            );
+        }
+        if (isLobby) container.classList.add("map-mode-lobby");
+        else if (isSpectator) container.classList.add("map-mode-spectator");
+        container._kmOnStateSelect = options.onStateSelect || null;
+
+        const viewport = global.CurrencySafeMapViewport?.create({
+            zoomMin: 1,
+            zoomMax: 2.5,
+            ...(container._mapViewportState || {})
+        }) || null;
+
+        function saveViewportState() {
+            if (viewport) container._mapViewportState = viewport.getState();
+        }
+
+        function bindMapViewport() {
+            if (!viewport || container._mapViewportBound) return;
+            container._mapViewportBound = true;
+            const onChange = () => {
+                saveViewportState();
+                relayout();
+            };
+            viewport.setupPanning(container, onChange);
+            viewport.bindWheel(container, onChange);
+            if (isLobby || isSpectator) viewport.bindZoomControls(container, onChange);
+        }
+
+        bindMapViewport();
 
         function placeMarkers() {
             if (!L) return;
-            const rect = inner.getBoundingClientRect();
-            const lay = L.computeLayout(rect.width, rect.height);
+            const wrapW = inner.clientWidth;
+            const wrapH = inner.clientHeight;
+            if (wrapW <= 0 || wrapH <= 0) return;
+            const lay = viewport
+                ? viewport.computeLayout(wrapW, wrapH)
+                : L.computeLayout(wrapW, wrapH);
             global.__mapLayout = lay;
             syncTransform(kmHost, lay);
             markersEl.innerHTML = "";
             playersRef.forEach((p, i) => {
+                const isGhost = !!p._ghost;
+                if (isGhost && hideGhosts) return;
                 let mapX = p.mapX;
                 let mapY = p.mapY;
                 if (mapX == null || mapY == null) {
@@ -157,40 +230,62 @@
                 if (mapX == null || mapY == null) return;
                 const pos = L.imagePercentToWrapPercent(mapX, mapY, lay);
                 const el = document.createElement("div");
-                const isGhost = !!p._ghost;
                 el.className = "map-preview-marker" + (isGhost ? " ghost" : "");
+                if (minimalPins) el.classList.add("map-preview-marker--mini");
+                if (options.highlightStateId && p.stateId === options.highlightStateId) {
+                    el.classList.add("highlight", "is-me", "map-preview-marker--self");
+                } else if (!isGhost) {
+                    el.classList.add("map-preview-marker--other");
+                }
                 el.style.left = pos.x + "%";
                 el.style.top = pos.y + "%";
                 const label = p.state ? ` · ${p.state}` : "";
                 const dotColor = stateColor(p.stateId);
                 const labelColor = isGhost ? "var(--muted, #8ba4be)" : stateColor(p.stateId);
                 const bal = Number(p.balance || 0).toLocaleString("en-MY");
-                const pinName = isGhost
-                    ? `${escapeHtml(p.name || "空")} · 待进驻`
-                    : `${escapeHtml(p.icon || "🧑")} ${escapeHtml(p.name || "Player")}${escapeHtml(label)}`;
-                const pinBal = isGhost ? "" : `<span class="pin-line pin-balance">RM ${bal}</span>`;
-                el.innerHTML =
-                    `<span class="map-preview-dot" style="background:${dotColor};box-shadow:0 0 12px ${dotColor}${isGhost ? "44" : "99"};${isGhost ? "opacity:0.45;" : ""}"></span>` +
-                    `<span class="map-preview-label" style="color:${labelColor};${isGhost ? "opacity:0.7;" : ""}">` +
-                    `<span class="pin-line pin-name">${pinName}</span>${pinBal}</span>`;
+                if (minimalPins) {
+                    el.innerHTML =
+                        `<span class="map-preview-dot" style="background:${dotColor};box-shadow:0 0 10px ${dotColor}88"></span>` +
+                        `<span class="map-preview-label map-preview-label--mini" style="color:${labelColor}">` +
+                        `${escapeHtml(p.icon || "🧑")} ${escapeHtml(p.name || "Player")}</span>`;
+                } else {
+                    const pinName = isGhost
+                        ? `${escapeHtml(p.name || "空")} · 待进驻`
+                        : `${escapeHtml(p.icon || "🧑")} ${escapeHtml(p.name || "Player")}${escapeHtml(label)}`;
+                    const pinBal = isGhost ? "" : `<span class="pin-line pin-balance">RM ${bal}</span>`;
+                    el.innerHTML =
+                        `<span class="map-preview-dot" style="background:${dotColor};box-shadow:0 0 12px ${dotColor}${isGhost ? "44" : "99"};${isGhost ? "opacity:0.45;" : ""}"></span>` +
+                        `<span class="map-preview-label" style="color:${labelColor};${isGhost ? "opacity:0.7;" : ""}">` +
+                        `<span class="pin-line pin-name">${pinName}</span>${pinBal}</span>`;
+                }
                 if (options.highlightId && p.id === options.highlightId) el.classList.add("highlight");
                 if (options.orderNumbers) el.dataset.order = String(i + 1);
                 markersEl.appendChild(el);
             });
+            if (map && options.highlightStateId) {
+                const slug = STATE_ID_TO_SLUG[options.highlightStateId];
+                if (slug && container._kmLastHighlight !== options.highlightStateId) {
+                    container._kmLastHighlight = options.highlightStateId;
+                    programmaticSelect(map, kmHost, slug);
+                }
+            }
         }
 
         function drawAttacks(now) {
             if (options.showAttackLines === false) return;
-            const rect = inner.getBoundingClientRect();
-            if (rect.width <= 0) return;
-            const lay = L.computeLayout(rect.width, rect.height);
+            const wrapW = inner.clientWidth;
+            const wrapH = inner.clientHeight;
+            if (wrapW <= 0) return;
+            const lay = viewport
+                ? viewport.computeLayout(wrapW, wrapH)
+                : L.computeLayout(wrapW, wrapH);
             const dpr = Math.min(global.devicePixelRatio || 1, 2);
-            attackCanvas.width = Math.floor(rect.width * dpr);
-            attackCanvas.height = Math.floor(rect.height * dpr);
-            attackCanvas.style.width = rect.width + "px";
-            attackCanvas.style.height = rect.height + "px";
+            attackCanvas.width = Math.floor(wrapW * dpr);
+            attackCanvas.height = Math.floor(wrapH * dpr);
+            attackCanvas.style.width = wrapW + "px";
+            attackCanvas.style.height = wrapH + "px";
             attackCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            attackCtx.clearRect(0, 0, rect.width, rect.height);
+            attackCtx.clearRect(0, 0, wrapW, wrapH);
             attackCtx.save();
             attackCtx.translate(lay.offsetX, lay.offsetY);
             attackCtx.scale(lay.scale, lay.scale);
@@ -207,11 +302,11 @@
 
         function relayout() {
             placeMarkers();
-            if (map) map.setData(playerChoropleth(playersRef));
+            if (map) map.setData(occupancyChoropleth(playersRef));
         }
 
         relayout();
-        if (options.showAttackLines !== false) {
+        if (options.showAttackLines !== false && !isLobby) {
             if (container._attackAnimId) global.cancelAnimationFrame(container._attackAnimId);
             animId = global.requestAnimationFrame(frame);
             container._attackAnimId = animId;
@@ -222,8 +317,12 @@
             container._mapResizeObs.observe(inner);
         }
         container._mapPlaceMarkers = relayout;
-        container._mapSetPlayers = (next) => {
+        container._mapSetPlayers = (next, opts) => {
             playersRef = next || [];
+            if (opts) {
+                Object.assign(options, opts);
+                container._kmOnStateSelect = options.onStateSelect || container._kmOnStateSelect;
+            }
             relayout();
         };
         container._kmDestroy = () => {
@@ -232,8 +331,9 @@
         };
     }
 
-    /** Game threat map — mount Kracked base; returns syncTransform helper */
-    function mountGameBase(threatMapEl) {
+    /** Game threat map — mount Kracked base; options.onStateSelect(stateId, slug) */
+    function mountGameBase(threatMapEl, options) {
+        options = options || {};
         if (!threatMapEl) return null;
         let host = threatMapEl.querySelector("[data-km-game]");
         if (!host) {
@@ -245,17 +345,30 @@
         }
         const map = mountWidget(host, { interactive: true });
         if (map) {
-            map.on("select", (slug) => {
-                const st = (global.MALAYSIA_STATES || []).find(
-                    (s) => STATE_ID_TO_SLUG[s.id] === slug
-                );
-                if (st && global.showToast && global.CurrencySafeI18n) {
-                    const label = global.getStateLabel?.(st.id) || st.label;
-                    global.showToast(label);
-                }
+            wireSelectHandler(map, host, threatMapEl, () => {
+                if (options.onStateSelect) return options.onStateSelect;
+                return (stateId) => {
+                    const st = (global.MALAYSIA_STATES || []).find((s) => s.id === stateId);
+                    if (st && global.showToast) {
+                        const label = global.getStateLabel?.(st.id) || st.label;
+                        global.showToast(label);
+                    }
+                };
             });
         }
+        threatMapEl._kmGameMap = map;
+        threatMapEl._kmGameHost = host;
         return { host, map };
+    }
+
+    function highlightGameState(threatMapEl, stateId) {
+        const map = threatMapEl?._kmGameMap;
+        const host = threatMapEl?._kmGameHost;
+        const slug = stateId ? STATE_ID_TO_SLUG[stateId] : null;
+        if (map && host && slug && threatMapEl._kmLastHighlight !== stateId) {
+            threatMapEl._kmLastHighlight = stateId;
+            programmaticSelect(map, host, slug);
+        }
     }
 
     function syncGameTransform(host) {
@@ -276,8 +389,12 @@
     global.KrackedMalaysiaMap = {
         WORKSHOP_THEME,
         STATE_ID_TO_SLUG,
+        SLUG_TO_STATE_ID,
+        slugToStateId,
         renderPreview,
         mountGameBase,
+        highlightGameState,
+        programmaticSelect,
         syncGameTransform,
         setGameChoropleth,
         syncTransform

@@ -5,17 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Currency Safe · 历史赛局</title>
     <link rel="icon" href="fcitlogo.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,700;14..32,900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/shared.css" />
     <link rel="stylesheet" href="css/lobby-hud.css" />
+    <link rel="stylesheet" href="css/home-portal.css?v=20260629" />
     <style>
-        .history-page { max-width: 920px; margin: 0 auto; padding: 2rem 1rem 4rem; }
-        .history-head { margin-bottom: 1.5rem; }
-        .history-head h1 { margin: 0 0 .35rem; font-size: 1.6rem; }
-        .history-head p { color: var(--muted); margin: 0; }
+        .history-shell { padding: 1.5rem 0 4rem; }
+        .history-panel { padding: 1.5rem 1.75rem; }
+        .history-head { margin-bottom: 1.25rem; }
+        .history-head h2 { margin: 0 0 0.35rem; font-size: 1.35rem; }
+        .history-head p { color: var(--muted); margin: 0; font-size: 0.9rem; }
         .history-table { display: grid; gap: 10px; }
         .history-row {
             display: grid;
-            grid-template-columns: 1fr auto auto;
+            grid-template-columns: 1fr auto;
             gap: 12px;
             align-items: center;
             padding: 14px 16px;
@@ -24,32 +28,105 @@
             background: rgba(255,255,255,.03);
         }
         .history-row b { display: block; }
-        .history-row span { color: var(--muted); font-size: .85rem; }
+        .history-row span { color: var(--muted); font-size: .85rem; display: block; }
         .history-actions { display: flex; gap: 8px; flex-wrap: wrap; }
         .history-empty { color: var(--muted); padding: 2rem; text-align: center; }
-        @media (max-width: 640px) {
-            .history-row { grid-template-columns: 1fr; }
-        }
     </style>
-    <script src="js/i18n.js"></script>
+    <script src="js/i18n.js?v=20260629"></script>
+    <script src="js/portal-sound.js?v=20260629"></script>
 </head>
-<body class="lobby-page">
-    <main class="history-page glass-panel" style="margin-top:2rem">
-        <div class="history-head">
-            <h1 data-i18n="matchHistory">历史赛局</h1>
-            <p data-i18n="matchHistoryDesc">已结束比赛的归档记录（服务器 /api/history）</p>
+<body class="lobby-page home-page history-page" data-i18n-page-title="pageTitleHistory">
+    <div class="home-dot-grid" aria-hidden="true"></div>
+    <div class="lobby-hud-overlay" aria-hidden="true"></div>
+
+    <header class="home-topbar glass-panel">
+        <div class="home-topbar-brand">
+            <a href="index.html" class="home-topbar-logo" aria-label="FCIT">
+                <img src="fcitlogo.png" alt="FCIT" width="64" height="64" />
+            </a>
+            <div class="home-topbar-titles">
+                <p class="home-topbar-kicker">Federal Security Network</p>
+                <h1>
+                    <span data-i18n="gameTitlePrefix">Currency Safe:</span>
+                    <span class="gradient-text" data-i18n="matchHistory">历史赛局</span>
+                </h1>
+            </div>
         </div>
-        <div id="historyList" class="history-table">
-            <div class="history-empty" data-i18n="historyLoading">加载中…</div>
+        <div class="home-topbar-actions">
+            <div class="home-lang-slot" id="historyLangSlot" aria-label="Language"></div>
+            <button type="button" class="home-menu-btn" id="historyMenuBtn" aria-expanded="false" aria-controls="historyMenuPanel" data-i18n-aria-label="menuOpen">
+                <span class="home-menu-icon" aria-hidden="true"></span>
+            </button>
         </div>
-        <div style="margin-top:1.5rem">
-            <a href="index.html" class="lobby-btn secondary" data-i18n="backHome">返回首页</a>
+        <div class="home-menu-panel hidden" id="historyMenuPanel" role="menu">
+            <button type="button" class="home-menu-item home-sound-btn" id="historySoundToggle" aria-pressed="false" role="menuitem" data-i18n="muteOff">音效：开</button>
+            <a href="index.html" class="home-menu-item home-toolbar-link" role="menuitem" data-i18n="backHome">返回首页</a>
         </div>
+    </header>
+
+    <main class="portal home-shell history-shell">
+        <section class="glass-panel history-panel">
+            <div class="history-head">
+                <h2 data-i18n="matchHistory">历史赛局</h2>
+                <p data-i18n="matchHistoryDesc">已结束比赛的归档记录（服务器 /api/history）</p>
+            </div>
+            <div id="historyList" class="history-table">
+                <div class="history-empty" data-i18n="historyLoading">加载中…</div>
+            </div>
+        </section>
     </main>
+
     <script>
         const t = (k) => CurrencySafeI18n.t(k);
-        CurrencySafeI18n.mountLangBar();
+        const $ = (id) => document.getElementById(id);
+
+        function updateSoundBtn() {
+            const btn = $("historySoundToggle");
+            if (!btn) return;
+            const muted = CurrencySafePortalSound.isMuted();
+            btn.setAttribute("aria-pressed", muted ? "true" : "false");
+            btn.textContent = t(muted ? "muteOn" : "muteOff");
+            btn.classList.toggle("is-muted", muted);
+        }
+
+        CurrencySafeI18n.mountLangBar({
+            onChange: () => {
+                CurrencySafeI18n.applyToDocument();
+                updateSoundBtn();
+            }
+        });
+        const langSlot = $("historyLangSlot");
+        const langBar = document.getElementById("csLangBar");
+        if (langSlot && langBar) {
+            langBar.classList.add("lang-bar--inline");
+            langSlot.appendChild(langBar);
+        }
         CurrencySafeI18n.unlockLang();
+
+        $("historySoundToggle")?.addEventListener("click", () => {
+            CurrencySafePortalSound.toggle();
+            updateSoundBtn();
+        });
+        updateSoundBtn();
+
+        function toggleHistoryMenu(force) {
+            const panel = $("historyMenuPanel");
+            const btn = $("historyMenuBtn");
+            if (!panel || !btn) return;
+            const open = typeof force === "boolean" ? force : panel.classList.contains("hidden");
+            panel.classList.toggle("hidden", !open);
+            btn.setAttribute("aria-expanded", open ? "true" : "false");
+        }
+        $("historyMenuBtn")?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            toggleHistoryMenu($("historyMenuPanel")?.classList.contains("hidden"));
+        });
+        document.addEventListener("click", (e) => {
+            if (!e.target.closest(".home-topbar")) toggleHistoryMenu(false);
+        });
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") toggleHistoryMenu(false);
+        });
 
         function escapeHtml(text) {
             const d = document.createElement("div");
@@ -103,7 +180,7 @@
                         const endedAt = btn.dataset.ended;
                         const r = await fetch(`/api/history/${encodeURIComponent(roomId)}/${endedAt}`);
                         const j = await r.json();
-                        if (!j.ok) { alert(j.error || "加载失败"); return; }
+                        if (!j.ok) { alert(j.error || t("historyError")); return; }
                         const blob = new Blob([JSON.stringify(j.match, null, 2)], { type: "application/json" });
                         const url = URL.createObjectURL(blob);
                         window.open(url, "_blank");

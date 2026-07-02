@@ -2,6 +2,7 @@
 
 > **玩家规则**：[ROOM_RULES.md](./ROOM_RULES.md)  
 > **UI 打磨**：[UI_ROADMAP.md](./UI_ROADMAP.md)  
+> **工程 / 技术债**：[ENGINEERING_ROADMAP.md](./ENGINEERING_ROADMAP.md)  
 > **已完成分队/央行基础**：[TEAM_BANK_ROADMAP.md](./TEAM_BANK_ROADMAP.md)（Phase 1–5 ✅）
 
 ---
@@ -23,7 +24,7 @@ flowchart TB
         P4[4 闪灯调度]
         P5[5 阅读 Bonus]
         P6[6 双榜]
-        P7[7 Firebase QA]
+        P7[7 WebSocket QA]
         P8[8 动效打磨]
     end
     done --> P0
@@ -48,7 +49,7 @@ flowchart TB
 | **4** | 央行闪灯图钉 | 3–4 天 | P0 | 📋 |
 | **5** | 阅读情报 Bonus | 5–7 天 | P0 | 📋 |
 | **6** | 分队榜 + 个人榜 | 2–4 天 | P1 | 📋 |
-| **7** | Firebase + QA | 4–6 天 | P1 | 📋 |
+| **7** | WebSocket 多端 QA | 4–6 天 | P1 | 📋 |
 | **8** | UI/动效打磨 | 2–3 天 | P2 | 📋 |
 | **9** | 品质打磨（逐关精修） | 持续 | P1 | ✅ 首批完成 |
 
@@ -65,7 +66,7 @@ flowchart TB
 | W3 | Phase 3 集体攻坚；Phase 4 闪灯骨架 |
 | W4 | Phase 5 阅读 Bonus 可赚钱进队库 |
 | W5 | Phase 6 双榜；Phase 7 测试清单 |
-| W6 | Phase 7 Firebase；Phase 8 动效；课堂试讲 |
+| W6 | Phase 7 WebSocket QA；Phase 8 动效；课堂试讲 |
 
 **可并行**：Phase 2（关卡 UI）∥ Phase 4（闪灯调度）；Phase 5 依赖 Phase 4 入口。
 
@@ -279,23 +280,23 @@ const BONUS_LOOT = {
 
 ---
 
-## Phase 7 — Firebase & QA（4–6 天）
+## Phase 7 — WebSocket 多端 QA（4–6 天）
 
 ### 任务
 
 - `targetRaids`、`bankBonus`、`vaultBalance` 事务与 subscribe
 - `phaseEndsAt` 多端对齐
-- `joinRoomAsPlayer(teamId)` Firebase 补全
+- 大厅组队 / `joinRoomAsPlayer(teamId)` 全路径回归
 
 ### 测试清单
 
 - [ ] 主页仅房间码 → 大厅登记 → 开赛
 - [ ] 随机三关含新玩法
-- [ ] 多人同攻一州分池 + 失误
+- [ ] 多人同攻一州：固定 RM 250 + 失误 −30
 - [ ] 闪灯自愿、错过、再闪
 - [ ] Bonus 扣款进队库
 - [ ] 双榜正确
-- [ ] 双标签 / 双设备（Firebase 开时）
+- [ ] 双标签 / 双设备（WebSocket 服务器开时）
 
 ---
 
@@ -325,7 +326,7 @@ const BONUS_LOOT = {
 | 9.9 | 文档 | `ROOM_RULES.md` | 规则与实现同步 | ✅ |
 | 9.10 | 大厅 UX | `lobby.html`, `room-*.js` | 只填名称、候场、点空位进州、离队换位 | ✅ |
 | 9.11 | 央行 Bonus | `game.html`, `room-*.js` | 面板打开后才占有偿次数；加载失败 Toast | ✅ |
-| 9.12 | 攻坚池 | `game.html`, `room-shared.js` | 转账后/同目标再攻奖池抽空时 `claimTeamDeploy` 开新池 | ✅ |
+| 9.12 | 攻州夺取 | `game.html`, `room-shared.js` | 固定 RM 250 + 失误 −30；无集体奖池 | ✅ |
 
 ---
 

@@ -28,6 +28,14 @@ body {
         linear-gradient(155deg, #010508 0%, #031018 52%, #010508 100%);
 }
 
+/* Desktop / laptop classroom only — not optimized for phone or tablet */
+body.lobby-page,
+body.home-page,
+body.spectator-page,
+body.game-page {
+    min-width: 64rem;
+}
+
 .portal {
     position: relative;
     z-index: 2;
@@ -426,4 +434,129 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
     font-family: SFMono-Regular, Consolas, monospace;
     font-size: 0.8rem;
     letter-spacing: 0.1em;
+}
+
+/* Shared overlays — game, ended, tutorial pages */
+.toast {
+    position: fixed;
+    z-index: 30;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%) translateY(80px);
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.25s ease;
+    background: var(--green-2, #22d3ee);
+    color: #021008;
+    padding: 14px 18px;
+    border-radius: 999px;
+    font-weight: 950;
+    box-shadow: var(--shadow);
+    max-width: min(92vw, 760px);
+    text-align: center;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: none;
+    place-items: center;
+    background: rgba(0, 0, 0, 0.74);
+    padding: 20px;
+}
+
+.modal.show {
+    display: grid;
+}
+
+.modal-box {
+    width: min(760px, 100%);
+    padding: 24px;
+    border-radius: 28px;
+    border: 1px solid var(--line);
+    background: linear-gradient(180deg, #071710, #04110c);
+    box-shadow: var(--shadow);
+}
+
+.modal-box h2 {
+    margin: 0 0 10px;
+}
+
+.modal-box p,
+.modal-box li {
+    color: var(--muted);
+    line-height: 1.65;
+}
+
+.overlay-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: none;
+    place-items: center;
+    background: rgba(0, 0, 0, 0.82);
+    padding: 20px;
+}
+
+.overlay-modal.show {
+    display: grid;
+}
+
+.overlay-box {
+    text-align: center;
+    padding: 28px;
+    border-radius: 24px;
+    border: 1px solid var(--line);
+    background: linear-gradient(180deg, #071710, #04110c);
+    max-width: 420px;
+    animation: overlayFade 0.3s ease;
+}
+
+.overlay-box h2 {
+    margin: 0 0 8px;
+    font-size: 1.5rem;
+}
+
+.overlay-box p {
+    color: var(--muted);
+    line-height: 1.55;
+}
+
+.vault-door-icon {
+    font-size: 4rem;
+    margin: 12px 0;
+    animation: char-bounce 1s ease infinite;
+}
+
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 16px;
+    pointer-events: none;
+    z-index: 60;
+    animation: confettiFall 0.9s ease-out forwards;
+    border-radius: 3px;
+}
+
+@keyframes overlayFade {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes confettiFall {
+    to {
+        transform: translate(var(--x), var(--y)) rotate(650deg);
+        opacity: 0;
+    }
+}
+
+@keyframes char-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
 }

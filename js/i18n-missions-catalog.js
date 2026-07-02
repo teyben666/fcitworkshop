@@ -83,8 +83,8 @@
             "mission.binary.toastWin": "破解成功！",
 
             "mission.mastermind.title": "四色密码",
-            "mission.mastermind.desc": "选 4 色 · 看绿黄点",
-            "mission.mastermind.agentNote": "绿=位置对，黄=颜色对；用尽行数算 1 次失误。",
+            "mission.mastermind.desc": "选 4 色 · 看绿黄点 · 密码不重复",
+            "mission.mastermind.agentNote": "绿=位置对，黄=颜色对；密码 4 色互不重复；用尽行数算 1 次失误。",
             "mission.mastermind.legendGreen": "🟢 对了",
             "mission.mastermind.legendYellow": "🟡 颜色对",
             "mission.mastermind.warnUrgent": "⚠️ 最后一行！",
@@ -239,8 +239,8 @@
             "mission.binary.toastWin": "Cracked!",
 
             "mission.mastermind.title": "Four-color code",
-            "mission.mastermind.desc": "Pick 4 colors · read dots",
-            "mission.mastermind.agentNote": "Green=exact; yellow=right color. Out of rows = +1 mistake.",
+            "mission.mastermind.desc": "Pick 4 colors · read dots · no repeats",
+            "mission.mastermind.agentNote": "Green=exact; yellow=right color. Secret uses 4 different colors; out of rows = +1 mistake.",
             "mission.mastermind.legendGreen": "🟢 exact",
             "mission.mastermind.legendYellow": "🟡 color",
             "mission.mastermind.warnUrgent": "⚠️ Last row!",

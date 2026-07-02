@@ -1,6 +1,6 @@
 # Currency Safe — 课堂 UI 打磨排期
 
-> 目标：降低新手认知负担，统一中英体验（每人自选语言），窄屏可用，教师观战与玩家界面分工清晰。
+> 目标：降低新手认知负担，统一中英体验（每人自选语言），**仅面向电脑课堂**（不支持手机/平板），教师观战与玩家界面分工清晰。
 
 ---
 
@@ -12,20 +12,20 @@
 | **B** | 截获任务向导 + 入职缩短 | P0 | ✅ 已实现 |
 | **C** | 密码告警 + 地图引导 + 简洁地图 | P1 | ✅ 已实现（Host 地图特效开关见 D） |
 | **D** | 战绩精简 + 观战分工 | P1 | ✅ 已实现 |
-| **E** | 低优先级体验 + CSS 统一 | P2 | 📋 排期中 |
+| **E** | 低优先级体验 + CSS 统一 | P2 | ✅ 已实现 |
 
 ---
 
 ## 阶段 A — 语言与顶栏（P0）
 
-### A1. 大厅语言选择（每人自选，进游戏锁定）
+### A1. 大厅语言选择（每人自选，全程可改）
 
 | 项 | 说明 |
 |----|------|
-| **需求** | 学生在 `lobby.html` 选 **中文** 或 **English**；进入 `game.html` 后不可改，避免课堂中途误切 |
-| **实现** | `js/i18n.js` + 大厅 `langZh` / `langEn` 按钮；`startGame` / 进入游戏中 `lockLang()` |
-| **存储** | `sessionStorage`: `csUiLang`, `csUiLangLocked` |
-| **后续** | `spectator.html`、`index.html` 静态文案可接同一套 `data-i18n` |
+| **需求** | 学生在任意页面（首页 / 大厅 / 游戏中）自选 **中文** 或 **English** |
+| **实现** | `js/i18n.js` + 各页语言按钮 / ☰ 菜单；`lockLang()` 已改为不锁定 |
+| **存储** | `sessionStorage`: `csUiLang` |
+| **平台** | **仅桌面 / 笔记本课堂**（`min-width: 64rem`），不针对手机 / 平板优化 |
 
 ### A2. 顶栏 HUD 从 7 项减到 4 项
 
@@ -42,7 +42,7 @@
 
 顶栏左侧：`返回大厅`（链回 `lobby.html?room=…`）、`任务简报`（原有 modal）、`音效` 开关。
 
-**验收**：窄屏顶栏 ≤2 行；英文/中文标签与 `CurrencySafeI18n.t()` 一致。
+**验收**：桌面顶栏单行 HUD + ☰ 菜单；英文/中文标签与 `CurrencySafeI18n.t()` 一致。
 
 ---
 
@@ -106,7 +106,7 @@
 | 练习 `practice` | 关攻击动画、扫描线（`map-calm`） |
 | 竞赛 `competitive` | 保持动感 |
 
-`room.settings.mapEffects` 已在 `room-shared.js` 预留；**Host 大厅开关**列入阶段 E。
+`room.settings.mapEffects`：练习模式默认关闭；竞赛模式房主可在大厅勾选「地图攻击线特效」。
 
 **验收**：密码过期后 3 秒内学生能看到告警条 + 防线 Tab；练习课不抢注意力。
 
@@ -138,14 +138,15 @@
 
 | # | 项 | 说明 | 估时 |
 |---|-----|------|------|
-| E1 | 图钉可读性 | 西马密集区：默认圆点，hover 放大 + 标签 | 0.5d |
+| E0 | 地图 pan/zoom 统一 | `js/map-viewport.js`：大厅预览 / 游戏 / 观战；修复缩放图钉漂移 | ✅ |
+| E1 | 图钉可读性 | 西马密集区：默认圆点，hover 放大 + 标签 | ✅ 观战/迷你图钉 |
 | E2 | 密钥片段 | 未完成 🔒，完成高亮片段（已在 fragments 部分实现） | 0.25d |
-| E3 | 小游戏文案 i18n | `renderTypingGame` 等动态 HTML 接入 `t()` | 1d |
-| E4 | Host「地图特效」开关 | `lobby` checkbox → `setMapEffects()` | 0.5d |
-| E5 | 色弱友好图钉 | 黄/绿/红加形状区分（player 方、target 菱形） | 0.5d |
-| E6 | `game.html` CSS → `shared.css` | 抽门户共用变量与按钮，减重复 | 1–2d |
-| E7 | `spectator.html` i18n | 与玩家语言 session 同步 | 0.5d |
-| E8 | `howModal` 双语 | 任务简报正文按语言切换 | 0.5d |
+| E3 | 小游戏文案 i18n | `renderTypingGame` 等 + `i18n-missions-catalog.js` | ✅ |
+| E4 | Host「地图特效」开关 | `lobby` checkbox → `setRoomMapEffects()` | ✅ |
+| E5 | 色弱友好图钉 | 方/圆/菱形 + 颜色（地图预览 + 游戏威胁图钉） | ✅ |
+| E6 | `game.html` CSS → `shared.css` | modal / toast / overlay 抽到共用样式 | ✅ |
+| E7 | `spectator.html` i18n | 与玩家语言 session 同步 | ✅ |
+| E8 | `howModal` 双语 | 任务简报 `data-i18n` + 英译 | ✅ |
 
 ---
 
@@ -176,21 +177,23 @@ gantt
 | 文件 | 变更 |
 |------|------|
 | `js/i18n.js` | 中英文案、`lockLang`、`applyToDocument` |
-| `lobby.html` | 语言选择、开局锁定 |
-| `game.html` | HUD、告警、向导、手风琴、地图提示、静音 |
-| `js/room-shared.js` | `settings.mapEffects` 默认值 |
-| `spectator.html` | （E7）待接 i18n |
-| `css/shared.css` | （E6）待合并样式 |
+| `lobby.html` | 语言选择、FCIT 顶栏、地图预览 pan/zoom |
+| `game.html` | HUD、☰ 菜单、地图 viewport、静音 |
+| `js/map-viewport.js` | 共用地图 pan/zoom（大厅预览 / 观战 / 游戏） |
+| `js/room-shared.js` | `joinPlayerToState`、`resolveJoinTeamId`、`syncTeamMemberIdsFromPlayers` |
+| `spectator.html` | i18n + `map-viewport.js` |
+| `css/shared.css` | 桌面最小宽度 `64rem`；（E6）待合并样式 |
 
 ---
 
 ## 课堂操作提示（给教师）
 
 1. 进大厅后提醒学生：**先选界面语言**（中文/English），再 Join。
-2. 比赛开始后语言不可改；需要换语言的学生退出重进大厅（比赛未开始时）。
-3. 练习课用 **Practice** 模式 → 地图自动简洁、部署不限。
-4. 观战链接：`spectator.html?room=房间码` — 投影用，学生主界面保持 `game.html`。
+2. 语言在**比赛进行中也可随时切换**（菜单内华语/English）。
+3. 本系统面向 **电脑浏览器课堂**，不支持手机 / 平板游玩。
+4. 练习课用 **Practice** 模式 → 地图自动简洁、部署不限。
+5. 观战链接：`spectator.html?room=房间码` — 投影用，学生主界面保持 `game.html`。
 
 ---
 
-*文档版本：2026-06-24 · 与当前仓库实现同步*
+*文档版本：2026-06-28 · 阶段 E 已完成；工程排期见 [ENGINEERING_ROADMAP.md](./ENGINEERING_ROADMAP.md)*

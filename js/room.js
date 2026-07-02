@@ -57,7 +57,7 @@
         "getRoomSettings", "logActivity", "applyBreach", "applyTransfer", "applyBankTransfer",
         "beginBankBonus", "confirmBankBonusOpen", "completeBankBonus", "getMaxDeployPerTarget",
         "claimTargetDeploy", "claimTeamDeploy", "shuffleTeamGroups", "assignPlayerToTeam", "createTeam",
-        "setRoomMaxTeamSize", "abandonTargetRaid",
+        "setRoomMaxTeamSize", "setRoomMapEffects", "abandonTargetRaid",
         "getTeamDeployCountRoom", "subscribe", "exportRoomCsv", "exportRoomReport",
         "setMatchDuration", "autoEndGameIfExpired", "touchLobbyPresence",
         "getConnectionStatus", "onConnectionChange"

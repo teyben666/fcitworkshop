@@ -110,6 +110,16 @@
             shuffleDone: "Shuffle 完成。",
             maxTeamSize: "每队人数上限",
             maxTeamSizeSet: "已更新每队人数上限。",
+            mapEffectsEnable: "地图攻击线特效",
+            mapEffectsHint: "关闭后地图更简洁（练习模式默认关闭）",
+            mapEffectsSet: "已更新地图特效设置。",
+            lobbyTeamFull: "该州队伍已满（最多 {n} 人）",
+            lobbyJoinedTeam: "已加入该队（{n} 人）",
+            lobbyJoinedState: "已进驻 {state}",
+            lobbyMapHint: "点击州属进驻或加入未满队伍 · 滚轮缩放 · 左键拖拽平移",
+            squadSlotFull: "已满",
+            squadSlotOpen: "空位",
+            squadSlotDeploy: "进驻",
             switchToSpectator: "改为观战",
             confirmSwitchSpectator: "改为观战后将从队伍中移除，且无法参与攻坚。确定？",
             switchedSpectator: "已切换为观战身份。",
@@ -162,6 +172,7 @@
             aiRotated: "{name} 轮换了密码，已完成关卡的情报已保留。",
             vaultNotReady: "{name} 尚未设置金库密码，无法攻击。",
             yourOwnTeam: "{name} 是你的队伍。",
+            mapNoDeploy: "该州无部署",
             matchTime: "剩余时间",
             leaveMatch: "离开比赛",
             confirmLeaveMatch: "确定离开比赛？你将离线，可稍后在首页重新加入。",
@@ -201,8 +212,16 @@
             soloEndDefaultMsg: "本次单人练习已结束。",
             soloReplayBtn: "再玩一次",
             lootEst: "实拿预估",
+            lootEstMeta: "名义 RM {base} · 失误 {mistakes} 次 · 每失误 −RM {penalty}",
             muteOn: "音效：关",
             muteOff: "音效：开",
+            menuOpen: "打开菜单",
+            mapZoomIn: "放大地图",
+            mapZoomOut: "缩小地图",
+            mapZoomReset: "重置地图缩放",
+            pageTitleHistory: "Currency Safe · 历史赛局",
+            serverSetupLink: "服务器说明",
+            startServerSetup: "启动说明",
             mapTitle: "马来西亚威胁地图",
             legendYou: "你",
             legendTarget: "选中目标",
@@ -248,7 +267,7 @@
             transferTo: "转入账户",
             transferAmount: "夺取金额",
             transferBtn: "确认转账",
-            transferPerfHint: "完成三关后按表现结算夺取金额",
+            transferPerfHint: "完成三关后按失误结算夺取金额",
             transferPerfScore: "表现评分",
             mapStatMissionReward: "本次夺取",
             scoreTitle: "分队榜",
@@ -432,7 +451,8 @@
             bonusClickableShort: "可点击",
             bonusJoinHint: "请在「可点击参与」阶段点击进入。",
             bonusCredited: "央行 Bonus +RM {amount} 已入队库！",
-            hostEndHold: "房主按住 0 · {n}s 后结束比赛",
+            hostEndHold: "房主按住 ` · {n}s 后结束比赛",
+            hostEndHoldSolo: "按住 ` · {n}s 后结束练习",
             abandonRaidOk: "已放弃当前目标攻坚。",
             pageTitleSpectator: "Currency Safe · 观战",
         },
@@ -541,6 +561,16 @@
             shuffleDone: "Shuffle complete.",
             maxTeamSize: "Max players per team",
             maxTeamSizeSet: "Max team size updated.",
+            mapEffectsEnable: "Map attack-line effects",
+            mapEffectsHint: "Turn off for a calmer map (off by default in Practice)",
+            mapEffectsSet: "Map effects setting updated.",
+            lobbyTeamFull: "This state team is full (max {n} players)",
+            lobbyJoinedTeam: "Joined the team ({n} players)",
+            lobbyJoinedState: "Deployed to {state}",
+            lobbyMapHint: "Click a state to deploy or join a team with open slots · wheel zoom · drag to pan",
+            squadSlotFull: "Full",
+            squadSlotOpen: "Open slot",
+            squadSlotDeploy: "Deploy",
             switchToSpectator: "Switch to spectator",
             confirmSwitchSpectator: "You will leave your team and cannot raid. Continue?",
             switchedSpectator: "You are now spectating.",
@@ -593,6 +623,7 @@
             aiRotated: "{name} rotated password. Completed level intel kept.",
             vaultNotReady: "{name} vault not ready yet.",
             yourOwnTeam: "{name} is your team.",
+            mapNoDeploy: "No deployment in this state",
             matchTime: "Time Left",
             leaveMatch: "Leave Match",
             confirmLeaveMatch: "Leave the match? You will go offline and can rejoin from the home page.",
@@ -632,8 +663,16 @@
             soloEndDefaultMsg: "This solo practice session has ended.",
             soloReplayBtn: "Play again",
             lootEst: "Est. payout",
+            lootEstMeta: "Base RM {base} · {mistakes} mistakes · −RM {penalty} each",
             muteOn: "Sound: Off",
             muteOff: "Sound: On",
+            menuOpen: "Open menu",
+            mapZoomIn: "Zoom map in",
+            mapZoomOut: "Zoom map out",
+            mapZoomReset: "Reset map zoom",
+            pageTitleHistory: "Currency Safe · Match history",
+            serverSetupLink: "Server setup",
+            startServerSetup: "Setup guide",
             mapTitle: "Malaysia Threat Map",
             legendYou: "You",
             legendTarget: "Target",
@@ -679,7 +718,7 @@
             transferTo: "Transfer To",
             transferAmount: "Loot Amount",
             transferBtn: "Confirm Transfer",
-            transferPerfHint: "Loot is calculated from your 3-level performance",
+            transferPerfHint: "Loot after 3 levels — mistakes reduce payout",
             transferPerfScore: "Performance",
             scoreTitle: "Team ranking",
             playerScoreTitle: "Player contributions",
@@ -843,7 +882,8 @@
             bonusClickableShort: "Tap now",
             bonusJoinHint: "Tap during the join window.",
             bonusCredited: "Central Bank Bonus +RM {amount} credited to team vault!",
-            hostEndHold: "Host holding 0 · match ends in {n}s",
+            hostEndHold: "Host: hold ` · match ends in {n}s",
+            hostEndHoldSolo: "Hold ` · practice ends in {n}s",
             abandonRaidOk: "Left the raid queue for this target.",
             pageTitleSpectator: "Currency Safe · Spectator",
             dialSlotHint: "Drag / scroll",
@@ -974,17 +1014,27 @@
         return true;
     }
 
-    function lockLang() {
-        sessionStorage.setItem(SK.uiLangLocked, "1");
+    function shouldHideLangBar(bar) {
+        if (!bar || !isLangLocked()) return false;
+        return !bar.classList.contains("lang-bar--inline");
+    }
+
+    function applyLangBarVisibility() {
         const bar = document.getElementById("csLangBar");
-        if (bar) bar.style.display = "none";
+        if (!bar) return;
+        bar.style.display = shouldHideLangBar(bar) ? "none" : "";
+        syncLangBarButtons();
+    }
+
+    function lockLang() {
+        /* Language stays editable throughout the app; clear any legacy lock. */
+        sessionStorage.removeItem(SK.uiLangLocked);
+        applyLangBarVisibility();
     }
 
     function unlockLang() {
         sessionStorage.removeItem(SK.uiLangLocked);
-        const bar = document.getElementById("csLangBar");
-        if (bar) bar.style.display = "";
-        syncLangBarButtons();
+        applyLangBarVisibility();
     }
 
     function isLangLocked() {
@@ -1020,6 +1070,9 @@
         document.querySelectorAll("[data-i18n-title]").forEach(el => {
             el.title = t(el.getAttribute("data-i18n-title"));
         });
+        document.querySelectorAll("[data-i18n-aria-label]").forEach(el => {
+            el.setAttribute("aria-label", t(el.getAttribute("data-i18n-aria-label")));
+        });
         const pageTitleKey = document.body?.getAttribute("data-i18n-page-title");
         if (pageTitleKey) document.title = t(pageTitleKey);
         document.documentElement.lang = getLang() === "en" ? "en" : "zh";
@@ -1042,15 +1095,16 @@
 
     function mountLangBar(opts) {
         opts = opts || {};
-        if (!document.getElementById("csLangBar")) {
-            const bar = document.createElement("div");
+        let bar = document.getElementById("csLangBar");
+        if (!bar) {
+            bar = document.createElement("div");
             bar.id = "csLangBar";
             bar.className = "lang-bar";
             bar.innerHTML =
                 `<button type="button" class="lang-btn" data-lang="zh" id="csLangZh">华语</button>` +
                 `<button type="button" class="lang-btn" data-lang="en" id="csLangEn">English</button>` +
                 `<span class="lang-locked-tip hidden" data-i18n="langLocked"></span>`;
-            document.body.appendChild(bar);
+            (opts.slot || document.body).appendChild(bar);
             bar.querySelector('[data-lang="zh"]').addEventListener("click", () => {
                 if (setLang("zh")) {
                     applyToDocument();
@@ -1063,12 +1117,16 @@
                     if (opts.onChange) opts.onChange("en");
                 }
             });
+        } else if (opts.slot && bar.parentElement !== opts.slot) {
+            opts.slot.appendChild(bar);
+        }
+        bar.classList.toggle("lang-bar--inline", !!opts.slot);
+        if (!opts.slot && bar.parentElement !== document.body) {
+            document.body.appendChild(bar);
+            bar.classList.remove("lang-bar--inline");
         }
         syncLangBarButtons();
-        if (isLangLocked()) {
-            const bar = document.getElementById("csLangBar");
-            if (bar) bar.style.display = "none";
-        }
+        applyLangBarVisibility();
         applyToDocument();
     }
 

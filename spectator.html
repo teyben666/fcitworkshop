@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,700;14..32,900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/shared.css" />
     <link rel="stylesheet" href="css/vendor/krackedmaps.css" />
-    <link rel="stylesheet" href="css/kracked-map-overrides.css" />
+    <link rel="stylesheet" href="css/kracked-map-overrides.css?v=20260628" />
     <link rel="stylesheet" href="css/spectator-dashboard.css" />
 </head>
 <body class="spectator-page">
@@ -75,15 +75,16 @@
     <script src="js/malaysia-states.js"></script>
     <script src="js/map-attack-lines.js"></script>
     <script src="js/map-layout.js"></script>
-    <script src="js/bank-bonus-pin.js"></script>
+    <script src="js/map-viewport.js?v=20260629"></script>
+    <script src="js/bank-bonus-pin.js?v=20260630c"></script>
     <script src="js/vendor/krackedmaps.umd.js"></script>
-    <script src="js/kracked-malaysia-map.js"></script>
+    <script src="js/kracked-malaysia-map.js?v=20260628b"></script>
     <script src="js/server-config.js?v=20260626"></script>
     <script src="js/room-shared.js"></script>
     <script src="js/room-local.js"></script>
     <script src="js/room-ws.js?v=20260626"></script>
     <script src="js/room.js?v=20260626"></script>
-    <script src="js/i18n.js"></script>
+    <script src="js/i18n.js?v=20260630c"></script>
     <script src="js/bank-bonus-scheduler.js"></script>
     <script>
         const $ = (id) => document.getElementById(id);
@@ -210,8 +211,14 @@
             }));
             if (window.MalaysiaMapPreview) {
                 const mapEl = $("spectatorMap");
-                if (mapEl._mapSetPlayers) mapEl._mapSetPlayers(mapPlayers);
-                else MalaysiaMapPreview.render(mapEl, mapPlayers, { showAttackLines: true });
+                const mapOpts = {
+                    mode: "spectator",
+                    showAttackLines: true,
+                    hideGhostPins: true,
+                    minimalPins: true
+                };
+                if (mapEl._mapSetPlayers) mapEl._mapSetPlayers(mapPlayers, mapOpts);
+                else MalaysiaMapPreview.render(mapEl, mapPlayers, mapOpts);
             }
             updateSpectatorBankBonus(room);
 
@@ -270,18 +277,18 @@
                 : `<div class="item">${escapeHtml(t("specEmptyActivity"))}</div>`;
         }
 
-        const HOST_END_HOLD_MS = 10000;
+        const HOST_END_HOLD_MS = 3000;
         let hostEndKeyTimer = null;
         let hostEndKeyStart = 0;
         let hostEndToastAt = 0;
 
-        function isZeroKey(e) {
-            return e.key === "0" || e.code === "Digit0" || e.code === "Numpad0";
+        function isHostEndKey(e) {
+            return e.key === "`" || e.code === "Backquote";
         }
 
         function bindHostLongPressEnd() {
             document.addEventListener("keydown", (e) => {
-                if (!isZeroKey(e) || e.repeat) return;
+                if (!isHostEndKey(e) || e.repeat) return;
                 const room = CurrencySafeRoom.getRoom(roomId);
                 if (!room || room.status !== "playing" || !CurrencySafeRoom.isHost(room)) return;
                 hostEndKeyStart = Date.now();
@@ -294,15 +301,15 @@
                         Promise.resolve(CurrencySafeRoom.endGame(roomId)).then(res => {
                             if (res?.ok) location.href = "ended.html?room=" + roomId;
                         });
-                    } else if (elapsed >= 2000 && Date.now() - hostEndToastAt > 900) {
+                    } else if (elapsed >= 800 && Date.now() - hostEndToastAt > 600) {
                         hostEndToastAt = Date.now();
                         const left = Math.ceil((HOST_END_HOLD_MS - elapsed) / 1000);
-                        console.log(`房主按住 0 · ${left}s 后结束比赛`);
+                        console.log(CurrencySafeI18n.tReplace("hostEndHold", { n: left }));
                     }
                 }, 200);
             });
             document.addEventListener("keyup", (e) => {
-                if (!isZeroKey(e)) return;
+                if (!isHostEndKey(e)) return;
                 if (hostEndKeyTimer) {
                     clearInterval(hostEndKeyTimer);
                     hostEndKeyTimer = null;
